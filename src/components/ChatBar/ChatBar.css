@@ -1,0 +1,48 @@
+@import url('https://fonts.googleapis.com/css2?family=Pacifico&display=swap');
+.chat__bar {
+    height: 95vh;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+}
+.chatBar__header{
+    margin-bottom: 0.5rem;
+}
+.bar__container > .text-center > h3{
+    font-family: 'Pacifico', cursive;
+}
+.find__friend input,
+.find__users input,
+.find__friend input:focus,
+.find__users input:focus{
+    background-image: linear-gradient(45deg, rgba(255, 73, 73, 0.418), rgba(255, 126, 21, 0.329), rgba(176, 79, 255, 0.335), rgba(255, 122, 188, 0.315));;
+}
+.find__friend input:focus,
+.find__users input:focus{
+    border: 1px solid #ffb68c;
+    box-shadow: none;
+}
+.list__body{
+    width: 100%;
+    flex: 1;
+    overflow-y: scroll;
+    overflow: -moz-scrollbars-none;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+.list__body::-webkit-scrollbar,
+.list__body::-webkit-scrollbar { 
+    width: 0 !important;
+    display: none; 
+  }
+
+.users__list h6{
+    font-weight: bold !important;
+    letter-spacing: 1px;
+}
+.chat__bar .loadingSpinner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
