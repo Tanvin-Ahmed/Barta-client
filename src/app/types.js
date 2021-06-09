@@ -14,3 +14,4 @@ export const POST_GROUP_CHAT = "post_group_chat";
 export const CHAT_ERROR = "chat_error";
 export const CHAT_UPLOAD_PERCENTAGE = "chat_upload_percentage";
 export const GET_ONE_ONE_CHAT_FROM_SOCKET = "get_one_one_chat_from_socket";
+export const SCREEN_SIZE = "screen_size";

@@ -4,6 +4,7 @@ import {
   CHAT_UPLOAD_PERCENTAGE,
   GET_ONE_ONE_CHAT,
   GET_ONE_ONE_CHAT_FROM_SOCKET,
+  SCREEN_SIZE,
 } from "../types";
 
 export const postOneOneChat = (chat) => {
@@ -67,5 +68,12 @@ export const getOneOneChatFromSocket = (message) => {
   return {
     type: GET_ONE_ONE_CHAT_FROM_SOCKET,
     payload: message,
+  };
+};
+
+export const getScreenSize = (size) => {
+  return {
+    type: SCREEN_SIZE,
+    payload: size,
   };
 };

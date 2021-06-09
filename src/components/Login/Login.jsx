@@ -4,6 +4,7 @@ import { useHistory, useLocation } from "react-router";
 import { postMyInfo } from "../../app/actions/userAction";
 import "./Login.css";
 import { initializationLoginFramework, SignInWithGoogle } from "./loginManager";
+import PermPhoneMsgIcon from "@material-ui/icons/PermPhoneMsg";
 
 const Login = () => {
   initializationLoginFramework();
@@ -35,6 +36,9 @@ const Login = () => {
   return (
     <section className="login">
       <div className="login__container">
+        <PermPhoneMsgIcon id="chat__icon" />
+        <h2>Barta</h2>
+        <h5 className="mb-5">Open your mind</h5>
         <button onClick={signIn} className="google__btn">
           SignIn with Google
         </button>

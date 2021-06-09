@@ -14,6 +14,7 @@ import { postFriendInfo, updateChatList } from "../../app/actions/userAction";
 import {
   getOneOneChat,
   getOneOneChatFromSocket,
+  getScreenSize,
   postOneOneChat,
 } from "../../app/actions/messageAction";
 import io from "socket.io-client";
@@ -24,13 +25,13 @@ const ROOT_CSS = css({
 });
 let socket;
 const Chat = () => {
-  const { addChatList, chatMessage, uploadPercentage } = useSelector(
-    (state) => ({
+  const { addChatList, chatMessage, uploadPercentage, largeScreen } =
+    useSelector((state) => ({
       addChatList: state.userReducer.addChatList,
       chatMessage: state.messageReducer.oneOneMessage,
       uploadPercentage: state.messageReducer.uploadPercentage,
-    })
-  );
+      largeScreen: state.messageReducer.largeScreen,
+    }));
   const dispatch = useDispatch();
   const [inputText, setInputText] = useState("");
   const [receiverInfo, setReceiverInfo] = useState({});
@@ -61,7 +62,23 @@ const Chat = () => {
     socket.on("one_one_chatMessage", (message) => {
       dispatch(getOneOneChatFromSocket(message));
     });
+
+    const screen = () => {
+      console.log(window.innerWidth);
+      if (window.innerWidth > 768) {
+        dispatch(getScreenSize(true));
+      } else {
+        dispatch(getScreenSize(false));
+      }
+    };
+    window.addEventListener("resize", screen);
+
+    return () => {
+      window.removeEventListener("resize", screen);
+    };
   }, []);
+
+  console.log(largeScreen);
 
   useMemo(() => {
     dispatch(getOneOneChat(roomId));
@@ -71,11 +88,12 @@ const Chat = () => {
     const chat = {
       id: roomId,
       sender: senderInfo.email,
-      message: text,
+      message: inputText,
       timeStamp: new Date().toUTCString(),
     };
     dispatch(postOneOneChat(chat));
 
+    setInputText("");
     !addChatList &&
       dispatch(
         postFriendInfo(roomId, { friendInfo: [senderInfo, receiverInfo] })
@@ -143,17 +161,34 @@ const Chat = () => {
         <IconButton>
           <AttachFileIcon />
         </IconButton>
-        <InputEmoji
-          value={inputText}
-          onChange={setInputText}
-          cleanOnEnter
-          onEnter={handleOnEnter}
-          placeholder="Type a message"
-        />
-        {inputText && (
-          <IconButton id="sendIcon">
-            <SendIcon />
-          </IconButton>
+        {largeScreen ? (
+          <>
+            <InputEmoji
+              value={inputText}
+              onChange={setInputText}
+              cleanOnEnter
+              onEnter={handleOnEnter}
+              placeholder="Type a message"
+            />
+            {inputText && (
+              <IconButton onClick={handleOnEnter} id="sendIcon">
+                <SendIcon />
+              </IconButton>
+            )}
+          </>
+        ) : (
+          <>
+            <InputEmoji
+              value={inputText}
+              onChange={setInputText}
+              placeholder="Type a message"
+            />
+            {inputText && (
+              <IconButton onClick={handleOnEnter} id="sendIcon">
+                <SendIcon />
+              </IconButton>
+            )}
+          </>
         )}
       </div>
     </section>

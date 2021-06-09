@@ -4,6 +4,7 @@ import {
   CHAT_ERROR,
   CHAT_UPLOAD_PERCENTAGE,
   GET_ONE_ONE_CHAT_FROM_SOCKET,
+  SCREEN_SIZE,
 } from "../types";
 
 const initialState = {
@@ -11,6 +12,7 @@ const initialState = {
   groupMessage: [],
   error: "",
   uploadPercentage: 0,
+  largeScreen: false,
 };
 
 export default (state = initialState, action) => {
@@ -42,6 +44,13 @@ export default (state = initialState, action) => {
         ...state,
         oneOneMessage: [...state.oneOneMessage, action.payload],
       };
+
+    case SCREEN_SIZE:
+      return {
+        ...state,
+        largeScreen: action.payload,
+      };
+
     default:
       return state;
   }
