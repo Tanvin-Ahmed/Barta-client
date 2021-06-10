@@ -62,7 +62,9 @@ const Chat = () => {
     socket.on("one_one_chatMessage", (message) => {
       dispatch(getOneOneChatFromSocket(message));
     });
+  }, []);
 
+  useEffect(() => {
     const screen = () => {
       console.log(window.innerWidth);
       if (window.innerWidth > 768) {
@@ -84,7 +86,7 @@ const Chat = () => {
     dispatch(getOneOneChat(roomId));
   }, []);
 
-  const handleOnEnter = (text) => {
+  const handleOnEnter = () => {
     const chat = {
       id: roomId,
       sender: senderInfo.email,
@@ -145,8 +147,8 @@ const Chat = () => {
             >
               <p className="name">
                 {message?.sender === senderInfo.email
-                  ? `${senderInfo.displayName}`
-                  : `${receiverInfo.displayName}`}
+                  ? `${senderInfo.displayName.split(" ")[0]}`
+                  : `${receiverInfo.displayName.split(" ")[0]}`}
               </p>
               <div>
                 {message?.message}
