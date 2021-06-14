@@ -174,11 +174,9 @@ export const updateChatList = (bool) => {
 };
 
 export const getReceiverInfo = (id) => {
-  console.log(id);
   return (dispatch) => {
     axios(`http://localhost:5000/user/account/receiverInfo/${id}`)
       .then((data) => {
-        console.log(data.data);
         dispatch({
           type: GET_RECEIVER_INFO,
           payload: data.data,

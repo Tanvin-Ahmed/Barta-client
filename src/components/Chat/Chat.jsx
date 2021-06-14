@@ -66,13 +66,20 @@ const Chat = ({ socket }) => {
     return `${ascendingSort[0]}_${ascendingSort[1]}`;
   }, []);
 
-  let lastMessageTime = useRef("");
+  let lastMessage = useRef({});
   useEffect(() => {
     socket.emit("join", { roomId });
 
     socket.on("one_one_chatMessage", (message) => {
-      if (message.timeStamp !== lastMessageTime.current) {
-        lastMessageTime.current = message.timeStamp;
+      if (
+        message.sender !== lastMessage.current?.sender ||
+        (message.sender === lastMessage.current?.sender &&
+          message.timeStamp !== lastMessage.current?.timeStamp)
+      ) {
+        lastMessage.current = {
+          sender: message.sender,
+          timeStamp: message.timeStamp,
+        };
         dispatch(getOneOneChatFromSocket(message));
       }
     });
