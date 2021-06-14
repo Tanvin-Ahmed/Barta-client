@@ -1,5 +1,5 @@
 import { Avatar, IconButton } from "@material-ui/core";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import "./Chat.css";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 import CallIcon from "@material-ui/icons/Call";
@@ -10,39 +10,50 @@ import AttachFileIcon from "@material-ui/icons/AttachFile";
 import SendIcon from "@material-ui/icons/Send";
 import { css } from "@emotion/css";
 import { useDispatch, useSelector } from "react-redux";
-import { postFriendInfo, updateChatList } from "../../app/actions/userAction";
+import {
+  getReceiverInfo,
+  postFriendInfo,
+  updateChatList,
+} from "../../app/actions/userAction";
 import {
   getOneOneChat,
   getOneOneChatFromSocket,
   getScreenSize,
   postOneOneChat,
 } from "../../app/actions/messageAction";
-import io from "socket.io-client";
+import { useParams } from "react-router-dom";
 
 const ROOT_CSS = css({
   height: "70%",
   width: "100%",
 });
-let socket;
-const Chat = () => {
-  const { addChatList, chatMessage, uploadPercentage, largeScreen } =
-    useSelector((state) => ({
-      addChatList: state.userReducer.addChatList,
-      chatMessage: state.messageReducer.oneOneMessage,
-      uploadPercentage: state.messageReducer.uploadPercentage,
-      largeScreen: state.messageReducer.largeScreen,
-    }));
+const Chat = ({ socket }) => {
   const dispatch = useDispatch();
-  const [inputText, setInputText] = useState("");
-  const [receiverInfo, setReceiverInfo] = useState({});
-  const [senderInfo, setSenderInfo] = useState({});
+  const { id } = useParams();
 
-  useEffect(async () => {
-    const friend = await sessionStorage.getItem("barta/receiver");
-    await setReceiverInfo(JSON.parse(friend));
-    const user = await localStorage.getItem("barta/user");
-    await setSenderInfo(JSON.parse(user));
-  }, []);
+  useMemo(() => {
+    const getUsersData = async () => {
+      await dispatch(getReceiverInfo(id));
+    };
+    getUsersData();
+  }, [dispatch, id]);
+
+  const {
+    senderInfo,
+    receiverInfo,
+    addChatList,
+    chatMessage,
+    uploadPercentage,
+    largeScreen,
+  } = useSelector((state) => ({
+    senderInfo: state.userReducer.userInfo,
+    receiverInfo: state.userReducer.receiverInfo,
+    addChatList: state.userReducer.addChatList,
+    chatMessage: state.messageReducer.oneOneMessage,
+    uploadPercentage: state.messageReducer.uploadPercentage,
+    largeScreen: state.messageReducer.largeScreen,
+  }));
+  const [inputText, setInputText] = useState("");
 
   const roomId = useMemo(() => {
     const sender = JSON.parse(localStorage.getItem("barta/user"))?.email?.split(
@@ -55,14 +66,17 @@ const Chat = () => {
     return `${ascendingSort[0]}_${ascendingSort[1]}`;
   }, []);
 
+  let lastMessageTime = useRef("");
   useEffect(() => {
-    socket = io("http://localhost:5000/");
     socket.emit("join", { roomId });
 
     socket.on("one_one_chatMessage", (message) => {
-      dispatch(getOneOneChatFromSocket(message));
+      if (message.timeStamp !== lastMessageTime.current) {
+        lastMessageTime.current = message.timeStamp;
+        dispatch(getOneOneChatFromSocket(message));
+      }
     });
-  }, []);
+  }, [dispatch, roomId, socket]);
 
   useEffect(() => {
     const screen = () => {
@@ -78,13 +92,13 @@ const Chat = () => {
     return () => {
       window.removeEventListener("resize", screen);
     };
-  }, []);
+  }, [dispatch]);
 
   console.log(largeScreen);
 
   useMemo(() => {
     dispatch(getOneOneChat(roomId));
-  }, []);
+  }, [dispatch, roomId]);
 
   const handleOnEnter = () => {
     const chat = {
@@ -98,7 +112,18 @@ const Chat = () => {
     setInputText("");
     !addChatList &&
       dispatch(
-        postFriendInfo(roomId, { friendInfo: [senderInfo, receiverInfo] })
+        postFriendInfo(roomId, {
+          friendInfo: [
+            {
+              email: senderInfo?.email,
+              friendOf: receiverInfo?.email?.split("@")[0],
+            },
+            {
+              email: receiverInfo.email,
+              friendOf: senderInfo?.email?.split("@")[0],
+            },
+          ],
+        })
       ) &&
       dispatch(updateChatList(true));
   };
@@ -135,30 +160,30 @@ const Chat = () => {
       )}
 
       <ScrollToBottom className={`${ROOT_CSS} chat__body`}>
-        {chatMessage !== [] &&
-          chatMessage.map((message) => (
-            <div
-              key={message._id}
-              className={
-                message?.sender === senderInfo.email
-                  ? "chat__text myChat"
-                  : "chat__text"
-              }
-            >
-              <p className="name">
-                {message?.sender === senderInfo.email
-                  ? `${senderInfo.displayName.split(" ")[0]}`
-                  : `${receiverInfo.displayName.split(" ")[0]}`}
+        {chatMessage.map((message) => (
+          <div
+            key={message._id}
+            className={
+              message?.sender === senderInfo.email
+                ? "chat__text myChat"
+                : "chat__text"
+            }
+          >
+            <p className="name">
+              {message?.sender === senderInfo.email
+                ? `${senderInfo.displayName?.split(" ")[0]}`
+                : `${receiverInfo.displayName?.split(" ")[0]}`}
+            </p>
+            <div>
+              {message?.message}
+              <p className="time">
+                {new Date(message?.timeStamp).toLocaleString()}
               </p>
-              <div>
-                {message?.message}
-                <p className="time">
-                  {new Date(message?.timeStamp).toLocaleString()}
-                </p>
-              </div>
             </div>
-          ))}
+          </div>
+        ))}
       </ScrollToBottom>
+
       <div className="chat__footer">
         <IconButton>
           <AttachFileIcon />
@@ -172,7 +197,7 @@ const Chat = () => {
               onEnter={handleOnEnter}
               placeholder="Type a message"
             />
-            {inputText && (
+            {inputText.trim() && (
               <IconButton onClick={handleOnEnter} id="sendIcon">
                 <SendIcon />
               </IconButton>
@@ -185,7 +210,7 @@ const Chat = () => {
               onChange={setInputText}
               placeholder="Type a message"
             />
-            {inputText && (
+            {inputText.trim() && (
               <IconButton onClick={handleOnEnter} id="sendIcon">
                 <SendIcon />
               </IconButton>

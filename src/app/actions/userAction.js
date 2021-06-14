@@ -4,9 +4,25 @@ import {
   ERROR_USER_INFO,
   GET_ALL_USER_INFO,
   GET_FRIEND_INFO,
+  GET_FRIEND_INFO_FROM_SOCKET,
   LOADING_USER_INFO,
   POST_USER_INFO,
+  GET_USER_INFO,
+  GET_RECEIVER_INFO,
+  UPDATE_FRIEND_STATUS,
 } from "../types";
+
+export const getUserInfo = () => {
+  return async (dispatch) => {
+    let userData = await localStorage.getItem("barta/user");
+    userData = JSON?.parse(userData);
+
+    dispatch({
+      type: GET_USER_INFO,
+      payload: userData,
+    });
+  };
+};
 
 export const getFriendInfo = (userEmail) => {
   return (dispatch) => {
@@ -14,7 +30,7 @@ export const getFriendInfo = (userEmail) => {
       .then((data) => {
         dispatch({
           type: GET_FRIEND_INFO,
-          payload: data.data?.chatList,
+          payload: data.data,
         });
       })
       .catch((error) => {
@@ -23,6 +39,26 @@ export const getFriendInfo = (userEmail) => {
           payload: error.message,
         });
       });
+  };
+};
+
+export const updateFriendStatus = (friendList) => {
+  return {
+    type: UPDATE_FRIEND_STATUS,
+    payload: friendList,
+  };
+};
+
+export const getFriendInfoFromSocket = (friendEmail) => {
+  return (dispatch) => {
+    axios(
+      `http://localhost:5000/user/account/getFriendDetailsByEmail/${friendEmail}`
+    ).then((data) => {
+      dispatch({
+        type: GET_FRIEND_INFO_FROM_SOCKET,
+        payload: data.data,
+      });
+    });
   };
 };
 
@@ -41,9 +77,8 @@ export const postFriendInfo = (roomId, friendData) => {
 
         if (email !== friend.email) {
           const friendInfo = {
+            friendOf: friend.friendOf,
             email: friend.email,
-            displayName: friend.displayName,
-            photoURL: friend.photoURL,
           };
 
           axios
@@ -69,34 +104,47 @@ export const postFriendInfo = (roomId, friendData) => {
   };
 };
 
-export const getAllUserInfo = (searchString, userEmail) => {
-  return (dispatch) => {
-    dispatch({
-      type: LOADING_USER_INFO,
-      payload: true,
-    });
-    axios(`http://localhost:5000/user/account/allAccount/${searchString}`)
-      .then((data) => {
-        dispatch({
-          type: GET_ALL_USER_INFO,
-          payload: data.data,
-        });
-        dispatch({
-          type: LOADING_USER_INFO,
-          payload: false,
-        });
-      })
-      .catch((error) => {
-        dispatch({
-          type: ERROR_USER_INFO,
-          payload: error.message,
-        });
-        dispatch({
-          type: LOADING_USER_INFO,
-          payload: false,
-        });
+export const getAllUserInfo = (searchString) => {
+  if (searchString.trim()) {
+    return (dispatch) => {
+      dispatch({
+        type: LOADING_USER_INFO,
+        payload: true,
       });
-  };
+      axios(`http://localhost:5000/user/account/allAccount/${searchString}`)
+        .then((data) => {
+          dispatch({
+            type: GET_ALL_USER_INFO,
+            payload: data.data[0] ? data.data : [],
+          });
+          dispatch({
+            type: LOADING_USER_INFO,
+            payload: false,
+          });
+        })
+        .catch((error) => {
+          dispatch({
+            type: ERROR_USER_INFO,
+            payload: error.message,
+          });
+          dispatch({
+            type: LOADING_USER_INFO,
+            payload: false,
+          });
+        });
+    };
+  } else {
+    return (dispatch) => {
+      dispatch({
+        type: GET_ALL_USER_INFO,
+        payload: [],
+      });
+      dispatch({
+        type: LOADING_USER_INFO,
+        payload: false,
+      });
+    };
+  }
 };
 
 export const postMyInfo = (user) => {
@@ -112,7 +160,7 @@ export const postMyInfo = (user) => {
       .catch((error) => {
         dispatch({
           type: ERROR_USER_INFO,
-          payload: error.message,
+          payload: error,
         });
       });
   };
@@ -122,5 +170,25 @@ export const updateChatList = (bool) => {
   return {
     type: ADD_CHAT_LIST,
     payload: bool,
+  };
+};
+
+export const getReceiverInfo = (id) => {
+  console.log(id);
+  return (dispatch) => {
+    axios(`http://localhost:5000/user/account/receiverInfo/${id}`)
+      .then((data) => {
+        console.log(data.data);
+        dispatch({
+          type: GET_RECEIVER_INFO,
+          payload: data.data,
+        });
+      })
+      .catch((err) => {
+        dispatch({
+          type: ERROR_USER_INFO,
+          payload: err.message,
+        });
+      });
   };
 };

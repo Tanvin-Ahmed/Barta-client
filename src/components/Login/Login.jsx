@@ -22,9 +22,21 @@ const Login = () => {
           email: result.email,
           displayName: result.displayName,
           photoURL: result.photoURL,
+          chatList: [],
+          status: "active",
+          goOffLine: new Date().toUTCString(),
+          timeStamp: new Date().toUTCString(),
         };
-        localStorage.setItem("barta/user", JSON.stringify(user));
-        user.timeStamp = new Date().toUTCString();
+        localStorage.setItem(
+          "barta/user",
+          JSON.stringify({
+            email: result.email,
+            displayName: result.displayName,
+            photoURL: result.photoURL,
+            status: "active",
+          })
+        );
+
         dispatch(postMyInfo(user));
         history.replace(from);
       })

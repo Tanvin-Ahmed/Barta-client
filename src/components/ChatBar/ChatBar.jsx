@@ -1,5 +1,5 @@
 import { Avatar, CardActionArea, IconButton } from "@material-ui/core";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import "./ChatBar.css";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 import PeopleIcon from "@material-ui/icons/People";
@@ -8,63 +8,92 @@ import GroupAddIcon from "@material-ui/icons/GroupAdd";
 import { useDispatch, useSelector } from "react-redux";
 import {
   getAllUserInfo,
-  getFriendInfo,
+  getFriendInfoFromSocket,
   updateChatList,
+  updateFriendStatus,
 } from "../../app/actions/userAction";
 import { useHistory } from "react-router";
 import { Spinner } from "react-bootstrap";
-import io from "socket.io-client";
 
-let socket;
-const ChatBar = () => {
+const ChatBar = ({ socket }) => {
   const history = useHistory();
 
-  const { users, friendList, error, loading, chatList } = useSelector(
+  const { users, friendList, error, loading, chatList, userInfo } = useSelector(
     (state) => ({
       users: state.userReducer.allUserInfo,
       friendList: state.userReducer.chatList,
       error: state.userReducer.error,
       loading: state.userReducer.loading,
       chatList: state.userReducer.addChatList,
+      userInfo: state.userReducer.userInfo,
     })
   );
 
   const dispatch = useDispatch();
 
-  const [userInfo, setUserInfo] = useState({});
-
+  let userEmail = useRef("");
+  let friendMail = useRef("");
   useEffect(() => {
-    let userData = localStorage.getItem("barta/user");
-    userData = JSON.parse(userData);
-    setUserInfo(userData);
+    socket.emit("my-account", userInfo?.email?.split("@")[0]);
+    socket.on("add-friend-list", (friendEmail) => {
+      if (friendEmail?.email !== friendMail.current) {
+        friendMail.current = friendEmail?.email;
+        dispatch(getFriendInfoFromSocket(friendEmail?.email));
+      }
+    });
+    socket.on("user-status", (user) => {
+      if (friendList[0]) {
+        if (user?.email && user.email !== userEmail.current) {
+          userEmail.current = user?.email;
+          isUserOnline(user, friendList);
+        }
+      }
+      setTimeout(() => {
+        userEmail.current = "";
+      }, 50);
+    });
 
-    socket = io("http://localhost:5000/");
-
-    dispatch(getFriendInfo(userData.email));
-  }, []);
+    const isUserOnline = (user, friendList) => {
+      for (let i in friendList) {
+        if (friendList[i].email === user?.email) {
+          friendList[i].status = user?.status;
+          if (user?.status === "inactive") {
+            friendList[i].goOfLine = new Date().toUTCString();
+          } else {
+            friendList[i].goOfLine = "";
+          }
+          break;
+        }
+      }
+      dispatch(updateFriendStatus(friendList));
+    };
+  }, [dispatch, socket, userInfo, friendList]);
 
   const handleSearchForFriend = (e) => {
     e.preventDefault();
 
-    dispatch(getAllUserInfo(e.target.value, userInfo.email));
+    dispatch(getAllUserInfo(e.target.value, userInfo?.email));
   };
 
   const handleReceiverInfo = (receiver) => {
-    sessionStorage.setItem("barta/receiver", JSON.stringify(receiver));
-    history.push("/chat");
+    sessionStorage.setItem(
+      "barta/receiver",
+      JSON.stringify({ email: receiver.email })
+    );
+    history.push(`/chat/${receiver._id}`);
   };
-  console.log("chat bar render");
 
   return (
     <section className="chat__bar">
       <div className="chatBar__header">
-        <div className="text-center">
-          <h3>Barta</h3>
+        <div className="text__center">
+          <h3 className="text-center">Barta</h3>
         </div>
         <div className="d-flex align-items-center justify-content-between flex-wrap">
           <div className="avatar">
-            <IconButton>
-              <Avatar src={userInfo.photoURL} />
+            <IconButton style={{ position: "relative" }}>
+              <Avatar src={userInfo?.photoURL} />
+              <div className="onLine" />
             </IconButton>
           </div>
           <div className="more__options">
@@ -108,15 +137,21 @@ const ChatBar = () => {
               />
             </div>
             <div className="friend__list mt-2">
-              {friendList?.map((friend) => (
+              {friendList?.reverse().map((friend) => (
                 <CardActionArea
+                  key={friend?._id}
                   onClick={() => handleReceiverInfo(friend)}
                   className="px-3 d-flex justify-content-start align-items-center"
                 >
-                  <div className="mr-3">
-                    <Avatar src={friend.photoURL} />
+                  <div style={{ position: "relative" }} className="mr-3">
+                    <Avatar src={friend?.photoURL} />
+                    <div
+                      className={
+                        friend?.status === "active" ? "onLine" : "d-none"
+                      }
+                    />
                   </div>
-                  <h6 className="m-4">{friend.displayName}</h6>
+                  <h6 className="m-4">{friend?.displayName}</h6>
                 </CardActionArea>
               ))}
             </div>
@@ -137,20 +172,23 @@ const ChatBar = () => {
                   <Spinner animation="grow" variant="warning" />
                 </div>
               ) : (
+                users !== [] &&
                 users?.map((otherUser) => {
                   if (otherUser.email !== userInfo.email) {
                     return (
                       <CardActionArea
+                        key={otherUser._id}
                         onClick={() => handleReceiverInfo(otherUser)}
                         className="px-3 d-flex justify-content-start align-items-center"
                       >
                         <div className="mr-3">
-                          <Avatar src={otherUser.photoURL} />
+                          <Avatar src={otherUser?.photoURL} />
                         </div>
-                        <h6 className="m-4">{otherUser.displayName}</h6>
+                        <h6 className="m-4">{otherUser?.displayName}</h6>
                       </CardActionArea>
                     );
                   }
+                  return null;
                 })
               )}
             </div>

@@ -3,21 +3,32 @@ import {
   ERROR_USER_INFO,
   GET_ALL_USER_INFO,
   GET_FRIEND_INFO,
+  GET_FRIEND_INFO_FROM_SOCKET,
   LOADING_USER_INFO,
   POST_USER_INFO,
+  GET_USER_INFO,
+  GET_RECEIVER_INFO,
+  UPDATE_FRIEND_STATUS,
 } from "../types";
 
 const initialState = {
+  userInfo: {},
   allUserInfo: [],
   chatList: [],
+  receiverInfo: {},
   error: "",
   success: "",
   loading: false,
   addChatList: true,
 };
 
-export default (state = initialState, action) => {
+const userReducer = (state = initialState, action) => {
   switch (action.type) {
+    case GET_USER_INFO:
+      return {
+        ...state,
+        userInfo: action.payload,
+      };
     case LOADING_USER_INFO:
       return {
         ...state,
@@ -29,6 +40,16 @@ export default (state = initialState, action) => {
         allUserInfo: action.payload,
       };
     case GET_FRIEND_INFO:
+      return {
+        ...state,
+        chatList: [...state.chatList, action.payload],
+      };
+    case GET_FRIEND_INFO_FROM_SOCKET:
+      return {
+        ...state,
+        chatList: [...state.chatList, action.payload],
+      };
+    case UPDATE_FRIEND_STATUS:
       return {
         ...state,
         chatList: action.payload,
@@ -48,7 +69,14 @@ export default (state = initialState, action) => {
         ...state,
         addChatList: action.payload,
       };
+    case GET_RECEIVER_INFO:
+      return {
+        ...state,
+        receiverInfo: action.payload,
+      };
     default:
       return state;
   }
 };
+
+export default userReducer;

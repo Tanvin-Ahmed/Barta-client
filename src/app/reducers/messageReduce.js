@@ -15,7 +15,7 @@ const initialState = {
   largeScreen: false,
 };
 
-export default (state = initialState, action) => {
+const messageReducer = (state = initialState, action) => {
   switch (action.type) {
     case GET_ONE_ONE_CHAT:
       return {
@@ -55,3 +55,5 @@ export default (state = initialState, action) => {
       return state;
   }
 };
+
+export default messageReducer;

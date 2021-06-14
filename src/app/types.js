@@ -5,6 +5,10 @@ export const ERROR_USER_INFO = "error_user_info";
 export const GET_ALL_USER_INFO = "get_all_user_info";
 export const LOADING_USER_INFO = "loading_user_info";
 export const ADD_CHAT_LIST = "add_chat_list";
+export const GET_FRIEND_INFO_FROM_SOCKET = "get_friend_info_from_socket";
+export const GET_USER_INFO = "get_user_info";
+export const GET_RECEIVER_INFO = "get_receiver_info";
+export const UPDATE_FRIEND_STATUS = "update_friend_status";
 
 // message
 export const GET_ONE_ONE_CHAT = "get_one_one_chat";
