@@ -9,7 +9,7 @@ export const GET_FRIEND_INFO_FROM_SOCKET = "get_friend_info_from_socket";
 export const GET_USER_INFO = "get_user_info";
 export const GET_RECEIVER_INFO = "get_receiver_info";
 export const UPDATE_FRIEND_STATUS = "update_friend_status";
-
+export const UPDATE_CHAT_STATUS = "update_chat_status";
 // message
 export const GET_ONE_ONE_CHAT = "get_one_one_chat";
 export const GET_GROUP_CHAT = "get_group_chat";

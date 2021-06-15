@@ -10,6 +10,7 @@ import {
   GET_USER_INFO,
   GET_RECEIVER_INFO,
   UPDATE_FRIEND_STATUS,
+  UPDATE_CHAT_STATUS,
 } from "../types";
 
 export const getUserInfo = () => {
@@ -188,5 +189,12 @@ export const getReceiverInfo = (id) => {
           payload: err.message,
         });
       });
+  };
+};
+
+export const updateChatStatus = (updateStatus) => {
+  return {
+    type: UPDATE_CHAT_STATUS,
+    payload: updateStatus,
   };
 };

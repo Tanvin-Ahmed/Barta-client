@@ -9,6 +9,7 @@ import {
   GET_USER_INFO,
   GET_RECEIVER_INFO,
   UPDATE_FRIEND_STATUS,
+  UPDATE_CHAT_STATUS,
 } from "../types";
 
 const initialState = {
@@ -70,6 +71,11 @@ const userReducer = (state = initialState, action) => {
         addChatList: action.payload,
       };
     case GET_RECEIVER_INFO:
+      return {
+        ...state,
+        receiverInfo: action.payload,
+      };
+    case UPDATE_CHAT_STATUS:
       return {
         ...state,
         receiverInfo: action.payload,

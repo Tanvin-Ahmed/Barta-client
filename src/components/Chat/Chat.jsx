@@ -14,6 +14,7 @@ import {
   getReceiverInfo,
   postFriendInfo,
   updateChatList,
+  updateChatStatus,
 } from "../../app/actions/userAction";
 import {
   getOneOneChat,
@@ -22,6 +23,7 @@ import {
   postOneOneChat,
 } from "../../app/actions/messageAction";
 import { useParams } from "react-router-dom";
+import TimeAgo from "timeago-react";
 
 const ROOT_CSS = css({
   height: "70%",
@@ -71,6 +73,7 @@ const Chat = ({ socket }) => {
     socket.emit("join", { roomId });
 
     socket.on("one_one_chatMessage", (message) => {
+      console.log(message);
       if (
         message.sender !== lastMessage.current?.sender ||
         (message.sender === lastMessage.current?.sender &&
@@ -83,7 +86,19 @@ const Chat = ({ socket }) => {
         dispatch(getOneOneChatFromSocket(message));
       }
     });
-  }, [dispatch, roomId, socket]);
+
+    socket.on("user-status", (friendStatus) => {
+      if (receiverInfo?.email && friendStatus?.email === receiverInfo?.email) {
+        receiverInfo.status = friendStatus?.status;
+        if (friendStatus?.status === "active") {
+          receiverInfo.goOffLine = "";
+        } else {
+          receiverInfo.goOffLine = new Date().toUTCString();
+        }
+        dispatch(updateChatStatus(receiverInfo));
+      }
+    });
+  }, [dispatch, roomId, socket, receiverInfo]);
 
   useEffect(() => {
     const screen = () => {
@@ -140,12 +155,22 @@ const Chat = ({ socket }) => {
       <div className="chat__header">
         <div className="header__info">
           <Avatar src={receiverInfo?.photoURL} />
-          <h6
-            style={{ fontWeight: "bold", letterSpacing: "1px" }}
-            className="p-2"
-          >
-            {receiverInfo.displayName}
-          </h6>
+          <div
+            className={receiverInfo?.status === "active" ? "online" : "d-none"}
+          />
+          <div className="p-2">
+            <h6
+              style={{ fontWeight: "bold", letterSpacing: "1px" }}
+              className="p-0 m-0"
+            >
+              {receiverInfo.displayName}
+            </h6>
+            {receiverInfo?.status === "inactive" && (
+              <small className="text-muted p-0 m-0">
+                active <TimeAgo datetime={receiverInfo?.goOffLine} />
+              </small>
+            )}
+          </div>
         </div>
         <div className="chat__options">
           <IconButton>
