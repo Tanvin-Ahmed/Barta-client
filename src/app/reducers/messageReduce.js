@@ -5,6 +5,7 @@ import {
   CHAT_UPLOAD_PERCENTAGE,
   GET_ONE_ONE_CHAT_FROM_SOCKET,
   SCREEN_SIZE,
+  IS_TYPE,
 } from "../types";
 
 const initialState = {
@@ -12,7 +13,8 @@ const initialState = {
   groupMessage: [],
   error: "",
   uploadPercentage: 0,
-  largeScreen: false,
+  largeScreen: true,
+  typing: false,
 };
 
 const messageReducer = (state = initialState, action) => {
@@ -49,6 +51,12 @@ const messageReducer = (state = initialState, action) => {
       return {
         ...state,
         largeScreen: action.payload,
+      };
+
+    case IS_TYPE:
+      return {
+        ...state,
+        typing: action.payload,
       };
 
     default:

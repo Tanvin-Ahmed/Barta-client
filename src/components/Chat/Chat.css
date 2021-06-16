@@ -93,8 +93,9 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  height: 6.5rem;
+  height: 6rem;
   position: relative;
+  padding-bottom: 2.2rem;
 }
 .react-input-emoji--container {
   background-color: rgba(255, 255, 255, 0.15) !important;
@@ -115,7 +116,13 @@
 
 @media (max-width: 444px) {
   .react-input-emoji--input {
-    max-height: 50px !important;
+    max-height: 60px !important;
+  }
+}
+
+@media (max-width: 406px) {
+  .chat__footer {
+    padding-bottom: 4rem;
   }
 }
 

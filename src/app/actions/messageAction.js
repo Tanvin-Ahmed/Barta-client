@@ -4,6 +4,7 @@ import {
   CHAT_UPLOAD_PERCENTAGE,
   GET_ONE_ONE_CHAT,
   GET_ONE_ONE_CHAT_FROM_SOCKET,
+  IS_TYPE,
   SCREEN_SIZE,
 } from "../types";
 
@@ -75,5 +76,12 @@ export const getScreenSize = (size) => {
   return {
     type: SCREEN_SIZE,
     payload: size,
+  };
+};
+
+export const isTyping = (typing) => {
+  return {
+    type: IS_TYPE,
+    payload: typing,
   };
 };

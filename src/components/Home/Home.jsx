@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import "./Home.css";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import ChatBar from "../ChatBar/ChatBar";

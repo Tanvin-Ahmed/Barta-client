@@ -20,6 +20,7 @@ import {
   getOneOneChat,
   getOneOneChatFromSocket,
   getScreenSize,
+  isTyping,
   postOneOneChat,
 } from "../../app/actions/messageAction";
 import { useParams } from "react-router-dom";
@@ -47,6 +48,7 @@ const Chat = ({ socket }) => {
     chatMessage,
     uploadPercentage,
     largeScreen,
+    typing,
   } = useSelector((state) => ({
     senderInfo: state.userReducer.userInfo,
     receiverInfo: state.userReducer.receiverInfo,
@@ -54,6 +56,7 @@ const Chat = ({ socket }) => {
     chatMessage: state.messageReducer.oneOneMessage,
     uploadPercentage: state.messageReducer.uploadPercentage,
     largeScreen: state.messageReducer.largeScreen,
+    typing: state.messageReducer.typing,
   }));
   const [inputText, setInputText] = useState("");
 
@@ -71,6 +74,12 @@ const Chat = ({ socket }) => {
   let lastMessage = useRef({});
   useEffect(() => {
     socket.emit("join", { roomId });
+
+    socket.on("displayTyping", (typingCondition) => {
+      if (typingCondition?.email === receiverInfo?.email) {
+        dispatch(isTyping(typingCondition?.type));
+      }
+    });
 
     socket.on("one_one_chatMessage", (message) => {
       console.log(message);
@@ -122,32 +131,50 @@ const Chat = ({ socket }) => {
     dispatch(getOneOneChat(roomId));
   }, [dispatch, roomId]);
 
-  const handleOnEnter = () => {
-    const chat = {
-      id: roomId,
-      sender: senderInfo.email,
-      message: inputText,
-      timeStamp: new Date().toUTCString(),
-    };
-    dispatch(postOneOneChat(chat));
+  const handleIsType = (e) => {
+    if (e._reactName === "onFocus") {
+      console.log("typing :", true);
+      socket.emit("typing", {
+        email: senderInfo?.email,
+        type: true,
+      });
+    } else if (e._reactName === "onBlur") {
+      console.log("typing :", false);
+      socket.emit("typing", {
+        email: senderInfo?.email,
+        type: false,
+      });
+    }
+  };
 
-    setInputText("");
-    !addChatList &&
-      dispatch(
-        postFriendInfo(roomId, {
-          friendInfo: [
-            {
-              email: senderInfo?.email,
-              friendOf: receiverInfo?.email?.split("@")[0],
-            },
-            {
-              email: receiverInfo.email,
-              friendOf: senderInfo?.email?.split("@")[0],
-            },
-          ],
-        })
-      ) &&
-      dispatch(updateChatList(true));
+  const handleOnEnter = () => {
+    if (inputText.trim()) {
+      const chat = {
+        id: roomId,
+        sender: senderInfo.email,
+        message: inputText,
+        timeStamp: new Date().toUTCString(),
+      };
+      dispatch(postOneOneChat(chat));
+
+      setInputText("");
+      !addChatList &&
+        dispatch(
+          postFriendInfo(roomId, {
+            friendInfo: [
+              {
+                email: senderInfo?.email,
+                friendOf: receiverInfo?.email?.split("@")[0],
+              },
+              {
+                email: receiverInfo.email,
+                friendOf: senderInfo?.email?.split("@")[0],
+              },
+            ],
+          })
+        ) &&
+        dispatch(updateChatList(true));
+    }
   };
 
   return (
@@ -214,6 +241,11 @@ const Chat = ({ socket }) => {
             </div>
           </div>
         ))}
+        {typing && (
+          <div className="chat__text">
+            <p className="text-muted">typing...</p>
+          </div>
+        )}
       </ScrollToBottom>
 
       <div className="chat__footer">
@@ -222,13 +254,19 @@ const Chat = ({ socket }) => {
         </IconButton>
         {largeScreen ? (
           <>
-            <InputEmoji
-              value={inputText}
-              onChange={setInputText}
-              cleanOnEnter
-              onEnter={handleOnEnter}
-              placeholder="Type a message"
-            />
+            <div
+              style={{ flex: 1 }}
+              onFocus={handleIsType}
+              onBlur={handleIsType}
+            >
+              <InputEmoji
+                value={inputText}
+                onChange={setInputText}
+                cleanOnEnter
+                onEnter={handleOnEnter}
+                placeholder="Type a message"
+              />
+            </div>
             {inputText.trim() && (
               <IconButton onClick={handleOnEnter} id="sendIcon">
                 <SendIcon />
@@ -237,11 +275,17 @@ const Chat = ({ socket }) => {
           </>
         ) : (
           <>
-            <InputEmoji
-              value={inputText}
-              onChange={setInputText}
-              placeholder="Type a message"
-            />
+            <div
+              style={{ flex: 1 }}
+              onFocus={handleIsType}
+              onBlur={handleIsType}
+            >
+              <InputEmoji
+                value={inputText}
+                onChange={setInputText}
+                placeholder="Type a message"
+              />
+            </div>
             {inputText.trim() && (
               <IconButton onClick={handleOnEnter} id="sendIcon">
                 <SendIcon />
