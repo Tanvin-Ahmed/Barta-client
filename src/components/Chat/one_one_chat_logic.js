@@ -1,8 +1,10 @@
 import {
+  getChosenFiles,
   getOneOneChatFromSocket,
   getScreenSize,
   isTyping,
   postOneOneChat,
+  uploadFiles,
 } from "../../app/actions/messageAction";
 import {
   getReceiverInfo,
@@ -97,17 +99,34 @@ export const handleOneOneChat = (
   inputText,
   senderEmail,
   receiverEmail,
-  dispatch
+  dispatch,
+  chosenFiles
 ) => {
-  const chat = {
-    id: roomId,
-    sender: senderEmail,
-    message: inputText,
-    timeStamp: new Date().toUTCString(),
-  };
-  dispatch(postOneOneChat(chat));
+  if (chosenFiles[0]) {
+    const data = new FormData();
+    data.append("id", roomId);
+    data.append("sender", senderEmail);
 
-  setInputText("");
+    for (let i = 0; i < chosenFiles.length; i++) {
+      const element = chosenFiles[i]?.file;
+      data.append("file", element);
+    }
+    data.append("timeStamp", new Date().toUTCString());
+
+    console.log(data);
+    dispatch(uploadFiles(data));
+    dispatch(getChosenFiles([]));
+  } else {
+    const chat = {
+      id: roomId,
+      sender: senderEmail,
+      message: inputText,
+      timeStamp: new Date().toUTCString(),
+    };
+    dispatch(postOneOneChat(chat));
+
+    setInputText("");
+  }
   !addChatList &&
     dispatch(
       postFriendInfo(roomId, {
@@ -124,4 +143,24 @@ export const handleOneOneChat = (
       })
     ) &&
     dispatch(updateChatList(true));
+};
+
+export const fileUpload = (e, dispatch) => {
+  const newFiles = e.target.files;
+
+  const files = [];
+  for (let i = 0; i < newFiles.length; i++) {
+    const element = newFiles[i];
+    files.push({
+      name: element.name,
+      url: URL.createObjectURL(element),
+      file: element,
+    });
+  }
+  dispatch(getChosenFiles(files));
+};
+
+export const deleteChosenFiles = (chosenFiles, index, dispatch) => {
+  chosenFiles.splice(index, 1);
+  dispatch(getChosenFiles(chosenFiles));
 };

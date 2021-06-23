@@ -9,9 +9,19 @@ import { css } from "@emotion/css";
 import InputEmoji from "react-input-emoji";
 import AttachFileIcon from "@material-ui/icons/AttachFile";
 import SendIcon from "@material-ui/icons/Send";
-import { handleIsType } from "./one_one_chat_logic";
+import {
+  deleteChosenFiles,
+  fileUpload,
+  handleIsType,
+} from "./one_one_chat_logic";
+import AddCircleIcon from "@material-ui/icons/AddCircle";
+import InsertPhotoIcon from "@material-ui/icons/InsertPhoto";
+import VideoLibraryIcon from "@material-ui/icons/VideoLibrary";
+import { isClickUploadOption } from "../../app/actions/messageAction";
+import img from "../../img/bg/js.png";
+import HighlightOffIcon from "@material-ui/icons/HighlightOff";
 
-export const ChatHeader = ({ receiverInfo, addChatList }) => {
+export const ChatHeader = ({ receiverInfo, addChatList, largeScreen }) => {
   return (
     <div className="chat__header">
       <div className="header__info">
@@ -26,7 +36,9 @@ export const ChatHeader = ({ receiverInfo, addChatList }) => {
             style={{ fontWeight: "bold", letterSpacing: "1px" }}
             className="p-0 m-0"
           >
-            {receiverInfo.displayName}
+            {largeScreen
+              ? receiverInfo.displayName
+              : receiverInfo.displayName?.split(" ")[0]}
           </h6>
           {addChatList && receiverInfo?.status === "inactive" && (
             <small className="text-muted p-0 m-0">
@@ -36,13 +48,13 @@ export const ChatHeader = ({ receiverInfo, addChatList }) => {
         </div>
       </div>
       <div className="chat__options">
-        <IconButton>
+        <IconButton className="icon">
           <CallIcon />
         </IconButton>
-        <IconButton>
+        <IconButton className="icon">
           <VideoCallIcon />
         </IconButton>
-        <IconButton>
+        <IconButton className="icon">
           <MoreVertIcon />
         </IconButton>
       </div>
@@ -82,6 +94,20 @@ export const ChatBody = ({ chatMessage, senderInfo, receiverInfo, typing }) => {
           </p>
           <div>
             {message?.message}
+            {message?.files[0] &&
+              message.files?.map((file, index) => {
+                if (file.contentType.split("/")[0] === "image") {
+                  return (
+                    <img
+                      key={file.id}
+                      className="chat__img"
+                      src={`http://localhost:5000/chatMessage/file/${file?.filename}`}
+                      alt={`${index + 1}`}
+                    />
+                  );
+                }
+                return null;
+              })}
             <p className="time">
               {new Date(message?.timeStamp).toLocaleString()}
             </p>
@@ -97,6 +123,81 @@ export const ChatBody = ({ chatMessage, senderInfo, receiverInfo, typing }) => {
   );
 };
 
+export const ShowFileBeforeUpload = ({ chosenFiles, dispatch }) => {
+  return (
+    <div className="show__file">
+      {chosenFiles.map((file, index) => {
+        if (file.file?.type?.split("/")[0] === "image") {
+          return (
+            <div key={index} style={{ position: "relative" }}>
+              <img className="show__img" src={file?.url} alt="" />
+              <HighlightOffIcon
+                onClick={() => deleteChosenFiles(chosenFiles, index, dispatch)}
+                className="times"
+              />
+            </div>
+          );
+        } else if (file.file?.type?.split("/")[0] === "video") {
+          return (
+            <div key={index} style={{ position: "relative" }}>
+              <video className="show__img" src={file?.url} />
+              <HighlightOffIcon
+                onClick={() => deleteChosenFiles(chosenFiles, index, dispatch)}
+                className="times"
+              />
+            </div>
+          );
+        } else if (file.file?.type?.split("/")[0] === "application") {
+          return (
+            <div
+              key={index}
+              className="show__files"
+              style={{ position: "relative" }}
+            >
+              <small style={{ fontWeight: "bold" }}>{file?.name}</small>
+              <HighlightOffIcon
+                className="delete__icon"
+                onClick={() => deleteChosenFiles(chosenFiles, index, dispatch)}
+              />
+            </div>
+          );
+        }
+      })}
+    </div>
+  );
+};
+
+export const UploadFile = ({ dispatch }) => {
+  return (
+    <div className="upload__file">
+      <div>
+        <IconButton onChange={(e) => fileUpload(e, dispatch)} className="icon">
+          <input type="file" name="file" accept="image/*" id="image" multiple />
+          <label htmlFor="image">
+            <InsertPhotoIcon />
+          </label>
+        </IconButton>
+      </div>
+      <div>
+        <IconButton onChange={(e) => fileUpload(e, dispatch)} className="icon">
+          <input type="file" name="file" accept="video/*" id="video" />
+          <label htmlFor="video">
+            <VideoLibraryIcon />
+          </label>
+        </IconButton>
+      </div>
+      <div>
+        <IconButton onChange={(e) => fileUpload(e, dispatch)} className="icon">
+          <input type="file" name="file" accept="file/*" id="file" multiple />
+          <label htmlFor="file">
+            <AttachFileIcon />
+          </label>
+        </IconButton>
+      </div>
+    </div>
+  );
+};
+
 export const ChatFooter = ({
   largeScreen,
   socket,
@@ -104,12 +205,20 @@ export const ChatFooter = ({
   inputText,
   setInputText,
   handleOnEnter,
+  dispatch,
+  clickUploadOption,
+  chosenFiles,
 }) => {
   return (
     <div className="chat__footer">
-      <IconButton>
-        <AttachFileIcon />
-      </IconButton>
+      {!inputText.trim() && (
+        <IconButton
+          onClick={() => dispatch(isClickUploadOption(!clickUploadOption))}
+          className="icon"
+        >
+          <AddCircleIcon />
+        </IconButton>
+      )}
       {largeScreen ? (
         <>
           <div
@@ -125,8 +234,8 @@ export const ChatFooter = ({
               placeholder="Type a message"
             />
           </div>
-          {inputText.trim() && (
-            <IconButton onClick={handleOnEnter} id="sendIcon">
+          {(inputText.trim() || chosenFiles) && (
+            <IconButton onClick={handleOnEnter} className="icon">
               <SendIcon />
             </IconButton>
           )}
@@ -144,8 +253,8 @@ export const ChatFooter = ({
               placeholder="Type a message"
             />
           </div>
-          {inputText.trim() && (
-            <IconButton onClick={handleOnEnter} id="sendIcon">
+          {(inputText.trim() || chosenFiles) && (
+            <IconButton onClick={handleOnEnter} className="icon">
               <SendIcon />
             </IconButton>
           )}

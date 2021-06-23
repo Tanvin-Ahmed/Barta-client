@@ -16,6 +16,8 @@ import {
   ChatBody,
   ChatFooter,
   ChatHeader,
+  ShowFileBeforeUpload,
+  UploadFile,
   UploadProgressBar,
 } from "./one_one_chat_component";
 
@@ -35,6 +37,8 @@ const Chat = ({ socket }) => {
     uploadPercentage,
     largeScreen,
     typing,
+    clickUploadOption,
+    chosenFiles,
   } = useSelector((state) => ({
     senderInfo: state.userReducer.userInfo,
     receiverInfo: state.userReducer.receiverInfo,
@@ -43,6 +47,8 @@ const Chat = ({ socket }) => {
     uploadPercentage: state.messageReducer.uploadPercentage,
     largeScreen: state.messageReducer.largeScreen,
     typing: state.messageReducer.typing,
+    clickUploadOption: state.messageReducer.clickUploadOption,
+    chosenFiles: state.messageReducer.chosenFiles,
   }));
   const [inputText, setInputText] = useState("");
 
@@ -67,7 +73,7 @@ const Chat = ({ socket }) => {
   }, [dispatch, roomId]);
 
   const handleOnEnter = () => {
-    if (inputText.trim()) {
+    if (inputText.trim() || chosenFiles[0]) {
       handleOneOneChat(
         roomId,
         addChatList,
@@ -75,14 +81,19 @@ const Chat = ({ socket }) => {
         inputText,
         senderInfo?.email,
         receiverInfo?.email,
-        dispatch
+        dispatch,
+        chosenFiles
       );
     }
   };
 
   return (
     <section className="chat">
-      <ChatHeader receiverInfo={receiverInfo} addChatList={addChatList} />
+      <ChatHeader
+        receiverInfo={receiverInfo}
+        addChatList={addChatList}
+        largeScreen={largeScreen}
+      />
 
       {uploadPercentage > 0 && (
         <UploadProgressBar uploadPercentage={uploadPercentage} />
@@ -95,6 +106,11 @@ const Chat = ({ socket }) => {
         typing={typing}
       />
 
+      {chosenFiles[0] && (
+        <ShowFileBeforeUpload chosenFiles={chosenFiles} dispatch={dispatch} />
+      )}
+      {clickUploadOption && <UploadFile dispatch={dispatch} />}
+
       <ChatFooter
         largeScreen={largeScreen}
         socket={socket}
@@ -102,6 +118,9 @@ const Chat = ({ socket }) => {
         inputText={inputText}
         setInputText={setInputText}
         handleOnEnter={handleOnEnter}
+        dispatch={dispatch}
+        clickUploadOption={clickUploadOption}
+        chosenFiles={chosenFiles[0]}
       />
     </section>
   );

@@ -2,10 +2,12 @@ import axios from "axios";
 import {
   CHAT_ERROR,
   CHAT_UPLOAD_PERCENTAGE,
+  CLICK_UPLOAD_OPTION,
   GET_ONE_ONE_CHAT,
   GET_ONE_ONE_CHAT_FROM_SOCKET,
   IS_TYPE,
   SCREEN_SIZE,
+  SELECTED_FILES,
 } from "../types";
 
 export const postOneOneChat = (chat) => {
@@ -25,6 +27,46 @@ export const postOneOneChat = (chat) => {
 
     axios
       .post("http://localhost:5000/chatMessage/postOneOneChat", chat, options)
+      .then((data) => {
+        console.log("Data loaded successfully");
+        dispatch({
+          type: CHAT_UPLOAD_PERCENTAGE,
+          payload: 100,
+        });
+        setTimeout(() => {
+          dispatch({
+            type: CHAT_UPLOAD_PERCENTAGE,
+            payload: 0,
+          });
+        }, 50);
+      })
+      .catch((err) => {
+        dispatch({
+          type: CHAT_ERROR,
+          payload: err.message,
+        });
+      });
+  };
+};
+
+export const uploadFiles = (chosenFiles) => {
+  // socket.emit("upload-files", chosenFiles);
+  return (dispatch) => {
+    const options = {
+      onUploadProgress: ({ loaded, total }) => {
+        let percent = Math.floor((loaded * 100) / total);
+
+        if (percent < 100) {
+          dispatch({
+            type: CHAT_UPLOAD_PERCENTAGE,
+            payload: percent,
+          });
+        }
+      },
+    };
+
+    axios
+      .post("http://localhost:5000/chatMessage/upload", chosenFiles, options)
       .then((data) => {
         console.log("Data loaded successfully");
         dispatch({
@@ -83,5 +125,19 @@ export const isTyping = (typing) => {
   return {
     type: IS_TYPE,
     payload: typing,
+  };
+};
+
+export const isClickUploadOption = (payload) => {
+  return {
+    type: CLICK_UPLOAD_OPTION,
+    payload,
+  };
+};
+
+export const getChosenFiles = (payload) => {
+  return {
+    type: SELECTED_FILES,
+    payload,
   };
 };

@@ -6,6 +6,8 @@ import {
   GET_ONE_ONE_CHAT_FROM_SOCKET,
   SCREEN_SIZE,
   IS_TYPE,
+  CLICK_UPLOAD_OPTION,
+  SELECTED_FILES,
 } from "../types";
 
 const initialState = {
@@ -15,6 +17,8 @@ const initialState = {
   uploadPercentage: 0,
   largeScreen: true,
   typing: false,
+  clickUploadOption: false,
+  chosenFiles: [],
 };
 
 const messageReducer = (state = initialState, action) => {
@@ -57,6 +61,18 @@ const messageReducer = (state = initialState, action) => {
       return {
         ...state,
         typing: action.payload,
+      };
+
+    case CLICK_UPLOAD_OPTION:
+      return {
+        ...state,
+        clickUploadOption: action.payload,
+      };
+
+    case SELECTED_FILES:
+      return {
+        ...state,
+        chosenFiles: action.payload,
       };
 
     default:
