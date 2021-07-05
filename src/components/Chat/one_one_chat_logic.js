@@ -1,9 +1,15 @@
 import {
+  deleteChat,
+  deleteMessage,
   getChosenFiles,
   getOneOneChatFromSocket,
   getScreenSize,
   isTyping,
+  openOptions,
   postOneOneChat,
+  reactTabToggle,
+  updateChatMessage,
+  updateReactInChat,
   uploadFiles,
 } from "../../app/actions/messageAction";
 import {
@@ -92,6 +98,29 @@ export const receiverStatusFromSocket = (socket, receiverInfo, dispatch) => {
   });
 };
 
+let updatedData = {};
+export const updateReact = (socket, dispatch, chatMessage) => {
+  socket.on("update-react", (update) => {
+    if (updatedData._id !== update._id || updatedData.react !== update.react) {
+      updatedData = update;
+      if (chatMessage.length > 0 || chatMessage[0]) {
+        dispatch(updateReactInChat(chatMessage, update));
+      }
+    }
+  });
+};
+
+let deletedId = "";
+export const deleteChatMessage = (socket, dispatch, chatMessage) => {
+  socket.on("delete-chatMessage", (deletedItem) => {
+    if (deletedId !== deletedItem._id) {
+      deletedId = deletedItem._id;
+      if (chatMessage.length > 0 || chatMessage[0])
+        dispatch(deleteMessage(chatMessage, deletedItem._id));
+    }
+  });
+};
+
 export const handleOneOneChat = (
   roomId,
   addChatList,
@@ -113,7 +142,7 @@ export const handleOneOneChat = (
     }
     data.append("timeStamp", new Date().toUTCString());
 
-    console.log(data);
+    // console.log(data);
     dispatch(uploadFiles(data));
     dispatch(getChosenFiles([]));
   } else {
@@ -121,6 +150,7 @@ export const handleOneOneChat = (
       id: roomId,
       sender: senderEmail,
       message: inputText,
+      react: "",
       timeStamp: new Date().toUTCString(),
     };
     dispatch(postOneOneChat(chat));
@@ -163,4 +193,30 @@ export const fileUpload = (e, dispatch) => {
 export const deleteChosenFiles = (chosenFiles, index, dispatch) => {
   chosenFiles.splice(index, 1);
   dispatch(getChosenFiles(chosenFiles));
+};
+
+export const options = (dispatch, bool, id) => {
+  const open = {
+    id,
+    bool,
+  };
+  dispatch(openOptions(open));
+};
+
+export const toggleReactTab = (dispatch, toggle) => {
+  dispatch(reactTabToggle(toggle));
+};
+
+export const handleReactions = (dispatch, id, react) => {
+  // console.log(react);
+  const reaction = {
+    id,
+    react,
+  };
+  dispatch(updateChatMessage(reaction));
+  toggleReactTab(dispatch, false);
+};
+
+export const handleDeleteMessage = (dispatch, message) => {
+  dispatch(deleteChat(message));
 };

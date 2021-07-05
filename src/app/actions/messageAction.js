@@ -3,11 +3,15 @@ import {
   CHAT_ERROR,
   CHAT_UPLOAD_PERCENTAGE,
   CLICK_UPLOAD_OPTION,
+  DELETE_CHAT_MESSAGE,
   GET_ONE_ONE_CHAT,
   GET_ONE_ONE_CHAT_FROM_SOCKET,
   IS_TYPE,
+  OPEN_OPTIONS_FOR_CHAT,
+  REACT_TAB_TOGGLE,
   SCREEN_SIZE,
   SELECTED_FILES,
+  UPDATE_CHAT_REACT,
 } from "../types";
 
 export const postOneOneChat = (chat) => {
@@ -107,6 +111,43 @@ export const getOneOneChat = (roomId) => {
   };
 };
 
+export const updateChatMessage = (react) => {
+  return (dispatch) => {
+    axios
+      .put("http://localhost:5000/chatMessage/updateChatMessage", react)
+      .then(() => console.log("update message successfully"))
+      .catch(() => alert("react not set, please try again"));
+  };
+};
+
+const deleteChatMessage = (id) => {
+  axios
+    .delete(`http://localhost:5000/chatMessage/deleteChatMessage/${id}`)
+    .then(() => console.log("deleted successfully"))
+    .catch(() => alert("failed to delete, please try again"));
+};
+
+export const deleteChat = (message) => {
+  return (dispatch) => {
+    if (message?.files?.length > 0) {
+      for (let i = 0; i < message?.files.length; i++) {
+        const filename = message?.files[i].filename;
+        axios
+          .delete(`http://localhost:5000/chatMessage/file/delete/${filename}`)
+          .then(() => {
+            console.log("delete file successfully");
+            if (i === message?.files?.length - 1) {
+              deleteChatMessage(message._id);
+            }
+          })
+          .catch(() => alert("file not deleted, please try again"));
+      }
+    } else {
+      deleteChatMessage(message?._id);
+    }
+  };
+};
+
 export const getOneOneChatFromSocket = (message) => {
   return {
     type: GET_ONE_ONE_CHAT_FROM_SOCKET,
@@ -139,5 +180,58 @@ export const getChosenFiles = (payload) => {
   return {
     type: SELECTED_FILES,
     payload,
+  };
+};
+
+export const openOptions = (payload) => {
+  return {
+    type: OPEN_OPTIONS_FOR_CHAT,
+    payload,
+  };
+};
+
+export const reactTabToggle = (payload) => {
+  return {
+    type: REACT_TAB_TOGGLE,
+    payload,
+  };
+};
+
+export const updateReactInChat = (chatMessage, update) => {
+  return (dispatch) => {
+    const message = chatMessage.find((message) => message?._id === update._id);
+    if (message) {
+      const updatedMessage = {
+        ...message,
+        ...update,
+      };
+      const index = chatMessage.findIndex(
+        (message) => message?._id === update._id
+      );
+      chatMessage.splice(index, 1, updatedMessage);
+
+      dispatch({
+        type: UPDATE_CHAT_REACT,
+        payload: chatMessage,
+      });
+    }
+  };
+};
+
+export const deleteMessage = (chatMessage, deletedItemId) => {
+  return (dispatch) => {
+    const message = chatMessage.find(
+      (message) => message._id === deletedItemId
+    );
+    if (message) {
+      const index = chatMessage.findIndex(
+        (message) => message._id === deletedItemId
+      );
+      chatMessage.splice(index, 1);
+      dispatch({
+        type: DELETE_CHAT_MESSAGE,
+        payload: chatMessage,
+      });
+    }
   };
 };

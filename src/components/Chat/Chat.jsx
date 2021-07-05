@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getOneOneChat } from "../../app/actions/messageAction";
 import { useParams } from "react-router-dom";
 import {
+  deleteChatMessage,
   getOneOneChatMessageFromSocket,
   getRoomId,
   getUsersData,
@@ -11,6 +12,7 @@ import {
   handleOneOneChat,
   receiverStatusFromSocket,
   screen,
+  updateReact,
 } from "./one_one_chat_logic";
 import {
   ChatBody,
@@ -39,6 +41,8 @@ const Chat = ({ socket }) => {
     typing,
     clickUploadOption,
     chosenFiles,
+    isOpenOptions,
+    reactTabIsOpen,
   } = useSelector((state) => ({
     senderInfo: state.userReducer.userInfo,
     receiverInfo: state.userReducer.receiverInfo,
@@ -49,6 +53,8 @@ const Chat = ({ socket }) => {
     typing: state.messageReducer.typing,
     clickUploadOption: state.messageReducer.clickUploadOption,
     chosenFiles: state.messageReducer.chosenFiles,
+    isOpenOptions: state.messageReducer.isOpenOptions,
+    reactTabIsOpen: state.messageReducer.reactTabIsOpen,
   }));
   const [inputText, setInputText] = useState("");
 
@@ -61,7 +67,9 @@ const Chat = ({ socket }) => {
     handleIsFriendTyping(socket, receiverInfo?.email, dispatch);
     getOneOneChatMessageFromSocket(socket, dispatch);
     receiverStatusFromSocket(socket, receiverInfo, dispatch);
-  }, [dispatch, roomId, socket, receiverInfo]);
+    chatMessage.length > 0 && updateReact(socket, dispatch, chatMessage);
+    chatMessage.length > 0 && deleteChatMessage(socket, dispatch, chatMessage);
+  }, [dispatch, roomId, socket, receiverInfo, chatMessage]);
 
   useEffect(() => {
     window.addEventListener("resize", screen(dispatch));
@@ -104,6 +112,9 @@ const Chat = ({ socket }) => {
         senderInfo={senderInfo}
         receiverInfo={receiverInfo}
         typing={typing}
+        dispatch={dispatch}
+        isOpenOptions={isOpenOptions}
+        reactTabIsOpen={reactTabIsOpen}
       />
 
       {chosenFiles[0] && (

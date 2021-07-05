@@ -43,7 +43,7 @@ const userReducer = (state = initialState, action) => {
     case GET_FRIEND_INFO:
       return {
         ...state,
-        chatList: [...state.chatList, action.payload],
+        chatList: action.payload,
       };
     case GET_FRIEND_INFO_FROM_SOCKET:
       return {

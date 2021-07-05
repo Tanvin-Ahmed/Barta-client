@@ -156,6 +156,33 @@
   display: none;
 }
 
+.reaction {
+  position: absolute;
+  border-radius: 50%;
+  padding: 0.1rem;
+  background-color: beige;
+  font-size: 12px;
+}
+
+.react-options {
+  position: absolute;
+  background-color: rgb(255, 160, 125);
+  border-radius: 5rem;
+  height: 2rem;
+  z-index: 1200;
+}
+
+.chose {
+  margin-top: 1rem;
+  border-radius: 50%;
+  transition: all 0.5s;
+  cursor: pointer;
+}
+
+.chose:hover {
+  background-color: rgba(255, 255, 255, 0.144);
+}
+
 .chat__footer {
   padding-top: 0.5rem;
   display: flex;

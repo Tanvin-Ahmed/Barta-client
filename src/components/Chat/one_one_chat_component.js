@@ -12,14 +12,21 @@ import SendIcon from "@material-ui/icons/Send";
 import {
   deleteChosenFiles,
   fileUpload,
+  handleDeleteMessage,
   handleIsType,
+  handleReactions,
+  options,
+  toggleReactTab,
 } from "./one_one_chat_logic";
 import AddCircleIcon from "@material-ui/icons/AddCircle";
 import InsertPhotoIcon from "@material-ui/icons/InsertPhoto";
 import VideoLibraryIcon from "@material-ui/icons/VideoLibrary";
 import { isClickUploadOption } from "../../app/actions/messageAction";
-import img from "../../img/bg/js.png";
 import HighlightOffIcon from "@material-ui/icons/HighlightOff";
+import DeleteIcon from "@material-ui/icons/Delete";
+import AddReactionIcon from "@material-ui/icons/AddReaction";
+import ReplayIcon from "@material-ui/icons/Replay";
+import { SRLWrapper } from "simple-react-lightbox";
 
 export const ChatHeader = ({ receiverInfo, addChatList, largeScreen }) => {
   return (
@@ -70,47 +77,147 @@ export const UploadProgressBar = ({ uploadPercentage }) => {
   );
 };
 
+const Options = ({ dispatch, reactTabIsOpen, message }) => {
+  return (
+    <div className="position-relative">
+      <div className="d-flex justify-content-center align-items-center">
+        <IconButton
+          onClick={() => handleDeleteMessage(dispatch, message)}
+          className="icon mx-1"
+        >
+          <DeleteIcon />
+        </IconButton>
+        <IconButton className="icon mx-1">
+          <ReplayIcon />
+        </IconButton>
+        <IconButton
+          onClick={() => toggleReactTab(dispatch, !reactTabIsOpen)}
+          className="icon mx-1"
+        >
+          <AddReactionIcon />
+        </IconButton>
+      </div>
+      {reactTabIsOpen && (
+        <div className="react-options d-flex justify-content-center align-items-center">
+          <p
+            onClick={() => handleReactions(dispatch, message?._id, "🧡")}
+            className="mx-1 p-1 chose"
+          >
+            🧡
+          </p>
+          <p
+            onClick={() => handleReactions(dispatch, message?._id, "😢")}
+            className="mx-1 p-1 chose"
+          >
+            😢
+          </p>
+          <p
+            onClick={() => handleReactions(dispatch, message?._id, "😠")}
+            className="mx-1 p-1 chose"
+          >
+            😠
+          </p>
+          <p
+            onClick={() => handleReactions(dispatch, message?._id, "🙄")}
+            className="mx-1 p-1 chose"
+          >
+            🙄
+          </p>
+          <p
+            onClick={() => handleReactions(dispatch, message?._id, "😦")}
+            className="mx-1 p-1 chose"
+          >
+            😦
+          </p>
+          <p
+            onClick={() => handleReactions(dispatch, message?._id, "👍")}
+            className="mx-1 p-1 chose"
+          >
+            👍
+          </p>
+        </div>
+      )}
+    </div>
+  );
+};
+
 const ROOT_CSS = css({
   height: "70%",
   width: "100%",
 });
 
-export const ChatBody = ({ chatMessage, senderInfo, receiverInfo, typing }) => {
+export const ChatBody = ({
+  chatMessage,
+  senderInfo,
+  receiverInfo,
+  typing,
+  dispatch,
+  isOpenOptions,
+  reactTabIsOpen,
+}) => {
   return (
     <ScrollToBottom className={`${ROOT_CSS} chat__body`}>
-      {chatMessage.map((message) => (
+      {chatMessage?.map((message) => (
         <div
-          key={message._id}
+          key={message?._id}
+          style={{ width: "100%" }}
           className={
             message?.sender === senderInfo.email
-              ? "chat__text myChat"
-              : "chat__text"
+              ? "d-flex d-flex justify-content-end align-items-center"
+              : "d-flex flex-row-reverse d-flex justify-content-end align-items-center"
           }
+          onMouseOver={() => options(dispatch, true, message?._id)}
+          onMouseLeave={() => options(dispatch, false, message?._id)}
         >
-          <p className="name">
-            {message?.sender === senderInfo.email
-              ? `${senderInfo.displayName?.split(" ")[0]}`
-              : `${receiverInfo.displayName?.split(" ")[0]}`}
-          </p>
-          <div>
-            {message?.message}
-            {message?.files[0] &&
-              message.files?.map((file, index) => {
-                if (file.contentType.split("/")[0] === "image") {
-                  return (
-                    <img
-                      key={file.id}
-                      className="chat__img"
-                      src={`http://localhost:5000/chatMessage/file/${file?.filename}`}
-                      alt={`${index + 1}`}
-                    />
-                  );
-                }
-                return null;
-              })}
-            <p className="time">
-              {new Date(message?.timeStamp).toLocaleString()}
+          {isOpenOptions?.bool && isOpenOptions?.id === message?._id && (
+            <Options
+              dispatch={dispatch}
+              reactTabIsOpen={reactTabIsOpen}
+              message={message}
+            />
+          )}
+          <div
+            key={message._id}
+            className={
+              message?.sender === senderInfo.email
+                ? "chat__text myChat"
+                : "chat__text"
+            }
+          >
+            <p className="name">
+              {message?.sender === senderInfo?.email
+                ? `${senderInfo?.displayName?.split(" ")[0]}`
+                : `${receiverInfo?.displayName?.split(" ")[0]}`}
             </p>
+            <div>
+              {message?.message}
+              {message?.files?.length > 0 &&
+                message.files?.map((file, index) => {
+                  if (file.contentType.split("/")[0] === "image") {
+                    return (
+                      <SRLWrapper>
+                        <a
+                          href={`http://localhost:5000/chatMessage/file/${file?.filename}`}
+                        >
+                          <img
+                            key={file.id}
+                            className="chat__img"
+                            src={`http://localhost:5000/chatMessage/file/${file?.filename}`}
+                            alt={`${index + 1}`}
+                          />
+                        </a>
+                      </SRLWrapper>
+                    );
+                  }
+                  return null;
+                })}
+              <p className="time">
+                {new Date(message?.timeStamp).toLocaleString()}
+              </p>
+            </div>
+            <div className={message?.react ? "reaction" : "d-none"}>
+              {message?.react}
+            </div>
           </div>
         </div>
       ))}

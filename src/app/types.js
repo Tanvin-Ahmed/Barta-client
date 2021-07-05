@@ -21,6 +21,13 @@ export const GET_ONE_ONE_CHAT_FROM_SOCKET = "get_one_one_chat_from_socket";
 export const SCREEN_SIZE = "screen_size";
 export const IS_TYPE = "is_type";
 export const CLICK_UPLOAD_OPTION = "click_upload_option";
+export const UPDATE_REACT = "update_react";
+export const UPDATE_CHAT_REACT = "update_chat_react";
+export const DELETE_CHAT_MESSAGE = "delete_chat_message";
 
 // file upload
 export const SELECTED_FILES = "selected_files";
+
+// chat page interaction
+export const OPEN_OPTIONS_FOR_CHAT = "open_options_for_chat";
+export const REACT_TAB_TOGGLE = "react_tab_toggle";

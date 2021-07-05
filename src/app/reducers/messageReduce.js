@@ -8,6 +8,10 @@ import {
   IS_TYPE,
   CLICK_UPLOAD_OPTION,
   SELECTED_FILES,
+  OPEN_OPTIONS_FOR_CHAT,
+  REACT_TAB_TOGGLE,
+  UPDATE_CHAT_REACT,
+  DELETE_CHAT_MESSAGE,
 } from "../types";
 
 const initialState = {
@@ -19,6 +23,8 @@ const initialState = {
   typing: false,
   clickUploadOption: false,
   chosenFiles: [],
+  isOpenOptions: {},
+  reactTabIsOpen: false,
 };
 
 const messageReducer = (state = initialState, action) => {
@@ -51,6 +57,18 @@ const messageReducer = (state = initialState, action) => {
         oneOneMessage: [...state.oneOneMessage, action.payload],
       };
 
+    case UPDATE_CHAT_REACT:
+      return {
+        ...state,
+        oneOneMessage: action.payload,
+      };
+
+    case DELETE_CHAT_MESSAGE:
+      return {
+        ...state,
+        oneOneMessage: action.payload,
+      };
+
     case SCREEN_SIZE:
       return {
         ...state,
@@ -73,6 +91,18 @@ const messageReducer = (state = initialState, action) => {
       return {
         ...state,
         chosenFiles: action.payload,
+      };
+
+    case OPEN_OPTIONS_FOR_CHAT:
+      return {
+        ...state,
+        isOpenOptions: action.payload,
+      };
+
+    case REACT_TAB_TOGGLE:
+      return {
+        ...state,
+        reactTabIsOpen: action.payload,
       };
 
     default:
