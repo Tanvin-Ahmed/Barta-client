@@ -131,9 +131,9 @@ export const deleteChat = (message) => {
   return (dispatch) => {
     if (message?.files?.length > 0) {
       for (let i = 0; i < message?.files.length; i++) {
-        const filename = message?.files[i].filename;
+        const id = message?.files[i].fileId;
         axios
-          .delete(`http://localhost:5000/chatMessage/file/delete/${filename}`)
+          .delete(`http://localhost:5000/chatMessage/file/delete/${id}`)
           .then(() => {
             console.log("delete file successfully");
             if (i === message?.files?.length - 1) {
