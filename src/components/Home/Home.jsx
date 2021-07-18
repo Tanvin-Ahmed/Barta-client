@@ -1,6 +1,11 @@
 import React, { useEffect } from "react";
 import "./Home.css";
-import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  useHistory,
+} from "react-router-dom";
 import ChatBar from "../ChatBar/ChatBar";
 import Chat from "../Chat/Chat";
 import Login from "../Login/Login";

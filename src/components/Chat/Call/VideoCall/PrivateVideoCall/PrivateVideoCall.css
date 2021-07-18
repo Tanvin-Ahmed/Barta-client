@@ -1,0 +1,27 @@
+.buttons__position {
+  position: absolute;
+  left: 50%;
+  top: 88%;
+  transform: translate(-50%, -20%);
+  z-index: 1500;
+}
+.myVideo__after_callReceive {
+  position: absolute;
+  left: 0%;
+  top: 68%;
+  width: 20%;
+  height: 20%;
+  border-radius: 5px;
+  object-fit: cover;
+  z-index: 1200;
+}
+
+.audio__video_mute_button {
+  background-color: rgb(243, 243, 243) !important;
+}
+.delete_button {
+  background-color: rgb(255, 164, 164) !important;
+}
+.receive_button {
+  background-color: rgb(190, 205, 253) !important;
+}

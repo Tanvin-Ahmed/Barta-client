@@ -5,6 +5,12 @@ import { updateFriendStatus } from "../../app/actions/userAction";
 import { useHistory } from "react-router";
 import { friendListUpdate } from "./chatBar_logic";
 import { ChatBarHeader, ChatList, SearchFriend } from "./chatBar_component";
+import {
+  getCaller,
+  getCallerSignal,
+  getUserName,
+  isReceivingCall,
+} from "../../app/actions/privateVideoCallAction";
 
 const ChatBar = ({ socket }) => {
   const history = useHistory();
@@ -25,7 +31,22 @@ const ChatBar = ({ socket }) => {
     socket.emit("my-account", userInfo?.email?.split("@")[0]);
     friendListUpdate(socket, dispatch);
     updateFriendStatus(socket, friendList, dispatch);
-  }, [dispatch, socket, userInfo, friendList]);
+
+    // for video chat
+    socket.on("callUser", (data) => {
+      if (data.userToCall === userInfo.email) {
+        sessionStorage.setItem(
+          "barta/receiver",
+          JSON.stringify({ email: data.from })
+        );
+        dispatch(isReceivingCall(true));
+        dispatch(getCaller(data.from));
+        dispatch(getUserName(data.name));
+        dispatch(getCallerSignal(data.signal));
+        history.push(`/chat/${data.callerDataBaseId}`);
+      }
+    });
+  }, [dispatch, socket, userInfo, friendList, history]);
 
   return (
     <section className="chat__bar">

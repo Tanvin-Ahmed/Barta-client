@@ -215,6 +215,28 @@
   height: 2rem;
 }
 
+.download__icon {
+  background: none;
+  border: none;
+}
+
+.show__document {
+  padding: 0.1rem 0.4rem;
+  margin-top: 0.4rem;
+  background-image: linear-gradient(
+    to right,
+    rgb(225, 182, 255),
+    rgb(255, 182, 237)
+  );
+  box-shadow: 0px 5px 10px rgba(141, 31, 132, 0.507);
+  border-radius: 10px;
+}
+
+.document__title {
+  font-weight: 500;
+  padding-right: 0.2rem;
+}
+
 @media (max-width: 444px) {
   .react-input-emoji--input {
     max-height: 60px !important;

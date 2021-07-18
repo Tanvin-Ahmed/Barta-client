@@ -13,6 +13,7 @@ import {
   SELECTED_FILES,
   UPDATE_CHAT_REACT,
 } from "../types";
+import FileServer from "file-saver";
 
 export const postOneOneChat = (chat) => {
   return (dispatch) => {
@@ -109,6 +110,19 @@ export const getOneOneChat = (roomId) => {
         });
       });
   };
+};
+
+export const download = (filename) => {
+  axios({
+    method: "GET",
+    url: `http://localhost:5000/chatMessage/file/${filename}`,
+    responseType: "blob",
+  })
+    .then((response) => {
+      console.log(response.data);
+      FileServer.saveAs(response.data, filename);
+    })
+    .catch((err) => alert("file is not saved, please try again."));
 };
 
 export const updateChatMessage = (react) => {

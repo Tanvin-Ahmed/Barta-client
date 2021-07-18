@@ -31,3 +31,18 @@ export const SELECTED_FILES = "selected_files";
 // chat page interaction
 export const OPEN_OPTIONS_FOR_CHAT = "open_options_for_chat";
 export const REACT_TAB_TOGGLE = "react_tab_toggle";
+
+// private video call
+export const OPEN_PRIVATE_VIDEO_CALL = "open_private_video_call";
+export const MY_ID = "my_id";
+export const USER_ID = "user_id";
+export const READ_STREAM = "read_stream";
+export const RECEIVING_CALL = "receiving_call";
+export const CALLER = "caller";
+export const CALLER_SIGNAL = "caller_signal";
+export const CALL_ACCEPTED = "call_accepted";
+export const CALL_ENDED = "call_ended";
+export const GET_MY_NAME = "get_my_name";
+export const GET_USER_NAME = "get_user_name";
+export const VOICE_OPEN = "voice_open";
+export const VIDEO_OPEN = "video_open";

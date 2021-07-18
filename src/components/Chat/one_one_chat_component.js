@@ -21,14 +21,21 @@ import {
 import AddCircleIcon from "@material-ui/icons/AddCircle";
 import InsertPhotoIcon from "@material-ui/icons/InsertPhoto";
 import VideoLibraryIcon from "@material-ui/icons/VideoLibrary";
-import { isClickUploadOption } from "../../app/actions/messageAction";
+import { download, isClickUploadOption } from "../../app/actions/messageAction";
 import HighlightOffIcon from "@material-ui/icons/HighlightOff";
 import DeleteIcon from "@material-ui/icons/Delete";
 import AddReactionIcon from "@material-ui/icons/AddReaction";
 import ReplayIcon from "@material-ui/icons/Replay";
 import { SRLWrapper } from "simple-react-lightbox";
+import ArrowDownwardIcon from "@material-ui/icons/ArrowDownward";
 
-export const ChatHeader = ({ receiverInfo, addChatList, largeScreen }) => {
+export const ChatHeader = ({
+  receiverInfo,
+  addChatList,
+  largeScreen,
+  // private video call
+  callUser,
+}) => {
   return (
     <div className="chat__header">
       <div className="header__info">
@@ -58,7 +65,7 @@ export const ChatHeader = ({ receiverInfo, addChatList, largeScreen }) => {
         <IconButton className="icon">
           <CallIcon />
         </IconButton>
-        <IconButton className="icon">
+        <IconButton onClick={callUser} className="icon">
           <VideoCallIcon />
         </IconButton>
         <IconButton className="icon">
@@ -146,6 +153,12 @@ const ROOT_CSS = css({
   width: "100%",
 });
 
+const option = {
+  buttons: {
+    showDownloadButton: false,
+  },
+};
+
 export const ChatBody = ({
   chatMessage,
   senderInfo,
@@ -163,8 +176,8 @@ export const ChatBody = ({
           style={{ width: "100%" }}
           className={
             message?.sender === senderInfo.email
-              ? "d-flex d-flex justify-content-end align-items-center"
-              : "d-flex flex-row-reverse d-flex justify-content-end align-items-center"
+              ? "d-flex d-flex justify-content-end align-items-center flex-wrap"
+              : "d-flex flex-row-reverse d-flex justify-content-end align-items-center flex-wrap"
           }
           onMouseOver={() => options(dispatch, true, message?._id)}
           onMouseLeave={() => options(dispatch, false, message?._id)}
@@ -191,26 +204,62 @@ export const ChatBody = ({
             </p>
             <div>
               {message?.message}
-              {message?.files?.length > 0 &&
-                message.files?.map((file, index) => {
-                  if (file.contentType.split("/")[0] === "image") {
-                    return (
-                      <SRLWrapper>
+              {message?.files?.length > 0 ? (
+                <SRLWrapper options={option}>
+                  {message.files?.map((file, index) => {
+                    if (file.contentType.split("/")[0] === "image") {
+                      return (
                         <a
                           href={`http://localhost:5000/chatMessage/file/${file?.filename}`}
                         >
                           <img
-                            key={file.id}
+                            key={file.fileId}
                             className="chat__img"
                             src={`http://localhost:5000/chatMessage/file/${file?.filename}`}
                             alt={`${index + 1}`}
                           />
                         </a>
-                      </SRLWrapper>
-                    );
-                  }
-                  return null;
-                })}
+                      );
+                    } else if (file.contentType.split("/")[0] === "video") {
+                      return (
+                        <div className="d-flex justify-content-center align-items-center">
+                          <IconButton
+                            onClick={() => download(file.filename)}
+                            className="icon download__icon"
+                          >
+                            <ArrowDownwardIcon />
+                          </IconButton>
+                          <video
+                            key={file.fileId}
+                            className="chat__img"
+                            src={`http://localhost:5000/chatMessage/file/${file?.filename}`}
+                            controls
+                            controlsList="nodownload"
+                          ></video>
+                        </div>
+                      );
+                    } else if (
+                      file.contentType.split("/")[0] === "application"
+                    ) {
+                      return (
+                        <div
+                          key={file.fileId}
+                          className="d-flex justify-content-center align-items-center show__document"
+                        >
+                          <IconButton
+                            onClick={() => download(file.filename)}
+                            className="icon download__icon"
+                          >
+                            <ArrowDownwardIcon />
+                          </IconButton>
+                          <div className="document__title">{file.filename}</div>
+                        </div>
+                      );
+                    }
+                    return null;
+                  })}
+                </SRLWrapper>
+              ) : null}
               <p className="time">
                 {new Date(message?.timeStamp).toLocaleString()}
               </p>
