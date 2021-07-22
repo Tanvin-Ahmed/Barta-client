@@ -25,3 +25,15 @@
 .receive_button {
   background-color: rgb(190, 205, 253) !important;
 }
+
+.video {
+  width: 45rem;
+  height: 100%;
+  object-fit: cover;
+}
+
+@media (max-width: 680px) {
+  .video {
+    width: 100%;
+  }
+}

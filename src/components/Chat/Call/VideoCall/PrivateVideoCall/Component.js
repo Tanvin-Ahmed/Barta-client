@@ -62,14 +62,24 @@ export const Buttons = ({
       )}
       {/* call end */}
       {receivingCall && !callAccepted ? (
-        <IconButton
-          className="receive_button m-2"
-          variant="contained"
-          size="small"
-          onClick={answerCall}
-        >
-          <PhoneInTalkIcon style={{ color: "dodgerblue" }} />
-        </IconButton>
+        <div className="d-flex justify-content-center align-items-center">
+          <IconButton
+            className="delete_button m-2"
+            variant="contained"
+            size="small"
+            onClick={leaveCall}
+          >
+            <CloseIcon style={{ color: "red" }} />
+          </IconButton>
+          <IconButton
+            className="receive_button m-2"
+            variant="contained"
+            size="small"
+            onClick={answerCall}
+          >
+            <PhoneInTalkIcon style={{ color: "dodgerblue" }} />
+          </IconButton>
+        </div>
       ) : (
         <IconButton
           className="delete_button m-2"
@@ -83,66 +93,3 @@ export const Buttons = ({
     </div>
   );
 };
-
-// <div className="button__group d-flex justify-content-center align-items-center flex-wrap">
-//   {/* voice mute */}
-//   {voiceOpen ? (
-//     <Button
-//       variant="contained"
-//       color="default"
-//       size="large"
-//       startIcon={<MicIcon />}
-//       className="m-2"
-//       onClick={handleAudioMute}
-//     ></Button>
-//   ) : (
-//     <Button
-//       variant="contained"
-//       color="default"
-//       size="large"
-//       startIcon={<MicOffIcon />}
-//       className="m-2"
-//       onClick={handleAudioMute}
-//     ></Button>
-//   )}
-//   {/* video mute */}
-//   {videoOpen ? (
-//     <Button
-//       variant="contained"
-//       color="default"
-//       size="large"
-//       startIcon={<VideocamIcon />}
-//       className="m-2"
-//       onClick={handleVideoMute}
-//     ></Button>
-//   ) : (
-//     <Button
-//       variant="contained"
-//       color="default"
-//       size="large"
-//       startIcon={<VideocamOffIcon />}
-//       className="m-2"
-//       onClick={handleVideoMute}
-//     ></Button>
-//   )}
-//   {/* call end */}
-//   {receivingCall && !callAccepted ? (
-//     <Button
-//       variant="contained"
-//       color="primary"
-//       size="large"
-//       startIcon={<PhoneInTalkIcon />}
-//       className="m-2"
-//       onClick={answerCall}
-//     ></Button>
-//   ) : (
-//     <Button
-//       variant="contained"
-//       color="secondary"
-//       size="large"
-//       startIcon={<CloseIcon />}
-//       className="m-2"
-//       onClick={leaveCall}
-//     ></Button>
-//   )}
-// </div>

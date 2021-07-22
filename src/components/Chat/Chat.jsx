@@ -3,6 +3,7 @@ import "./Chat.css";
 import { useDispatch, useSelector } from "react-redux";
 import { getOneOneChat } from "../../app/actions/messageAction";
 import { useParams } from "react-router-dom";
+import { useHistory } from "react-router";
 import Peer from "simple-peer";
 import {
   deleteChatMessage,
@@ -25,10 +26,13 @@ import {
 } from "./one_one_chat_component";
 import PrivateVideoCall from "./Call/VideoCall/PrivateVideoCall/PrivateVideoCall";
 import {
+  getCaller,
+  getCallerSignal,
   getMyId,
   getMyName,
   getStream,
   getUserId,
+  getUserName,
   isCallAccepted,
   isReceivingCall,
   setVideoCallIsOpen,
@@ -37,6 +41,7 @@ import {
 const Chat = ({ socket }) => {
   const dispatch = useDispatch();
   const { id } = useParams();
+  const history = useHistory();
 
   useMemo(() => {
     getUsersData(dispatch, id);
@@ -93,12 +98,27 @@ const Chat = ({ socket }) => {
     receiverStatusFromSocket(socket, receiverInfo, dispatch);
     chatMessage.length > 0 && updateReact(socket, dispatch, chatMessage);
     chatMessage.length > 0 && deleteChatMessage(socket, dispatch, chatMessage);
+  }, [chatMessage, dispatch, receiverInfo, roomId, socket]);
 
+  useEffect(() => {
     // video chat data
+    socket.on("callUser", (data) => {
+      if (data.userToCall === senderInfo.email) {
+        sessionStorage.setItem(
+          "barta/receiver",
+          JSON.stringify({ email: data.from })
+        );
+        dispatch(isReceivingCall(true));
+        dispatch(getCaller(data.from));
+        dispatch(getUserName(data.name));
+        dispatch(getCallerSignal(data.signal));
+        history.push(`/chat/${data.callerDataBaseId}`);
+      }
+    });
     dispatch(getUserId(receiverInfo.email));
     dispatch(getMyId(senderInfo.email));
     dispatch(getMyName(senderInfo.displayName));
-  }, [dispatch, roomId, socket, receiverInfo, chatMessage, senderInfo]);
+  }, [dispatch, socket, receiverInfo, senderInfo, history]);
 
   useEffect(() => {
     window.addEventListener("resize", screen(dispatch));
@@ -149,7 +169,7 @@ const Chat = ({ socket }) => {
             signal: signal,
             from: myId,
             name: myName,
-            callerDataBaseId: id,
+            callerDataBaseId: senderInfo._id,
           });
         });
 

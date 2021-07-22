@@ -16,7 +16,7 @@ import {
 export const getUserInfo = () => {
   return async (dispatch) => {
     let userData = await localStorage.getItem("barta/user");
-    userData = JSON?.parse(userData);
+    userData = JSON.parse(userData);
 
     dispatch({
       type: GET_USER_INFO,
@@ -150,9 +150,20 @@ export const getAllUserInfo = (searchString) => {
 
 export const postMyInfo = (user) => {
   return (dispatch) => {
+    getUserInfo();
     axios
       .post("http://localhost:5000/user/account", user)
       .then((data) => {
+        localStorage.setItem(
+          "barta/user",
+          JSON.stringify({
+            _id: data.data._id,
+            email: data.data.email,
+            displayName: data.data.displayName,
+            photoURL: data.data.photoURL,
+            status: "active",
+          })
+        );
         dispatch({
           type: POST_USER_INFO,
           payload: data.data.insertCount > 0,

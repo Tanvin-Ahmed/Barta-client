@@ -18,6 +18,7 @@ const Login = () => {
   const signIn = () => {
     SignInWithGoogle()
       .then((result) => {
+        console.log(result);
         const user = {
           email: result.email,
           displayName: result.displayName,
@@ -27,6 +28,7 @@ const Login = () => {
           goOffLine: new Date().toUTCString(),
           timeStamp: new Date().toUTCString(),
         };
+
         localStorage.setItem(
           "barta/user",
           JSON.stringify({
@@ -36,8 +38,8 @@ const Login = () => {
             status: "active",
           })
         );
-
         dispatch(postMyInfo(user));
+
         history.replace(from);
       })
       .catch((error) => {
