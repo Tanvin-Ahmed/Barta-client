@@ -10,6 +10,7 @@ import {
   getCallerSignal,
   getUserName,
   isReceivingCall,
+  isVideoChat,
 } from "../../app/actions/privateVideoCallAction";
 
 const ChatBar = ({ socket }) => {
@@ -43,6 +44,9 @@ const ChatBar = ({ socket }) => {
         dispatch(getCaller(data.from));
         dispatch(getUserName(data.name));
         dispatch(getCallerSignal(data.signal));
+        data.callType === "video"
+          ? dispatch(isVideoChat(true))
+          : dispatch(isVideoChat(false));
         history.push(`/chat/${data.callerDataBaseId}`);
       }
     });

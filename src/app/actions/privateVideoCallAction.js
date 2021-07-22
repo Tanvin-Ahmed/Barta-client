@@ -10,6 +10,7 @@ import {
   READ_STREAM,
   RECEIVING_CALL,
   USER_ID,
+  VIDEO_CHAT,
   VIDEO_OPEN,
   VOICE_OPEN,
 } from "../types";
@@ -18,6 +19,13 @@ export const setVideoCallIsOpen = (toggle) => {
   return {
     type: OPEN_PRIVATE_VIDEO_CALL,
     payload: toggle,
+  };
+};
+
+export const isVideoChat = (bool) => {
+  return {
+    type: VIDEO_CHAT,
+    payload: bool,
   };
 };
 

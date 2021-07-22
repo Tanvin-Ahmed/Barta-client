@@ -62,10 +62,10 @@ export const ChatHeader = ({
         </div>
       </div>
       <div className="chat__options">
-        <IconButton className="icon">
+        <IconButton onClick={() => callUser(false)} className="icon">
           <CallIcon />
         </IconButton>
-        <IconButton onClick={callUser} className="icon">
+        <IconButton onClick={() => callUser(true)} className="icon">
           <VideoCallIcon />
         </IconButton>
         <IconButton className="icon">

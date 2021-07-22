@@ -33,6 +33,7 @@ const PrivateVideoCall = ({
     callEnded,
     receiverInfo,
     userInfo,
+    videoChat,
   } = useSelector((state) => ({
     stream: state.privateVideoCall.stream,
     receivingCall: state.privateVideoCall.receivingCall,
@@ -44,17 +45,18 @@ const PrivateVideoCall = ({
     callEnded: state.privateVideoCall.callEnd,
     receiverInfo: state.userReducer.receiverInfo,
     userInfo: state.userReducer.userInfo,
+    videoChat: state.privateVideoCall.videoChat,
   }));
 
   useEffect(() => {
     receivingCall &&
       navigator.mediaDevices
-        .getUserMedia({ video: true, audio: true })
+        .getUserMedia({ video: videoChat, audio: true })
         .then((stream) => {
           dispatch(getStream(stream));
           myVideo.current.srcObject = stream;
         });
-  }, [dispatch, myVideo, receivingCall]);
+  }, [dispatch, myVideo, receivingCall, videoChat]);
 
   useEffect(() => {
     const cutCall = () => {
@@ -138,23 +140,47 @@ const PrivateVideoCall = ({
   return (
     <div style={{ position: "relative" }}>
       <div style={{ position: "relative", width: "100%", height: "95vh" }}>
-        {callAccepted && !callEnded ? (
-          <video playsInline ref={userVideo} autoPlay className="video" />
+        {videoChat ? (
+          <>
+            {callAccepted && !callEnded ? (
+              <video playsInline ref={userVideo} autoPlay className="video" />
+            ) : (
+              <img
+                src={call_bg}
+                alt=""
+                style={{
+                  minWidth: "100%",
+                  minHeight: "100%",
+                  objectFit: "cover",
+                }}
+              />
+            )}
+            {stream && (
+              <video
+                playsInline
+                muted
+                ref={myVideo}
+                autoPlay
+                className="myVideo__after_callReceive"
+              />
+            )}
+          </>
         ) : (
-          <img
-            src={call_bg}
-            alt=""
-            style={{ minWidth: "100%", minHeight: "100%", objectFit: "cover" }}
-          />
-        )}
-        {stream && (
-          <video
-            playsInline
-            muted
-            ref={myVideo}
-            autoPlay
-            className="myVideo__after_callReceive"
-          />
+          <div>
+            <img
+              src={call_bg}
+              alt=""
+              style={{
+                minWidth: "100%",
+                minHeight: "100%",
+                objectFit: "cover",
+              }}
+            />
+            <audio muted ref={myVideo} autoPlay></audio>
+            {callAccepted && !callEnded && (
+              <audio ref={userVideo} autoPlay></audio>
+            )}
+          </div>
         )}
       </div>
       <div className="buttons__position">
@@ -167,6 +193,7 @@ const PrivateVideoCall = ({
           handleVideoMute={handleVideoMute}
           answerCall={answerCall}
           leaveCall={leaveCall}
+          videoChat={videoChat}
         />
       </div>
     </div>

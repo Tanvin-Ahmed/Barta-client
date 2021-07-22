@@ -10,6 +10,7 @@ import {
   READ_STREAM,
   RECEIVING_CALL,
   USER_ID,
+  VIDEO_CHAT,
   VIDEO_OPEN,
   VOICE_OPEN,
 } from "../types";
@@ -28,10 +29,16 @@ const initialState = {
   userName: "",
   voiceOpen: true,
   videoOpen: true,
+  videoChat: false,
 };
 
 const privateVideoCall = (state = initialState, action) => {
   switch (action.type) {
+    case VIDEO_CHAT:
+      return {
+        ...state,
+        videoChat: action.payload,
+      };
     case OPEN_PRIVATE_VIDEO_CALL:
       return {
         ...state,

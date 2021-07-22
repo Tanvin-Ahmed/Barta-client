@@ -35,6 +35,7 @@ import {
   getUserName,
   isCallAccepted,
   isReceivingCall,
+  isVideoChat,
   setVideoCallIsOpen,
 } from "../../app/actions/privateVideoCallAction";
 
@@ -149,10 +150,11 @@ const Chat = ({ socket }) => {
   const userVideo = useRef();
   const myVideo = useRef();
 
-  const callUser = () => {
+  const callUser = (video) => {
     dispatch(setVideoCallIsOpen(true));
+    dispatch(isVideoChat(video));
     navigator.mediaDevices
-      .getUserMedia({ video: true, audio: true })
+      .getUserMedia({ video: video, audio: true })
       .then((stream) => {
         dispatch(getStream(stream));
         myVideo.current.srcObject = stream;
@@ -170,6 +172,7 @@ const Chat = ({ socket }) => {
             from: myId,
             name: myName,
             callerDataBaseId: senderInfo._id,
+            callType: video ? "video" : "audio",
           });
         });
 

@@ -17,6 +17,7 @@ export const Buttons = ({
   handleVideoMute,
   answerCall,
   leaveCall,
+  videoChat,
 }) => {
   return (
     <div className="button__group d-flex justify-content-center align-items-center">
@@ -41,25 +42,27 @@ export const Buttons = ({
         </IconButton>
       )}
       {/* video mute */}
-      {videoOpen ? (
-        <IconButton
-          className="audio__video_mute_button m-2"
-          variant="contained"
-          size="small"
-          onClick={handleVideoMute}
-        >
-          <VideocamIcon style={{ color: "gray" }} />
-        </IconButton>
-      ) : (
-        <IconButton
-          className="audio__video_mute_button m-2"
-          variant="contained"
-          size="small"
-          onClick={handleVideoMute}
-        >
-          <VideocamOffIcon style={{ color: "gray" }} />
-        </IconButton>
-      )}
+      {videoOpen
+        ? videoChat && (
+            <IconButton
+              className="audio__video_mute_button m-2"
+              variant="contained"
+              size="small"
+              onClick={handleVideoMute}
+            >
+              <VideocamIcon style={{ color: "gray" }} />
+            </IconButton>
+          )
+        : videoChat && (
+            <IconButton
+              className="audio__video_mute_button m-2"
+              variant="contained"
+              size="small"
+              onClick={handleVideoMute}
+            >
+              <VideocamOffIcon style={{ color: "gray" }} />
+            </IconButton>
+          )}
       {/* call end */}
       {receivingCall && !callAccepted ? (
         <div className="d-flex justify-content-center align-items-center">
