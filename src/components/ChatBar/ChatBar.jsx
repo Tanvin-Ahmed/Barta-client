@@ -47,6 +47,8 @@ const ChatBar = ({ socket }) => {
         data.callType === "video"
           ? dispatch(isVideoChat(true))
           : dispatch(isVideoChat(false));
+
+        socket.emit("call-reach-to-me", data.from);
         history.push(`/chat/${data.callerDataBaseId}`);
       }
     });

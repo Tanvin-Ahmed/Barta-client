@@ -6,6 +6,7 @@ import {
   isCallAccepted,
   isCallEnded,
   isReceivingCall,
+  setCallReachToReceiver,
   setVideoCallIsOpen,
   setVideoOpen,
   setVoiceOpen,
@@ -13,6 +14,7 @@ import {
 import { Buttons } from "./Component";
 import "./PrivateVideoCall.css";
 import call_bg from "../../../../../img/bg/call_bg.jpg";
+import ringtone from "../../../../../audios/Facebook_messenger_ringtone.mp3";
 
 const PrivateVideoCall = ({
   socket,
@@ -34,6 +36,8 @@ const PrivateVideoCall = ({
     receiverInfo,
     userInfo,
     videoChat,
+    userName,
+    callReachToReceiver,
   } = useSelector((state) => ({
     stream: state.privateVideoCall.stream,
     receivingCall: state.privateVideoCall.receivingCall,
@@ -46,8 +50,11 @@ const PrivateVideoCall = ({
     receiverInfo: state.userReducer.receiverInfo,
     userInfo: state.userReducer.userInfo,
     videoChat: state.privateVideoCall.videoChat,
+    userName: state.privateVideoCall.userName,
+    callReachToReceiver: state.privateVideoCall.callReachToReceiver,
   }));
 
+  ////////////////// OPEN CAMERA AND MICROPHONE //////////////////
   useEffect(() => {
     receivingCall &&
       navigator.mediaDevices
@@ -58,6 +65,16 @@ const PrivateVideoCall = ({
         });
   }, [dispatch, myVideo, receivingCall, videoChat]);
 
+  ////////////////// RESPONSE IF RECEIVER IS ONLINE ///////////////////
+  useEffect(() => {
+    socket.once("call-reach-to-user", (to) => {
+      if (to === userInfo.email) {
+        dispatch(setCallReachToReceiver(true));
+      }
+    });
+  }, [socket, dispatch, userInfo]);
+
+  ///////////////// CUT THE CALL ///////////////////////
   useEffect(() => {
     const cutCall = () => {
       stream?.getTracks()?.forEach((track) => {
@@ -76,6 +93,7 @@ const PrivateVideoCall = ({
         dispatch(isCallAccepted(false));
         connectionRef.current && connectionRef.current.destroy();
         userVideo.current = null;
+        window.location.reload();
       }
     });
   }, [socket, connectionRef, userVideo, userInfo, dispatch, stream]);
@@ -113,6 +131,7 @@ const PrivateVideoCall = ({
 
     peer.on("signal", (signal) => {
       socket.emit("answerCall", { signal, to: caller });
+      dispatch(isReceivingCall(false));
     });
 
     peer.on("stream", (stream) => {
@@ -128,13 +147,13 @@ const PrivateVideoCall = ({
     dispatch(setVideoCallIsOpen(false));
     dispatch(isReceivingCall(false));
     dispatch(isCallAccepted(false));
-    connectionRef.current.destroy();
+    connectionRef.current && connectionRef.current.destroy();
     userVideo.current = null;
-    // window.location.reload();
 
     socket.emit("cutCall", {
       to: receiverInfo.email,
     });
+    window.location.reload();
   };
 
   return (
@@ -145,15 +164,33 @@ const PrivateVideoCall = ({
             {callAccepted && !callEnded ? (
               <video playsInline ref={userVideo} autoPlay className="video" />
             ) : (
-              <img
-                src={call_bg}
-                alt=""
-                style={{
-                  minWidth: "100%",
-                  minHeight: "100%",
-                  objectFit: "cover",
-                }}
-              />
+              <>
+                <img
+                  src={call_bg}
+                  alt=""
+                  style={{
+                    minWidth: "100%",
+                    minHeight: "100%",
+                    objectFit: "cover",
+                    position: "relative",
+                  }}
+                />
+                {receivingCall ? (
+                  <div className="callInfo">
+                    <h5>{userName}</h5>
+                    <h6>is calling....</h6>
+                    <audio src={ringtone} loop autoPlay></audio>
+                  </div>
+                ) : (
+                  <div className="callInfo">
+                    <h6>You calling....</h6>
+                    <h5>{receiverInfo.displayName}</h5>
+                    <h6>
+                      {callReachToReceiver ? "Ringing...." : "Connecting..."}
+                    </h6>
+                  </div>
+                )}
+              </>
             )}
             {stream && (
               <video
@@ -166,7 +203,7 @@ const PrivateVideoCall = ({
             )}
           </>
         ) : (
-          <div>
+          <>
             <img
               src={call_bg}
               alt=""
@@ -174,13 +211,27 @@ const PrivateVideoCall = ({
                 minWidth: "100%",
                 minHeight: "100%",
                 objectFit: "cover",
+                position: "relative",
               }}
             />
+            {receivingCall ? (
+              <div className="callInfo">
+                <h5>{userName}</h5>
+                <h6>is calling....</h6>
+                <audio src={ringtone} loop autoPlay></audio>
+              </div>
+            ) : (
+              <div className="callInfo">
+                <h6>You calling....</h6>
+                <h5>{receiverInfo.displayName}</h5>
+                <h6>{callReachToReceiver ? "Ringing...." : "Connecting..."}</h6>
+              </div>
+            )}
             <audio muted ref={myVideo} autoPlay></audio>
             {callAccepted && !callEnded && (
               <audio ref={userVideo} autoPlay></audio>
             )}
-          </div>
+          </>
         )}
       </div>
       <div className="buttons__position">

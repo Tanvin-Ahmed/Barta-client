@@ -47,3 +47,4 @@ export const GET_USER_NAME = "get_user_name";
 export const VOICE_OPEN = "voice_open";
 export const VIDEO_OPEN = "video_open";
 export const VIDEO_CHAT = "video_chat";
+export const CALL_REACH_TO_RECEIVER = "call_reach_to_receiver";

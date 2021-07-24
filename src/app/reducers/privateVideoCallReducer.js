@@ -3,6 +3,7 @@ import {
   CALLER_SIGNAL,
   CALL_ACCEPTED,
   CALL_ENDED,
+  CALL_REACH_TO_RECEIVER,
   GET_MY_NAME,
   GET_USER_NAME,
   MY_ID,
@@ -30,6 +31,7 @@ const initialState = {
   voiceOpen: true,
   videoOpen: true,
   videoChat: false,
+  callReachToReceiver: false,
 };
 
 const privateVideoCall = (state = initialState, action) => {
@@ -103,6 +105,11 @@ const privateVideoCall = (state = initialState, action) => {
       return {
         ...state,
         videoOpen: action.payload,
+      };
+    case CALL_REACH_TO_RECEIVER:
+      return {
+        ...state,
+        callReachToReceiver: action.payload,
       };
     default:
       return state;

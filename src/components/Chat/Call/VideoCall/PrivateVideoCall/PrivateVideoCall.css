@@ -26,6 +26,17 @@
   background-color: rgb(190, 205, 253) !important;
 }
 
+.callInfo {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 12;
+  color: white;
+  font-weight: 3rem;
+  text-align: center;
+}
+
 .video {
   width: 45rem;
   height: 100%;

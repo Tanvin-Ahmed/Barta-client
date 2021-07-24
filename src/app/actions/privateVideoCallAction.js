@@ -3,6 +3,7 @@ import {
   CALLER_SIGNAL,
   CALL_ACCEPTED,
   CALL_ENDED,
+  CALL_REACH_TO_RECEIVER,
   GET_MY_NAME,
   GET_USER_NAME,
   MY_ID,
@@ -110,5 +111,12 @@ export const getUserName = (name) => {
   return {
     type: GET_USER_NAME,
     payload: name,
+  };
+};
+
+export const setCallReachToReceiver = (bool) => {
+  return {
+    type: CALL_REACH_TO_RECEIVER,
+    payload: bool,
   };
 };

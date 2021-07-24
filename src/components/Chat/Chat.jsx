@@ -113,6 +113,11 @@ const Chat = ({ socket }) => {
         dispatch(getCaller(data.from));
         dispatch(getUserName(data.name));
         dispatch(getCallerSignal(data.signal));
+        data.callType === "video"
+          ? dispatch(isVideoChat(true))
+          : dispatch(isVideoChat(false));
+
+        socket.emit("call-reach-to-me", data.from);
         history.push(`/chat/${data.callerDataBaseId}`);
       }
     });
