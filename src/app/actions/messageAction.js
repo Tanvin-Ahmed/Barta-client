@@ -11,6 +11,7 @@ import {
   REACT_TAB_TOGGLE,
   SCREEN_SIZE,
   SELECTED_FILES,
+  SET_ROOM_ID,
   UPDATE_CHAT_REACT,
 } from "../types";
 import FileServer from "file-saver";
@@ -247,5 +248,12 @@ export const deleteMessage = (chatMessage, deletedItemId) => {
         payload: chatMessage,
       });
     }
+  };
+};
+
+export const setRoomId = (id) => {
+  return {
+    type: SET_ROOM_ID,
+    payload: id,
   };
 };

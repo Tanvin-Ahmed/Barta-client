@@ -1,15 +1,20 @@
+import axios from "axios";
 import {
   CALLER,
   CALLER_SIGNAL,
   CALL_ACCEPTED,
   CALL_ENDED,
   CALL_REACH_TO_RECEIVER,
+  CALL_TIMER,
   GET_MY_NAME,
   GET_USER_NAME,
   MY_ID,
   OPEN_PRIVATE_VIDEO_CALL,
   READ_STREAM,
   RECEIVING_CALL,
+  SET_INTERVAL,
+  SET_RECEIVER,
+  START_TIMER,
   USER_ID,
   VIDEO_CHAT,
   VIDEO_OPEN,
@@ -119,4 +124,36 @@ export const setCallReachToReceiver = (bool) => {
     type: CALL_REACH_TO_RECEIVER,
     payload: bool,
   };
+};
+
+export const setCallTimer = (timer) => {
+  return {
+    type: CALL_TIMER,
+    payload: timer,
+  };
+};
+
+export const setStartTimer = (bol) => {
+  return {
+    type: START_TIMER,
+    payload: bol,
+  };
+};
+
+export const setInterVal = (interVal) => {
+  return {
+    type: SET_INTERVAL,
+    payload: interVal,
+  };
+};
+
+export const setReceiver = (bol) => {
+  return {
+    type: SET_RECEIVER,
+    payload: bol,
+  };
+};
+
+export const setCallInfoInDatabase = (callInfo) => {
+  axios.post("http://localhost:5000/chatMessage/postCallInfo", callInfo);
 };

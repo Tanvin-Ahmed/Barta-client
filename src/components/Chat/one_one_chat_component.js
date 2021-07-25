@@ -28,6 +28,11 @@ import AddReactionIcon from "@material-ui/icons/AddReaction";
 import ReplayIcon from "@material-ui/icons/Replay";
 import { SRLWrapper } from "simple-react-lightbox";
 import ArrowDownwardIcon from "@material-ui/icons/ArrowDownward";
+import CallMadeIcon from "@material-ui/icons/CallMade";
+import CallReceivedIcon from "@material-ui/icons/CallReceived";
+import CallMissedOutgoingIcon from "@material-ui/icons/CallMissedOutgoing";
+import CallMissedIcon from "@material-ui/icons/CallMissed";
+import Timer from "./Call/VideoCall/PrivateVideoCall/Timer.jsx";
 
 export const ChatHeader = ({
   receiverInfo,
@@ -204,12 +209,56 @@ export const ChatBody = ({
             </p>
             <div>
               {message?.message}
+              {message.receiver && (
+                <>
+                  <div className="d-flex justify-content-center align-items-center">
+                    {message?.callDuration?.s > 0 ? (
+                      message?.sender === senderInfo.email ? (
+                        <CallMadeIcon
+                          className="mr-2"
+                          variant="contained"
+                          size="small"
+                          style={{ color: "blue" }}
+                        />
+                      ) : (
+                        <CallReceivedIcon
+                          className="mr-2"
+                          variant="contained"
+                          size="small"
+                          style={{ color: "green" }}
+                        />
+                      )
+                    ) : message?.sender === senderInfo.email ? (
+                      <CallMissedOutgoingIcon
+                        className="mr-2"
+                        variant="contained"
+                        size="small"
+                        style={{ color: "red" }}
+                      />
+                    ) : (
+                      <CallMissedIcon
+                        className="mr-2"
+                        variant="contained"
+                        size="small"
+                        style={{ color: "red" }}
+                      />
+                    )}
+                    <h6>{message?.callDescription}</h6>
+                  </div>
+                  {message?.callDuration?.s > 0 && (
+                    <small>
+                      <Timer timer={message?.callDuration} />
+                    </small>
+                  )}
+                </>
+              )}
               {message?.files?.length > 0 ? (
                 <SRLWrapper options={option}>
                   {message.files?.map((file, index) => {
                     if (file.contentType.split("/")[0] === "image") {
                       return (
                         <a
+                          key={index}
                           href={`http://localhost:5000/chatMessage/file/${file?.filename}`}
                         >
                           <img
@@ -222,7 +271,10 @@ export const ChatBody = ({
                       );
                     } else if (file.contentType.split("/")[0] === "video") {
                       return (
-                        <div className="d-flex justify-content-center align-items-center">
+                        <div
+                          key={index}
+                          className="d-flex justify-content-center align-items-center"
+                        >
                           <IconButton
                             onClick={() => download(file.filename)}
                             className="icon download__icon"
@@ -243,7 +295,7 @@ export const ChatBody = ({
                     ) {
                       return (
                         <div
-                          key={file.fileId}
+                          key={index}
                           className="d-flex justify-content-center align-items-center show__document"
                         >
                           <IconButton

@@ -4,12 +4,16 @@ import {
   CALL_ACCEPTED,
   CALL_ENDED,
   CALL_REACH_TO_RECEIVER,
+  CALL_TIMER,
   GET_MY_NAME,
   GET_USER_NAME,
   MY_ID,
   OPEN_PRIVATE_VIDEO_CALL,
   READ_STREAM,
   RECEIVING_CALL,
+  SET_INTERVAL,
+  SET_RECEIVER,
+  START_TIMER,
   USER_ID,
   VIDEO_CHAT,
   VIDEO_OPEN,
@@ -32,6 +36,10 @@ const initialState = {
   videoOpen: true,
   videoChat: false,
   callReachToReceiver: false,
+  timer: { h: 0, m: 0, s: 0 },
+  startTimer: false,
+  interVal: null,
+  receiver: false,
 };
 
 const privateVideoCall = (state = initialState, action) => {
@@ -110,6 +118,26 @@ const privateVideoCall = (state = initialState, action) => {
       return {
         ...state,
         callReachToReceiver: action.payload,
+      };
+    case CALL_TIMER:
+      return {
+        ...state,
+        timer: action.payload,
+      };
+    case START_TIMER:
+      return {
+        ...state,
+        startTimer: action.payload,
+      };
+    case SET_INTERVAL:
+      return {
+        ...state,
+        interVal: action.payload,
+      };
+    case SET_RECEIVER:
+      return {
+        ...state,
+        receiver: action.payload,
       };
     default:
       return state;

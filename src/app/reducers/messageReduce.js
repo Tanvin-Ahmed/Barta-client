@@ -12,6 +12,7 @@ import {
   REACT_TAB_TOGGLE,
   UPDATE_CHAT_REACT,
   DELETE_CHAT_MESSAGE,
+  SET_ROOM_ID,
 } from "../types";
 
 const initialState = {
@@ -25,6 +26,7 @@ const initialState = {
   chosenFiles: [],
   isOpenOptions: {},
   reactTabIsOpen: false,
+  roomId: "",
 };
 
 const messageReducer = (state = initialState, action) => {
@@ -103,6 +105,12 @@ const messageReducer = (state = initialState, action) => {
       return {
         ...state,
         reactTabIsOpen: action.payload,
+      };
+
+    case SET_ROOM_ID:
+      return {
+        ...state,
+        roomId: action.payload,
       };
 
     default:

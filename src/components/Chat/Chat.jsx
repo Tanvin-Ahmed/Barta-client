@@ -36,8 +36,11 @@ import {
   isCallAccepted,
   isReceivingCall,
   isVideoChat,
+  setReceiver,
+  setStartTimer,
   setVideoCallIsOpen,
 } from "../../app/actions/privateVideoCallAction";
+import { start } from "./Call/VideoCall/PrivateVideoCall/timer";
 
 const Chat = ({ socket }) => {
   const dispatch = useDispatch();
@@ -65,6 +68,7 @@ const Chat = ({ socket }) => {
     idToCall,
     myName,
     receivingCall,
+    timer,
   } = useSelector((state) => ({
     // private chat
     senderInfo: state.userReducer.userInfo,
@@ -85,12 +89,13 @@ const Chat = ({ socket }) => {
     idToCall: state.privateVideoCall.idToCall,
     myName: state.privateVideoCall.myName,
     receivingCall: state.privateVideoCall.receivingCall,
+    timer: state.privateVideoCall.timer,
   }));
   const [inputText, setInputText] = useState("");
 
   const roomId = useMemo(() => {
-    return getRoomId();
-  }, []);
+    return getRoomId(dispatch);
+  }, [dispatch]);
 
   useEffect(() => {
     socket.emit("join", { roomId });
@@ -109,6 +114,7 @@ const Chat = ({ socket }) => {
           "barta/receiver",
           JSON.stringify({ email: data.from })
         );
+        dispatch(setReceiver(true));
         dispatch(isReceivingCall(true));
         dispatch(getCaller(data.from));
         dispatch(getUserName(data.name));
@@ -184,6 +190,8 @@ const Chat = ({ socket }) => {
         socket.on("callAccepted", (data) => {
           if (data.to === senderInfo.email) {
             dispatch(isCallAccepted(true));
+            dispatch(setStartTimer(true));
+            start(timer, dispatch);
             dispatch(isReceivingCall(false));
             peer.signal(data.signal);
           }

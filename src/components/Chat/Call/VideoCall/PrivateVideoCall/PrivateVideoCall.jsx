@@ -6,7 +6,11 @@ import {
   isCallAccepted,
   isCallEnded,
   isReceivingCall,
+  setCallInfoInDatabase,
   setCallReachToReceiver,
+  setCallTimer,
+  setReceiver,
+  setStartTimer,
   setVideoCallIsOpen,
   setVideoOpen,
   setVoiceOpen,
@@ -15,6 +19,8 @@ import { Buttons } from "./Component";
 import "./PrivateVideoCall.css";
 import call_bg from "../../../../../img/bg/call_bg.jpg";
 import ringtone from "../../../../../audios/Facebook_messenger_ringtone.mp3";
+import { end, start } from "./timer";
+import Timer from "./Timer.jsx";
 
 const PrivateVideoCall = ({
   socket,
@@ -38,6 +44,11 @@ const PrivateVideoCall = ({
     videoChat,
     userName,
     callReachToReceiver,
+    startTimer,
+    timer,
+    interVal,
+    receiver,
+    roomId,
   } = useSelector((state) => ({
     stream: state.privateVideoCall.stream,
     receivingCall: state.privateVideoCall.receivingCall,
@@ -52,6 +63,11 @@ const PrivateVideoCall = ({
     videoChat: state.privateVideoCall.videoChat,
     userName: state.privateVideoCall.userName,
     callReachToReceiver: state.privateVideoCall.callReachToReceiver,
+    startTimer: state.privateVideoCall.startTimer,
+    timer: state.privateVideoCall.timer,
+    interVal: state.privateVideoCall.interVal,
+    receiver: state.privateVideoCall.receiver,
+    roomId: state.messageReducer.roomId,
   }));
 
   ////////////////// OPEN CAMERA AND MICROPHONE //////////////////
@@ -87,16 +103,20 @@ const PrivateVideoCall = ({
     socket.on("callEnded", (to) => {
       if (to === userInfo.email) {
         cutCall();
+        dispatch(setReceiver(false));
         dispatch(isCallEnded(true));
+        dispatch(setStartTimer(false));
         dispatch(setVideoCallIsOpen(false));
         dispatch(isReceivingCall(false));
         dispatch(isCallAccepted(false));
         connectionRef.current && connectionRef.current.destroy();
         userVideo.current = null;
+        end(interVal);
+        dispatch(setCallTimer({ s: 0, m: 0, h: 0 }));
         window.location.reload();
       }
     });
-  }, [socket, connectionRef, userVideo, userInfo, dispatch, stream]);
+  }, [socket, connectionRef, userVideo, userInfo, dispatch, stream, interVal]);
 
   // stop both mic and camera
   const stopBothVideoAndAudio = () => {
@@ -132,6 +152,8 @@ const PrivateVideoCall = ({
     peer.on("signal", (signal) => {
       socket.emit("answerCall", { signal, to: caller });
       dispatch(isReceivingCall(false));
+      dispatch(setStartTimer(true));
+      start(timer, dispatch);
     });
 
     peer.on("stream", (stream) => {
@@ -143,13 +165,24 @@ const PrivateVideoCall = ({
 
   const leaveCall = () => {
     stopBothVideoAndAudio();
+    end(interVal);
+    setCallInfoInDatabase({
+      id: roomId,
+      sender: receiver ? caller : userInfo.email,
+      receiver: receiver ? userInfo.email : receiverInfo.email,
+      callDuration: timer,
+      callDescription: videoChat ? "Video Call" : "Audio Call",
+      timeStamp: new Date().toUTCString(),
+    });
+    dispatch(setCallTimer({ s: 0, m: 0, h: 0 }));
     dispatch(isCallEnded(true));
+    dispatch(setStartTimer(false));
     dispatch(setVideoCallIsOpen(false));
     dispatch(isReceivingCall(false));
     dispatch(isCallAccepted(false));
     connectionRef.current && connectionRef.current.destroy();
     userVideo.current = null;
-
+    dispatch(setReceiver(false));
     socket.emit("cutCall", {
       to: receiverInfo.email,
     });
@@ -183,10 +216,14 @@ const PrivateVideoCall = ({
                   </div>
                 ) : (
                   <div className="callInfo">
-                    <h6>You calling....</h6>
+                    {!startTimer && <h6>You calling....</h6>}
                     <h5>{receiverInfo.displayName}</h5>
                     <h6>
-                      {callReachToReceiver ? "Ringing...." : "Connecting..."}
+                      {!startTimer
+                        ? callReachToReceiver
+                          ? "Ringing...."
+                          : "Connecting..."
+                        : ""}
                     </h6>
                   </div>
                 )}
@@ -222,9 +259,15 @@ const PrivateVideoCall = ({
               </div>
             ) : (
               <div className="callInfo">
-                <h6>You calling....</h6>
+                {!startTimer && <h6>You calling....</h6>}
                 <h5>{receiverInfo.displayName}</h5>
-                <h6>{callReachToReceiver ? "Ringing...." : "Connecting..."}</h6>
+                <h6>
+                  {!startTimer
+                    ? callReachToReceiver
+                      ? "Ringing...."
+                      : "Connecting..."
+                    : ""}
+                </h6>
               </div>
             )}
             <audio muted ref={myVideo} autoPlay></audio>
@@ -234,6 +277,11 @@ const PrivateVideoCall = ({
           </>
         )}
       </div>
+      {callAccepted && !callEnded && (
+        <div className="timer">
+          <Timer timer={timer} />
+        </div>
+      )}
       <div className="buttons__position">
         <Buttons
           videoOpen={videoOpen}

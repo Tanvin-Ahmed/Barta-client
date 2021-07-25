@@ -24,6 +24,7 @@ export const CLICK_UPLOAD_OPTION = "click_upload_option";
 export const UPDATE_REACT = "update_react";
 export const UPDATE_CHAT_REACT = "update_chat_react";
 export const DELETE_CHAT_MESSAGE = "delete_chat_message";
+export const SET_ROOM_ID = "set_room_id";
 
 // file upload
 export const SELECTED_FILES = "selected_files";
@@ -32,7 +33,7 @@ export const SELECTED_FILES = "selected_files";
 export const OPEN_OPTIONS_FOR_CHAT = "open_options_for_chat";
 export const REACT_TAB_TOGGLE = "react_tab_toggle";
 
-// private video call
+// private call
 export const OPEN_PRIVATE_VIDEO_CALL = "open_private_video_call";
 export const MY_ID = "my_id";
 export const USER_ID = "user_id";
@@ -48,3 +49,7 @@ export const VOICE_OPEN = "voice_open";
 export const VIDEO_OPEN = "video_open";
 export const VIDEO_CHAT = "video_chat";
 export const CALL_REACH_TO_RECEIVER = "call_reach_to_receiver";
+export const CALL_TIMER = "call_timer";
+export const START_TIMER = "start_timer";
+export const SET_INTERVAL = "set_interval";
+export const SET_RECEIVER = "set_receiver";

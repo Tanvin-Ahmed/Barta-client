@@ -11,6 +11,7 @@ import {
   getUserName,
   isReceivingCall,
   isVideoChat,
+  setReceiver,
 } from "../../app/actions/privateVideoCallAction";
 
 const ChatBar = ({ socket }) => {
@@ -40,6 +41,7 @@ const ChatBar = ({ socket }) => {
           "barta/receiver",
           JSON.stringify({ email: data.from })
         );
+        dispatch(setReceiver(true));
         dispatch(isReceivingCall(true));
         dispatch(getCaller(data.from));
         dispatch(getUserName(data.name));

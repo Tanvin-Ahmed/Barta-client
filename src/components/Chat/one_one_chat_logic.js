@@ -8,6 +8,7 @@ import {
   openOptions,
   postOneOneChat,
   reactTabToggle,
+  setRoomId,
   updateChatMessage,
   updateReactInChat,
   uploadFiles,
@@ -32,7 +33,7 @@ export const getUsersData = async (dispatch, id) => {
   await dispatch(getReceiverInfo(id));
 };
 
-export const getRoomId = () => {
+export const getRoomId = (dispatch) => {
   const sender = JSON.parse(localStorage.getItem("barta/user"))?.email?.split(
     "@"
   );
@@ -40,7 +41,9 @@ export const getRoomId = () => {
     sessionStorage.getItem("barta/receiver")
   )?.email?.split("@");
   const ascendingSort = [sender[0], receiver[0]].sort();
-  return `${ascendingSort[0]}_${ascendingSort[1]}`;
+  const roomId = `${ascendingSort[0]}_${ascendingSort[1]}`;
+  dispatch(setRoomId(roomId));
+  return roomId;
 };
 
 export const handleIsType = (e, socket, senderEmail) => {
