@@ -89,7 +89,7 @@ export const UploadProgressBar = ({ uploadPercentage }) => {
   );
 };
 
-const Options = ({ dispatch, reactTabIsOpen, message }) => {
+const Options = ({ dispatch, reactTabIsOpen, message, sender }) => {
   return (
     <div className="position-relative">
       <div className="d-flex justify-content-center align-items-center">
@@ -112,37 +112,39 @@ const Options = ({ dispatch, reactTabIsOpen, message }) => {
       {reactTabIsOpen && (
         <div className="react-options d-flex justify-content-center align-items-center">
           <p
-            onClick={() => handleReactions(dispatch, message?._id, "🧡")}
+            onClick={() => handleReactions(dispatch, message, sender, "🧡")}
             className="mx-1 p-1 chose"
           >
             🧡
           </p>
           <p
-            onClick={() => handleReactions(dispatch, message?._id, "😢")}
+            onClick={() => handleReactions(dispatch, message, sender, "😢")}
             className="mx-1 p-1 chose"
           >
             😢
           </p>
           <p
-            onClick={() => handleReactions(dispatch, message?._id, "😠")}
+            onClick={() => handleReactions(dispatch, message, sender, "😠")}
             className="mx-1 p-1 chose"
           >
             😠
           </p>
           <p
-            onClick={() => handleReactions(dispatch, message?._id, "🙄")}
+            onClick={() => handleReactions(dispatch, message, sender, "🙄")}
             className="mx-1 p-1 chose"
           >
             🙄
           </p>
           <p
-            onClick={() => handleReactions(dispatch, message?._id, "😦")}
+            onClick={() =>
+              handleReactions(dispatch, message?._id, sender, "😦")
+            }
             className="mx-1 p-1 chose"
           >
             😦
           </p>
           <p
-            onClick={() => handleReactions(dispatch, message?._id, "👍")}
+            onClick={() => handleReactions(dispatch, message, sender, "👍")}
             className="mx-1 p-1 chose"
           >
             👍
@@ -192,6 +194,7 @@ export const ChatBody = ({
               dispatch={dispatch}
               reactTabIsOpen={reactTabIsOpen}
               message={message}
+              sender={senderInfo?.email}
             />
           )}
           <div
@@ -316,8 +319,28 @@ export const ChatBody = ({
                 {new Date(message?.timeStamp).toLocaleString()}
               </p>
             </div>
-            <div className={message?.react ? "reaction" : "d-none"}>
-              {message?.react}
+            <div className="tooltip__hover">
+              {message?.react.length > 0 && (
+                <div className="reaction">
+                  {message?.react[0]?.react === message?.react[1]?.react
+                    ? message?.react[0]?.react
+                    : message?.react?.map((r, index) => {
+                        return <div key={index}>{r?.react}</div>;
+                      })}
+                  {message?.react?.length > 0 && <>{message?.react?.length}</>}
+                  <div className="message__tooltip">
+                    {message?.react?.map((r, i) => (
+                      <div
+                        key={i}
+                        className="d-flex justify-content-between align-items-center"
+                      >
+                        <h6 className="m-2">{r.sender}</h6>
+                        <div>{r.react}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -370,6 +393,7 @@ export const ShowFileBeforeUpload = ({ chosenFiles, dispatch }) => {
             </div>
           );
         }
+        return null;
       })}
     </div>
   );

@@ -1,6 +1,7 @@
 import {
   deleteChat,
   deleteMessage,
+  deleteReact,
   getChosenFiles,
   getOneOneChatFromSocket,
   getScreenSize,
@@ -10,6 +11,7 @@ import {
   reactTabToggle,
   setRoomId,
   updateChatMessage,
+  updatePreReact,
   updateReactInChat,
   uploadFiles,
 } from "../../app/actions/messageAction";
@@ -101,14 +103,10 @@ export const receiverStatusFromSocket = (socket, receiverInfo, dispatch) => {
   });
 };
 
-let updatedData = {};
 export const updateReact = (socket, dispatch, chatMessage) => {
-  socket.on("update-react", (update) => {
-    if (updatedData._id !== update._id || updatedData.react !== update.react) {
-      updatedData = update;
-      if (chatMessage.length > 0 || chatMessage[0]) {
-        dispatch(updateReactInChat(chatMessage, update));
-      }
+  socket.once("update-react", (update) => {
+    if (chatMessage.length > 0 || chatMessage[0]) {
+      dispatch(updateReactInChat(chatMessage, update));
     }
   });
 };
@@ -153,7 +151,7 @@ export const handleOneOneChat = (
       id: roomId,
       sender: senderEmail,
       message: inputText,
-      react: "",
+      react: [],
       timeStamp: new Date().toUTCString(),
     };
     dispatch(postOneOneChat(chat));
@@ -210,13 +208,17 @@ export const toggleReactTab = (dispatch, toggle) => {
   dispatch(reactTabToggle(toggle));
 };
 
-export const handleReactions = (dispatch, id, react) => {
-  // console.log(react);
-  const reaction = {
-    id,
-    react,
-  };
-  dispatch(updateChatMessage(reaction));
+export const handleReactions = (dispatch, message, sender, react) => {
+  const preReact = message?.react?.find((r) => r.sender === sender);
+  if (preReact) {
+    if (preReact.react === react) {
+      deleteReact({ id: message._id, sender });
+    } else {
+      updatePreReact({ id: message._id, sender, react });
+    }
+  } else {
+    updateChatMessage({ id: message._id, reactInfo: { sender, react } });
+  }
   toggleReactTab(dispatch, false);
 };
 

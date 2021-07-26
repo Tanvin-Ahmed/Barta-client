@@ -127,12 +127,24 @@ export const download = (filename) => {
 };
 
 export const updateChatMessage = (react) => {
-  return (dispatch) => {
-    axios
-      .put("http://localhost:5000/chatMessage/updateChatMessage", react)
-      .then(() => console.log("update message successfully"))
-      .catch(() => alert("react not set, please try again"));
-  };
+  axios
+    .put("http://localhost:5000/chatMessage/updateChatMessage", react)
+    .then(() => console.log("update message successfully"))
+    .catch(() => alert("react not set, please try again"));
+};
+
+export const updatePreReact = (react) => {
+  axios
+    .put("http://localhost:5000/chatMessage/updateOnlyReact", react)
+    .then(() => console.log("update message successfully"))
+    .catch(() => alert("react not set, please try again"));
+};
+
+export const deleteReact = (react) => {
+  axios
+    .put("http://localhost:5000/chatMessage/removeReact", react)
+    .then(() => console.log("update message successfully"))
+    .catch(() => alert("react not remove, please try again"));
 };
 
 const deleteChatMessage = (id) => {
@@ -216,10 +228,18 @@ export const updateReactInChat = (chatMessage, update) => {
   return (dispatch) => {
     const message = chatMessage.find((message) => message?._id === update._id);
     if (message) {
-      const updatedMessage = {
-        ...message,
-        ...update,
-      };
+      let updatedMessage = {};
+      if (update?.react[0]) {
+        updatedMessage = {
+          ...message,
+          ...update,
+        };
+      } else {
+        const key = Object.keys(update.react)[0];
+        const indexOfReact = parseInt(key.split(".")[1]);
+        message.react[indexOfReact].react = update.react[key];
+        updatedMessage = { ...message };
+      }
       const index = chatMessage.findIndex(
         (message) => message?._id === update._id
       );

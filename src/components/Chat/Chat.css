@@ -158,10 +158,13 @@
 
 .reaction {
   position: absolute;
-  border-radius: 50%;
+  border-radius: 10px;
   padding: 0.1rem;
   background-color: beige;
   font-size: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .react-options {
@@ -235,6 +238,24 @@
 .document__title {
   font-weight: 500;
   padding-right: 0.2rem;
+}
+
+.message__tooltip {
+  position: absolute;
+  bottom: 150%;
+  right: -100%;
+  object-fit: contain;
+  background-color: rgb(248, 248, 248);
+  padding: 0.5rem;
+  border-radius: 10px;
+  box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2);
+  z-index: 1600;
+  display: none;
+  transition: all 0.5s;
+}
+
+.tooltip__hover:hover .message__tooltip {
+  display: block;
 }
 
 @media (max-width: 444px) {
