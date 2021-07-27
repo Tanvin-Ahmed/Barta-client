@@ -67,13 +67,23 @@ export const ChatHeader = ({
         </div>
       </div>
       <div className="chat__options">
-        <IconButton onClick={() => callUser(false)} className="icon">
+        <IconButton
+          variant="contained"
+          size="small"
+          onClick={() => callUser(false)}
+          className="icon"
+        >
           <CallIcon />
         </IconButton>
-        <IconButton onClick={() => callUser(true)} className="icon">
+        <IconButton
+          variant="contained"
+          size="small"
+          onClick={() => callUser(true)}
+          className="icon"
+        >
           <VideoCallIcon />
         </IconButton>
-        <IconButton className="icon">
+        <IconButton variant="contained" size="small" className="icon">
           <MoreVertIcon />
         </IconButton>
       </div>
@@ -94,15 +104,19 @@ const Options = ({ dispatch, reactTabIsOpen, message, sender }) => {
     <div className="position-relative">
       <div className="d-flex justify-content-center align-items-center">
         <IconButton
+          variant="contained"
+          size="small"
           onClick={() => handleDeleteMessage(dispatch, message)}
           className="icon mx-1"
         >
           <DeleteIcon />
         </IconButton>
-        <IconButton className="icon mx-1">
+        <IconButton variant="contained" size="small" className="icon mx-1">
           <ReplayIcon />
         </IconButton>
         <IconButton
+          variant="contained"
+          size="small"
           onClick={() => toggleReactTab(dispatch, !reactTabIsOpen)}
           className="icon mx-1"
         >
@@ -279,6 +293,8 @@ export const ChatBody = ({
                           className="d-flex justify-content-center align-items-center"
                         >
                           <IconButton
+                            variant="contained"
+                            size="small"
                             onClick={() => download(file.filename)}
                             className="icon download__icon"
                           >
@@ -302,6 +318,8 @@ export const ChatBody = ({
                           className="d-flex justify-content-center align-items-center show__document"
                         >
                           <IconButton
+                            variant="contained"
+                            size="small"
                             onClick={() => download(file.filename)}
                             className="icon download__icon"
                           >
@@ -332,9 +350,14 @@ export const ChatBody = ({
                     {message?.react?.map((r, i) => (
                       <div
                         key={i}
-                        className="d-flex justify-content-between align-items-center"
+                        className="d-flex justify-content-between align-items-center react__display"
                       >
-                        <h6 className="m-2">{r.sender}</h6>
+                        <div
+                          style={{ fontWeight: "bold", width: "100%" }}
+                          className="m-1"
+                        >
+                          {r.sender}
+                        </div>
                         <div>{r.react}</div>
                       </div>
                     ))}
