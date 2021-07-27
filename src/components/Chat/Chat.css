@@ -59,7 +59,7 @@
   );
   padding: 0.2rem 0.5rem;
   border-radius: 0.3rem;
-  width: fit-content;
+  width: 80%;
   box-shadow: 0px 5px 10px rgba(255, 129, 71, 0.486);
   margin-bottom: 1rem;
   font-family: sans-serif;
@@ -166,6 +166,10 @@
   align-items: center;
 }
 
+.reaction__receiver {
+  left: 92%;
+}
+
 .react-options {
   position: absolute;
   background-color: rgb(255, 160, 125);
@@ -242,7 +246,7 @@
 .message__tooltip {
   position: absolute;
   bottom: 150%;
-  right: -250%;
+  right: -280%;
   background-color: rgb(248, 248, 248);
   padding: 0.5rem;
   border-radius: 10px;
@@ -259,6 +263,13 @@
 @media (max-width: 444px) {
   .react-input-emoji--input {
     max-height: 60px !important;
+  }
+  .icon__button {
+    font-size: 1.3rem !important;
+  }
+  .icon {
+    width: 1.5rem;
+    height: 1.5rem;
   }
 }
 

@@ -100,7 +100,7 @@ const PrivateVideoCall = ({
       });
     };
 
-    socket.on("callEnded", (to) => {
+    socket.once("callEnded", (to) => {
       if (to === userInfo.email) {
         cutCall();
         dispatch(setReceiver(false));

@@ -73,7 +73,7 @@ export const ChatHeader = ({
           onClick={() => callUser(false)}
           className="icon"
         >
-          <CallIcon />
+          <CallIcon className="icon__button" />
         </IconButton>
         <IconButton
           variant="contained"
@@ -81,10 +81,10 @@ export const ChatHeader = ({
           onClick={() => callUser(true)}
           className="icon"
         >
-          <VideoCallIcon />
+          <VideoCallIcon className="icon__button" />
         </IconButton>
         <IconButton variant="contained" size="small" className="icon">
-          <MoreVertIcon />
+          <MoreVertIcon className="icon__button" />
         </IconButton>
       </div>
     </div>
@@ -109,10 +109,10 @@ const Options = ({ dispatch, reactTabIsOpen, message, sender }) => {
           onClick={() => handleDeleteMessage(dispatch, message)}
           className="icon mx-1"
         >
-          <DeleteIcon />
+          <DeleteIcon className="icon__button" />
         </IconButton>
         <IconButton variant="contained" size="small" className="icon mx-1">
-          <ReplayIcon />
+          <ReplayIcon className="icon__button" />
         </IconButton>
         <IconButton
           variant="contained"
@@ -120,7 +120,7 @@ const Options = ({ dispatch, reactTabIsOpen, message, sender }) => {
           onClick={() => toggleReactTab(dispatch, !reactTabIsOpen)}
           className="icon mx-1"
         >
-          <AddReactionIcon />
+          <AddReactionIcon className="icon__button" />
         </IconButton>
       </div>
       {reactTabIsOpen && (
@@ -197,8 +197,8 @@ export const ChatBody = ({
           style={{ width: "100%" }}
           className={
             message?.sender === senderInfo.email
-              ? "d-flex d-flex justify-content-end align-items-center flex-wrap"
-              : "d-flex flex-row-reverse d-flex justify-content-end align-items-center flex-wrap"
+              ? "d-flex d-flex justify-content-end align-items-center"
+              : "d-flex flex-row-reverse d-flex justify-content-end align-items-center"
           }
           onMouseOver={() => options(dispatch, true, message?._id)}
           onMouseLeave={() => options(dispatch, false, message?._id)}
@@ -339,7 +339,13 @@ export const ChatBody = ({
             </div>
             <div className="tooltip__hover">
               {message?.react.length > 0 && (
-                <div className="reaction">
+                <div
+                  className={
+                    message?.sender === senderInfo.email
+                      ? "reaction"
+                      : "reaction reaction__receiver"
+                  }
+                >
                   {message?.react[0]?.react === message?.react[1]?.react
                     ? message?.react[0]?.react
                     : message?.react?.map((r, index) => {
@@ -471,7 +477,7 @@ export const ChatFooter = ({
           onClick={() => dispatch(isClickUploadOption(!clickUploadOption))}
           className="icon"
         >
-          <AddCircleIcon />
+          <AddCircleIcon className="icon__button" />
         </IconButton>
       )}
       {largeScreen ? (
@@ -491,7 +497,7 @@ export const ChatFooter = ({
           </div>
           {(inputText.trim() || chosenFiles) && (
             <IconButton onClick={handleOnEnter} className="icon">
-              <SendIcon />
+              <SendIcon className="icon__button" />
             </IconButton>
           )}
         </>

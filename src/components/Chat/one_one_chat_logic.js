@@ -65,7 +65,7 @@ export const handleIsType = (e, socket, senderEmail) => {
 };
 
 export const handleIsFriendTyping = (socket, receiverEmail, dispatch) => {
-  socket.on("displayTyping", (typingCondition) => {
+  socket.once("displayTyping", (typingCondition) => {
     if (typingCondition?.email === receiverEmail) {
       dispatch(isTyping(typingCondition?.type));
     }
@@ -74,7 +74,7 @@ export const handleIsFriendTyping = (socket, receiverEmail, dispatch) => {
 
 let lastMessage = {};
 export const getOneOneChatMessageFromSocket = (socket, dispatch) => {
-  socket.on("one_one_chatMessage", (message) => {
+  socket.once("one_one_chatMessage", (message) => {
     if (
       message.sender !== lastMessage?.sender ||
       (message.sender === lastMessage?.sender &&
@@ -90,7 +90,7 @@ export const getOneOneChatMessageFromSocket = (socket, dispatch) => {
 };
 
 export const receiverStatusFromSocket = (socket, receiverInfo, dispatch) => {
-  socket.on("user-status", (friendStatus) => {
+  socket.once("user-status", (friendStatus) => {
     if (receiverInfo?.email && friendStatus?.email === receiverInfo?.email) {
       receiverInfo.status = friendStatus?.status;
       if (friendStatus?.status === "active") {
@@ -113,7 +113,7 @@ export const updateReact = (socket, dispatch, chatMessage) => {
 
 let deletedId = "";
 export const deleteChatMessage = (socket, dispatch, chatMessage) => {
-  socket.on("delete-chatMessage", (deletedItem) => {
+  socket.once("delete-chatMessage", (deletedItem) => {
     if (deletedId !== deletedItem._id) {
       deletedId = deletedItem._id;
       if (chatMessage.length > 0 || chatMessage[0])

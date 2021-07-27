@@ -5,7 +5,7 @@ import {
 
 let email = "";
 export const friendListUpdate = (socket, dispatch) => {
-  socket.on("add-friend-list", (friendEmail) => {
+  socket.once("add-friend-list", (friendEmail) => {
     if (friendEmail?.email !== email) {
       email = friendEmail?.email;
       dispatch(getFriendInfoFromSocket(friendEmail?.email));
@@ -15,7 +15,7 @@ export const friendListUpdate = (socket, dispatch) => {
 
 let friendEmail = "";
 export const updateFriendStatus = (socket, friendList, dispatch) => {
-  socket.on("user-status", (user) => {
+  socket.once("user-status", (user) => {
     if (friendList[0]) {
       if (user?.email && user.email !== friendEmail) {
         friendEmail = user?.email;

@@ -229,7 +229,7 @@ export const updateReactInChat = (chatMessage, update) => {
     const message = chatMessage.find((message) => message?._id === update._id);
     if (message) {
       let updatedMessage = {};
-      if (update?.react[0]) {
+      if (update?.react?.length >= 0) {
         updatedMessage = {
           ...message,
           ...update,
