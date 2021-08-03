@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -49,6 +49,7 @@ const PrivateVideoCall = ({
     interVal,
     receiver,
     roomId,
+    openPrivateVideoCall,
   } = useSelector((state) => ({
     stream: state.privateVideoCall.stream,
     receivingCall: state.privateVideoCall.receivingCall,
@@ -68,9 +69,10 @@ const PrivateVideoCall = ({
     interVal: state.privateVideoCall.interVal,
     receiver: state.privateVideoCall.receiver,
     roomId: state.messageReducer.roomId,
+    openPrivateVideoCall: state.privateVideoCall.openPrivateVideoCall,
   }));
 
-  ////////////////// OPEN CAMERA AND MICROPHONE //////////////////
+  ////////////////// OPEN CAMERA AND MICROPHONE OF RECEIVER //////////////////
   useEffect(() => {
     receivingCall &&
       navigator.mediaDevices
@@ -83,14 +85,14 @@ const PrivateVideoCall = ({
 
   ////////////////// RESPONSE IF RECEIVER IS ONLINE ///////////////////
   useEffect(() => {
-    socket.once("call-reach-to-user", (to) => {
+    socket.on("call-reach-to-user", (to) => {
       if (to === userInfo.email) {
         dispatch(setCallReachToReceiver(true));
       }
     });
   }, [socket, dispatch, userInfo]);
 
-  ///////////////// CUT THE CALL ///////////////////////
+  ///////////////// CUT THE CALL FROM RECEIVER ///////////////////////
   useEffect(() => {
     const cutCall = () => {
       stream?.getTracks()?.forEach((track) => {
@@ -100,7 +102,7 @@ const PrivateVideoCall = ({
       });
     };
 
-    socket.once("callEnded", (to) => {
+    socket.on("callEnded", (to) => {
       if (to === userInfo.email) {
         cutCall();
         dispatch(setReceiver(false));
@@ -111,12 +113,70 @@ const PrivateVideoCall = ({
         dispatch(isCallAccepted(false));
         connectionRef.current && connectionRef.current.destroy();
         userVideo.current = null;
-        end(interVal);
-        dispatch(setCallTimer({ s: 0, m: 0, h: 0 }));
-        window.location.reload();
+        (timer.s > 0 || timer.m > 0 || timer.h > 0) &&
+          end(interVal) &&
+          dispatch(setCallTimer({ s: 0, m: 0, h: 0 }));
+        !receiver && window.location.reload();
       }
     });
-  }, [socket, connectionRef, userVideo, userInfo, dispatch, stream, interVal]);
+  }, [
+    socket,
+    receiver,
+    connectionRef,
+    userVideo,
+    userInfo,
+    dispatch,
+    stream,
+    interVal,
+    timer,
+  ]);
+
+  ///////////////// CUT THE CALL AFTER FIXED TIME TO RINGING ///////////////////
+  let setTime = useRef({ database: true, time: null });
+  useEffect(() => {
+    if (openPrivateVideoCall && !receiver && !callAccepted) {
+      setTime.current.time = setTimeout(() => {
+        stream?.getTracks()?.forEach((track) => {
+          if (track.readyState === "live") {
+            track.stop();
+          }
+        });
+        setTime.current.database &&
+          setCallInfoInDatabase({
+            id: roomId,
+            sender: userInfo.email,
+            receiver: receiverInfo.email,
+            callDuration: timer,
+            callDescription: videoChat ? "Video Call" : "Audio Call",
+            timeStamp: new Date().toUTCString(),
+          });
+        setTime.current.database = false;
+        dispatch(setVideoCallIsOpen(false));
+        dispatch(setCallReachToReceiver(false));
+        connectionRef.current && connectionRef.current.destroy();
+        userVideo.current = null;
+        socket.emit("cutCall", {
+          to: receiverInfo.email,
+        });
+      }, 40000);
+    } else {
+      clearTimeout(setTime.current.time);
+    }
+  }, [
+    callAccepted,
+    openPrivateVideoCall,
+    connectionRef,
+    dispatch,
+    receiver,
+    receiverInfo.email,
+    roomId,
+    socket,
+    stream,
+    timer,
+    userInfo.email,
+    userVideo,
+    videoChat,
+  ]);
 
   // stop both mic and camera
   const stopBothVideoAndAudio = () => {
@@ -163,10 +223,10 @@ const PrivateVideoCall = ({
     connectionRef.current = peer;
   };
 
-  const leaveCall = () => {
+  const leaveCall = async () => {
     stopBothVideoAndAudio();
     end(interVal);
-    setCallInfoInDatabase({
+    await setCallInfoInDatabase({
       id: roomId,
       sender: receiver ? caller : userInfo.email,
       receiver: receiver ? userInfo.email : receiverInfo.email,
@@ -186,7 +246,7 @@ const PrivateVideoCall = ({
     socket.emit("cutCall", {
       to: receiverInfo.email,
     });
-    window.location.reload();
+    !receiver && window.location.reload();
   };
 
   return (
@@ -216,7 +276,6 @@ const PrivateVideoCall = ({
                   </div>
                 ) : (
                   <div className="callInfo">
-                    {!startTimer && <h6>You calling....</h6>}
                     <h5>{receiverInfo.displayName}</h5>
                     <h6>
                       {!startTimer
@@ -259,7 +318,6 @@ const PrivateVideoCall = ({
               </div>
             ) : (
               <div className="callInfo">
-                {!startTimer && <h6>You calling....</h6>}
                 <h5>{receiverInfo.displayName}</h5>
                 <h6>
                   {!startTimer

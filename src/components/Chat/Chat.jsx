@@ -108,7 +108,7 @@ const Chat = ({ socket }) => {
 
   useEffect(() => {
     // video chat data
-    socket.once("callUser", (data) => {
+    socket.on("callUser", (data) => {
       if (data.userToCall === senderInfo.email) {
         sessionStorage.setItem(
           "barta/receiver",
@@ -187,7 +187,7 @@ const Chat = ({ socket }) => {
           });
         });
 
-        socket.once("callAccepted", (data) => {
+        socket.on("callAccepted", (data) => {
           if (data.to === senderInfo.email) {
             dispatch(isCallAccepted(true));
             dispatch(setStartTimer(true));

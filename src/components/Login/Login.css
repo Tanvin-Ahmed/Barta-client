@@ -11,58 +11,35 @@
 .login__container > h2 {
   font-family: "Lobster", cursive;
   font-size: 3em;
-  background: -webkit-linear-gradient(
-    right,
-    rgba(255, 73, 73, 0.637),
-    rgba(255, 126, 21, 0.616),
-    rgba(176, 79, 255, 0.575),
-    rgba(255, 122, 188, 0.555)
-  );
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: rgb(255, 57, 22);
+  text-shadow: 0px 0px 10px rgba(110, 14, 1, 0.8);
 }
 
 .login__container > h5 {
   font-family: "Lobster", cursive;
   letter-spacing: 2px;
-  background: -webkit-linear-gradient(
-    left,
-    rgba(255, 73, 73, 0.637),
-    rgba(255, 126, 21, 0.616),
-    rgba(176, 79, 255, 0.575),
-    rgba(255, 122, 188, 0.555)
-  );
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: rgb(255, 57, 22);
+  text-shadow: 0px 0px 10px rgba(110, 14, 1, 0.8);
 }
 
 .login__container .MuiSvgIcon-root {
   font-size: 10rem;
-  color: rgb(255, 181, 162);
-  box-shadow: 1px 2px 5px 4px rgb(255, 195, 180);
+  color: rgb(255, 56, 6);
+  box-shadow: 1px 2px 10px 5px rgba(179, 28, 2, 0.479);
   margin-bottom: 4rem;
 }
 
 .google__btn {
-  background-image: linear-gradient(
-    45deg,
-    rgba(255, 198, 123, 0.315),
-    rgba(251, 61, 93, 0.397)
-  );
+  background: rgb(255, 57, 22);
   padding: 0.6rem 1.7rem;
   font-weight: 600;
   border: none;
   border-radius: 10px;
-  box-shadow: 0px 5px 10px rgba(255, 129, 71, 0.486);
-  color: rgba(255, 81, 0, 0.993);
+  color: whitesmoke;
   letter-spacing: 1px;
-  text-shadow: 0px 5px 8px rgba(255, 129, 71, 0.904);
 }
 
 .google__btn:hover {
-  background-image: linear-gradient(
-    225deg,
-    rgba(255, 198, 123, 0.315),
-    rgba(251, 61, 93, 0.397)
-  );
+  background: rgb(255, 47, 10);
+  box-shadow: 0px 0px 6px 3px rgba(88, 21, 0, 0.705);
 }

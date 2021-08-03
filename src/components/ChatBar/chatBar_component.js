@@ -12,7 +12,7 @@ export const ChatBarHeader = ({ userPhotoURL, dispatch }) => {
   return (
     <div className="chatBar__header">
       <div className="text__center">
-        <h3 className="text-center">Barta</h3>
+        <h3 className="text-center text-light">Barta</h3>
       </div>
       <div className="d-flex align-items-center justify-content-between flex-wrap">
         <div className="avatar">
@@ -23,7 +23,7 @@ export const ChatBarHeader = ({ userPhotoURL, dispatch }) => {
         </div>
         <div className="more__options">
           <IconButton>
-            <MoreVertIcon />
+            <MoreVertIcon className="text-light" size="small" />
           </IconButton>
         </div>
       </div>
@@ -33,7 +33,7 @@ export const ChatBarHeader = ({ userPhotoURL, dispatch }) => {
             onClick={() => dispatch(updateChatList(true))}
             style={{ padding: "0.2rem 2rem" }}
           >
-            <PeopleIcon />
+            <PeopleIcon className="text-light" size="small" />
           </CardActionArea>
         </div>
         <div>
@@ -41,12 +41,12 @@ export const ChatBarHeader = ({ userPhotoURL, dispatch }) => {
             onClick={() => dispatch(updateChatList(false))}
             style={{ padding: "0.2rem 2rem" }}
           >
-            <PersonAddIcon />
+            <PersonAddIcon className="text-light" size="small" />
           </CardActionArea>
         </div>
         <div>
           <CardActionArea style={{ padding: "0.2rem 2rem" }}>
-            <GroupAddIcon />
+            <GroupAddIcon className="text-light" size="small" />
           </CardActionArea>
         </div>
       </div>
@@ -65,7 +65,7 @@ export const ChatList = ({ friendList, history }) => {
           <CardActionArea
             key={friend?._id}
             onClick={() => handleReceiverInfo(friend, history)}
-            className="px-3 d-flex justify-content-start align-items-center"
+            className="px-3 d-flex justify-content-start align-items-center text-light"
           >
             <div style={{ position: "relative" }} className="mr-3">
               <Avatar src={friend?.photoURL} />
@@ -73,7 +73,9 @@ export const ChatList = ({ friendList, history }) => {
                 className={friend?.status === "active" ? "onLine" : "d-none"}
               />
             </div>
-            <h6 className="m-4">{friend?.displayName}</h6>
+            <h6 style={{ letterSpacing: "1px" }} className="m-4">
+              {friend?.displayName}
+            </h6>
           </CardActionArea>
         ))}
       </div>
@@ -111,7 +113,7 @@ export const SearchFriend = ({
                 <CardActionArea
                   key={otherUser._id}
                   onClick={() => handleReceiverInfo(otherUser, history)}
-                  className="px-3 d-flex justify-content-start align-items-center"
+                  className="px-3 d-flex justify-content-start align-items-center text-light"
                 >
                   <div className="mr-3">
                     <Avatar src={otherUser?.photoURL} />

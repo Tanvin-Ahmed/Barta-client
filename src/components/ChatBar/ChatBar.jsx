@@ -35,7 +35,7 @@ const ChatBar = ({ socket }) => {
     updateFriendStatus(socket, friendList, dispatch);
 
     // for video chat
-    socket.once("callUser", (data) => {
+    socket.on("callUser", (data) => {
       if (data.userToCall === userInfo.email) {
         sessionStorage.setItem(
           "barta/receiver",
