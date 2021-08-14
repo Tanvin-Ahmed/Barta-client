@@ -1,9 +1,8 @@
 import React, { useEffect } from "react";
 import "./ChatBar.css";
 import { useDispatch, useSelector } from "react-redux";
-import { updateFriendStatus } from "../../app/actions/userAction";
 import { useHistory } from "react-router";
-import { friendListUpdate } from "./chatBar_logic";
+import { isUserOnline } from "./chatBar_logic";
 import { ChatBarHeader, ChatList, SearchFriend } from "./chatBar_component";
 import {
   getCaller,
@@ -12,7 +11,8 @@ import {
   isReceivingCall,
   isVideoChat,
   setReceiver,
-} from "../../app/actions/privateVideoCallAction";
+} from "../../app/actions/privateCallAction";
+import { getFriendInfoFromSocket } from "../../app/actions/userAction";
 
 const ChatBar = ({ socket }) => {
   const history = useHistory();
@@ -29,12 +29,30 @@ const ChatBar = ({ socket }) => {
     })
   );
 
+  //////////////// Friend List Update ///////////////
   useEffect(() => {
-    socket.emit("my-account", userInfo?.email?.split("@")[0]);
-    friendListUpdate(socket, dispatch);
-    updateFriendStatus(socket, friendList, dispatch);
+    if (socket === null) return;
+    socket.on("add-friend-list", (friendEmail) => {
+      dispatch(getFriendInfoFromSocket(friendEmail?.email));
+    });
+    return () => socket.off("add-friend-list");
+  }, [socket, dispatch]);
 
-    // for video chat
+  //////////////// Update friend Status ///////////////////
+  useEffect(() => {
+    if (socket === null && !friendList.length) return;
+
+    const userStatus = (user) => {
+      isUserOnline(user, friendList, dispatch);
+    };
+
+    socket.on("user-status", userStatus);
+    return () => socket.off("user-status");
+  }, [socket, dispatch, friendList]);
+
+  ///////////////////// User Notify Private Call //////////////////
+  useEffect(() => {
+    // if (socket === null) return;
     socket.on("callUser", (data) => {
       if (data.userToCall === userInfo.email) {
         sessionStorage.setItem(
@@ -54,6 +72,9 @@ const ChatBar = ({ socket }) => {
         history.push(`/chat/${data.callerDataBaseId}`);
       }
     });
+    // return () => {
+    //   socket.disconnect();
+    // };
   }, [dispatch, socket, userInfo, friendList, history]);
 
   return (

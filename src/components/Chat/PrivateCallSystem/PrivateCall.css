@@ -5,7 +5,7 @@
   transform: translate(-50%, -50%);
   z-index: 1500;
 }
-.myVideo__after_callReceive {
+.myStream__after_callReceive {
   position: absolute;
   left: 0%;
   top: 68%;

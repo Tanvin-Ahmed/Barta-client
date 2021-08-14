@@ -1,10 +1,10 @@
 import { combineReducers } from "redux";
 import userReducer from "./reducers/userReducer";
 import messageReducer from "./reducers/messageReduce";
-import privateVideoCall from "./reducers/privateVideoCallReducer";
+import privateCall from "./reducers/privateCallReducer";
 
 export default combineReducers({
   userReducer,
   messageReducer,
-  privateVideoCall,
+  privateCall,
 });

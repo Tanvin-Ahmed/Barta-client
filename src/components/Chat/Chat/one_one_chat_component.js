@@ -21,7 +21,10 @@ import {
 import AddCircleIcon from "@material-ui/icons/AddCircle";
 import InsertPhotoIcon from "@material-ui/icons/InsertPhoto";
 import VideoLibraryIcon from "@material-ui/icons/VideoLibrary";
-import { download, isClickUploadOption } from "../../app/actions/messageAction";
+import {
+  download,
+  isClickUploadOption,
+} from "../../../app/actions/messageAction";
 import HighlightOffIcon from "@material-ui/icons/HighlightOff";
 import DeleteIcon from "@material-ui/icons/Delete";
 import AddReactionIcon from "@material-ui/icons/AddReaction";
@@ -32,7 +35,7 @@ import CallMadeIcon from "@material-ui/icons/CallMade";
 import CallReceivedIcon from "@material-ui/icons/CallReceived";
 import CallMissedOutgoingIcon from "@material-ui/icons/CallMissedOutgoing";
 import CallMissedIcon from "@material-ui/icons/CallMissed";
-import Timer from "./Call/VideoCall/PrivateVideoCall/Timer.jsx";
+import Timer from "../PrivateCallSystem/Timer.jsx";
 
 export const ChatHeader = ({
   receiverInfo,
@@ -113,14 +116,16 @@ const Options = ({ dispatch, reactTabIsOpen, message, sender }) => {
             : "d-flex flex-row-reverse justify-content-center align-items-center"
         }
       >
-        <IconButton
-          variant="contained"
-          size="small"
-          onClick={() => handleDeleteMessage(dispatch, message)}
-          className="icon mx-1"
-        >
-          <DeleteIcon className="icon__button text-light" />
-        </IconButton>
+        {message?.sender === sender && (
+          <IconButton
+            variant="contained"
+            size="small"
+            onClick={() => handleDeleteMessage(dispatch, message)}
+            className="icon mx-1"
+          >
+            <DeleteIcon className="icon__button text-light" />
+          </IconButton>
+        )}
         <IconButton variant="contained" size="small" className="icon mx-1">
           <ReplayIcon className="icon__button text-light" />
         </IconButton>
@@ -134,7 +139,11 @@ const Options = ({ dispatch, reactTabIsOpen, message, sender }) => {
         </IconButton>
       </div>
       {reactTabIsOpen && (
-        <div className="react-options d-flex justify-content-center align-items-center">
+        <div
+          className={`${
+            message?.sender === sender ? "" : "react_options_receiver"
+          } react_options d-flex justify-content-center align-items-center`}
+        >
           <p
             onClick={() => handleReactions(dispatch, message, sender, "🧡")}
             className="mx-1 p-1 chose"
@@ -307,7 +316,7 @@ export const ChatBody = ({
                               variant="contained"
                               size="small"
                               onClick={() => download(file.filename)}
-                              className="icon download__icon"
+                              className="icon download__icon text-light"
                             >
                               <ArrowDownwardIcon />
                             </IconButton>
@@ -326,13 +335,16 @@ export const ChatBody = ({
                         return (
                           <div
                             key={index}
-                            className="d-flex justify-content-center align-items-center show__document"
+                            className={`d-flex justify-content-between align-items-center show__document ${
+                              message?.sender === senderInfo.email &&
+                              "show_user_document"
+                            }`}
                           >
                             <IconButton
                               variant="contained"
                               size="small"
                               onClick={() => download(file.filename)}
-                              className="icon download__icon"
+                              className="icon download__icon text-light"
                             >
                               <ArrowDownwardIcon />
                             </IconButton>
@@ -351,7 +363,7 @@ export const ChatBody = ({
                 </p>
               </div>
               <div className="tooltip__hover">
-                {message?.react.length > 0 && (
+                {message?.react?.length > 0 && (
                   <div
                     className={
                       message?.sender === senderInfo.email
@@ -430,7 +442,15 @@ export const ShowFileBeforeUpload = ({ chosenFiles, dispatch }) => {
               className="show__files"
               style={{ position: "relative" }}
             >
-              <small style={{ fontWeight: "bold" }}>{file?.name}</small>
+              <small
+                style={{
+                  fontWeight: "400",
+                  color: "#fff",
+                  letterSpacing: "1px",
+                }}
+              >
+                {file?.name}
+              </small>
               <HighlightOffIcon
                 className="delete__icon"
                 onClick={() => deleteChosenFiles(chosenFiles, index, dispatch)}

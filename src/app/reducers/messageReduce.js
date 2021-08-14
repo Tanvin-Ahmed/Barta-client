@@ -13,6 +13,8 @@ import {
   UPDATE_CHAT_REACT,
   DELETE_CHAT_MESSAGE,
   SET_ROOM_ID,
+  REFETCH_MESSAGE,
+  GET_MESSAGE_PROGRESS,
 } from "../types";
 
 const initialState = {
@@ -20,6 +22,7 @@ const initialState = {
   groupMessage: [],
   error: "",
   uploadPercentage: 0,
+  getMessageProgress: 0,
   largeScreen: true,
   typing: false,
   clickUploadOption: false,
@@ -27,6 +30,7 @@ const initialState = {
   isOpenOptions: {},
   reactTabIsOpen: false,
   roomId: "",
+  reFetchMessage: false,
 };
 
 const messageReducer = (state = initialState, action) => {
@@ -34,7 +38,17 @@ const messageReducer = (state = initialState, action) => {
     case GET_ONE_ONE_CHAT:
       return {
         ...state,
-        oneOneMessage: action.payload,
+        oneOneMessage: [...state.oneOneMessage, ...action.payload],
+      };
+    case GET_MESSAGE_PROGRESS:
+      return {
+        ...state,
+        getMessageProgress: action.payload,
+      };
+    case REFETCH_MESSAGE:
+      return {
+        ...state,
+        reFetchMessage: action.payload,
       };
     case GET_GROUP_CHAT:
       return {

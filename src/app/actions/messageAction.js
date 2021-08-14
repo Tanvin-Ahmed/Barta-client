@@ -4,11 +4,13 @@ import {
   CHAT_UPLOAD_PERCENTAGE,
   CLICK_UPLOAD_OPTION,
   DELETE_CHAT_MESSAGE,
+  GET_MESSAGE_PROGRESS,
   GET_ONE_ONE_CHAT,
   GET_ONE_ONE_CHAT_FROM_SOCKET,
   IS_TYPE,
   OPEN_OPTIONS_FOR_CHAT,
   REACT_TAB_TOGGLE,
+  REFETCH_MESSAGE,
   SCREEN_SIZE,
   SELECTED_FILES,
   SET_ROOM_ID,
@@ -95,21 +97,83 @@ export const uploadFiles = (chosenFiles) => {
   };
 };
 
-export const getOneOneChat = (roomId) => {
+// let previousDataId = "";
+
+export const getOneOneChat = (data) => {
+  console.log("get data from server", data);
   return (dispatch) => {
-    axios(`http://localhost:5000/chatMessage/getOneOneChat/${roomId}`)
-      .then((chats) => {
+    const options = {
+      onDownloadProgress: ({ loaded, total }) => {
+        let percent = Math.floor((loaded * 100) / total);
+        if (percent < 100) {
+          dispatch({
+            type: GET_MESSAGE_PROGRESS,
+            payload: percent,
+          });
+        }
+      },
+    };
+
+    axios
+      .post(
+        `http://localhost:5000/chatMessage/getOneOneChat/${data?.roomId}`,
+        {
+          pageNum: data?.pageNum,
+        },
+        options
+      )
+      .then((data) => {
+        // if (previousDataId !== data.data[0]?._id) {
+        //   previousDataId = data.data[0]?._id;
+        // progress
+        dispatch({
+          type: GET_MESSAGE_PROGRESS,
+          payload: 100,
+        });
+        setTimeout(() => {
+          dispatch({
+            type: GET_MESSAGE_PROGRESS,
+            payload: 0,
+          });
+        }, 50);
+
+        // data
+        const chat = data?.data?.reverse();
         dispatch({
           type: GET_ONE_ONE_CHAT,
-          payload: chats.data,
+          payload: chat,
         });
+
+        if (chat?.length === 9) {
+          dispatch({
+            type: REFETCH_MESSAGE,
+            payload: true,
+          });
+        } else {
+          dispatch({
+            type: REFETCH_MESSAGE,
+            payload: false,
+          });
+          // }
+        }
       })
       .catch((err) => {
         dispatch({
           type: CHAT_ERROR,
           payload: err.message,
         });
+        dispatch({
+          type: GET_MESSAGE_PROGRESS,
+          payload: 0,
+        });
       });
+  };
+};
+
+export const stopReFetchMessage = () => {
+  return {
+    type: REFETCH_MESSAGE,
+    payload: false,
   };
 };
 

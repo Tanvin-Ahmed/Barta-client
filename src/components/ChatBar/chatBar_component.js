@@ -30,22 +30,22 @@ export const ChatBarHeader = ({ userPhotoURL, dispatch }) => {
       <div className="add__friend mt-2 d-flex justify-content-around align-items-center flex-wrap">
         <div>
           <CardActionArea
+            style={{ padding: "0.6rem", borderRadius: "50%" }}
             onClick={() => dispatch(updateChatList(true))}
-            style={{ padding: "0.2rem 2rem" }}
           >
             <PeopleIcon className="text-light" size="small" />
           </CardActionArea>
         </div>
         <div>
           <CardActionArea
+            style={{ padding: "0.6rem", borderRadius: "50%" }}
             onClick={() => dispatch(updateChatList(false))}
-            style={{ padding: "0.2rem 2rem" }}
           >
             <PersonAddIcon className="text-light" size="small" />
           </CardActionArea>
         </div>
         <div>
-          <CardActionArea style={{ padding: "0.2rem 2rem" }}>
+          <CardActionArea style={{ padding: "0.6rem", borderRadius: "50%" }}>
             <GroupAddIcon className="text-light" size="small" />
           </CardActionArea>
         </div>

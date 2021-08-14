@@ -1,26 +1,21 @@
 import {
   deleteChat,
-  deleteMessage,
   deleteReact,
   getChosenFiles,
-  getOneOneChatFromSocket,
   getScreenSize,
-  isTyping,
   openOptions,
   postOneOneChat,
   reactTabToggle,
   setRoomId,
   updateChatMessage,
   updatePreReact,
-  updateReactInChat,
   uploadFiles,
-} from "../../app/actions/messageAction";
+} from "../../../app/actions/messageAction";
 import {
   getReceiverInfo,
   postFriendInfo,
   updateChatList,
-  updateChatStatus,
-} from "../../app/actions/userAction";
+} from "../../../app/actions/userAction";
 
 export const screen = (dispatch) => {
   console.log(window.innerWidth);
@@ -62,64 +57,6 @@ export const handleIsType = (e, socket, senderEmail) => {
       type: false,
     });
   }
-};
-
-export const handleIsFriendTyping = (socket, receiverEmail, dispatch) => {
-  socket.on("displayTyping", (typingCondition) => {
-    if (typingCondition?.email === receiverEmail) {
-      dispatch(isTyping(typingCondition?.type));
-    }
-  });
-};
-
-let lastMessage = {};
-export const getOneOneChatMessageFromSocket = (socket, dispatch) => {
-  socket.on("one_one_chatMessage", (message) => {
-    if (
-      message.sender !== lastMessage?.sender ||
-      (message.sender === lastMessage?.sender &&
-        message.timeStamp !== lastMessage?.timeStamp)
-    ) {
-      lastMessage = {
-        sender: message.sender,
-        timeStamp: message.timeStamp,
-      };
-      dispatch(getOneOneChatFromSocket(message));
-    }
-  });
-};
-
-export const receiverStatusFromSocket = (socket, receiverInfo, dispatch) => {
-  socket.on("user-status", (friendStatus) => {
-    if (receiverInfo?.email && friendStatus?.email === receiverInfo?.email) {
-      receiverInfo.status = friendStatus?.status;
-      if (friendStatus?.status === "active") {
-        receiverInfo.goOffLine = "";
-      } else {
-        receiverInfo.goOffLine = new Date().toUTCString();
-      }
-      dispatch(updateChatStatus(receiverInfo));
-    }
-  });
-};
-
-export const updateReact = (socket, dispatch, chatMessage) => {
-  socket.on("update-react", (update) => {
-    if (chatMessage.length > 0 || chatMessage[0]) {
-      dispatch(updateReactInChat(chatMessage, update));
-    }
-  });
-};
-
-let deletedId = "";
-export const deleteChatMessage = (socket, dispatch, chatMessage) => {
-  socket.on("delete-chatMessage", (deletedItem) => {
-    if (deletedId !== deletedItem._id) {
-      deletedId = deletedItem._id;
-      if (chatMessage.length > 0 || chatMessage[0])
-        dispatch(deleteMessage(chatMessage, deletedItem._id));
-    }
-  });
 };
 
 export const handleOneOneChat = (

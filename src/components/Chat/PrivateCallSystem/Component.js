@@ -3,7 +3,7 @@ import { IconButton } from "@material-ui/core";
 import MicOffIcon from "@material-ui/icons/MicOff";
 import VideocamOffIcon from "@material-ui/icons/VideocamOff";
 import CloseIcon from "@material-ui/icons/Close";
-import "./PrivateVideoCall.css";
+import "./PrivateCall.css";
 import MicIcon from "@material-ui/icons/Mic";
 import VideocamIcon from "@material-ui/icons/Videocam";
 import PhoneInTalkIcon from "@material-ui/icons/PhoneInTalk";

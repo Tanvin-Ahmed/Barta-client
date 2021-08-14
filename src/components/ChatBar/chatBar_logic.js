@@ -1,34 +1,9 @@
 import {
   getAllUserInfo,
-  getFriendInfoFromSocket,
+  updateFriendStatus,
 } from "../../app/actions/userAction";
 
-let email = "";
-export const friendListUpdate = (socket, dispatch) => {
-  socket.on("add-friend-list", (friendEmail) => {
-    if (friendEmail?.email !== email) {
-      email = friendEmail?.email;
-      dispatch(getFriendInfoFromSocket(friendEmail?.email));
-    }
-  });
-};
-
-let friendEmail = "";
-export const updateFriendStatus = (socket, friendList, dispatch) => {
-  socket.on("user-status", (user) => {
-    if (friendList[0]) {
-      if (user?.email && user.email !== friendEmail) {
-        friendEmail = user?.email;
-        isUserOnline(user, friendList, dispatch);
-      }
-    }
-    setTimeout(() => {
-      friendEmail = "";
-    }, 50);
-  });
-};
-
-const isUserOnline = (user, friendList, dispatch) => {
+export const isUserOnline = (user, friendList, dispatch) => {
   for (let i in friendList) {
     if (friendList[i].email === user?.email) {
       friendList[i].status = user?.status;
@@ -37,7 +12,6 @@ const isUserOnline = (user, friendList, dispatch) => {
       } else {
         friendList[i].goOfLine = "";
       }
-      break;
     }
   }
   dispatch(updateFriendStatus(friendList));

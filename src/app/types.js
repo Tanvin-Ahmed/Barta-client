@@ -25,6 +25,8 @@ export const UPDATE_REACT = "update_react";
 export const UPDATE_CHAT_REACT = "update_chat_react";
 export const DELETE_CHAT_MESSAGE = "delete_chat_message";
 export const SET_ROOM_ID = "set_room_id";
+export const REFETCH_MESSAGE = "refetch_message";
+export const GET_MESSAGE_PROGRESS = "get_message_progress";
 
 // file upload
 export const SELECTED_FILES = "selected_files";

@@ -1,7 +1,7 @@
 import {
   setCallTimer,
   setInterVal,
-} from "../../../../../app/actions/privateVideoCallAction";
+} from "../../../app/actions/privateCallAction";
 
 const run = (timer, dispatch) => {
   if (timer.m === 60) {

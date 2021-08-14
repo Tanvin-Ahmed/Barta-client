@@ -14,18 +14,18 @@ import {
   setVideoCallIsOpen,
   setVideoOpen,
   setVoiceOpen,
-} from "../../../../../app/actions/privateVideoCallAction";
+} from "../../../app/actions/privateCallAction";
 import { Buttons } from "./Component";
-import "./PrivateVideoCall.css";
-import call_bg from "../../../../../img/bg/call_bg.jpg";
-import ringtone from "../../../../../audios/Facebook_messenger_ringtone.mp3";
-import { end, start } from "./timer";
+import "./PrivateCall.css";
+import call_bg from "../../../img/bg/call_bg.jpg";
+import ringtone from "../../../audios/Facebook_messenger_ringtone.mp3";
+import { end, start } from "./timer.js";
 import Timer from "./Timer.jsx";
 
 const PrivateVideoCall = ({
   socket,
-  userVideo,
-  myVideo,
+  userStream,
+  myStream,
   connectionRef,
   Peer,
 }) => {
@@ -51,25 +51,25 @@ const PrivateVideoCall = ({
     roomId,
     openPrivateVideoCall,
   } = useSelector((state) => ({
-    stream: state.privateVideoCall.stream,
-    receivingCall: state.privateVideoCall.receivingCall,
-    callerSignal: state.privateVideoCall.callerSignal,
-    caller: state.privateVideoCall.caller,
-    callAccepted: state.privateVideoCall.callAccepted,
-    videoOpen: state.privateVideoCall.videoOpen,
-    voiceOpen: state.privateVideoCall.voiceOpen,
-    callEnded: state.privateVideoCall.callEnd,
+    stream: state.privateCall.stream,
+    receivingCall: state.privateCall.receivingCall,
+    callerSignal: state.privateCall.callerSignal,
+    caller: state.privateCall.caller,
+    callAccepted: state.privateCall.callAccepted,
+    videoOpen: state.privateCall.videoOpen,
+    voiceOpen: state.privateCall.voiceOpen,
+    callEnded: state.privateCall.callEnd,
     receiverInfo: state.userReducer.receiverInfo,
     userInfo: state.userReducer.userInfo,
-    videoChat: state.privateVideoCall.videoChat,
-    userName: state.privateVideoCall.userName,
-    callReachToReceiver: state.privateVideoCall.callReachToReceiver,
-    startTimer: state.privateVideoCall.startTimer,
-    timer: state.privateVideoCall.timer,
-    interVal: state.privateVideoCall.interVal,
-    receiver: state.privateVideoCall.receiver,
-    roomId: state.messageReducer.roomId,
-    openPrivateVideoCall: state.privateVideoCall.openPrivateVideoCall,
+    videoChat: state.privateCall.videoChat,
+    userName: state.privateCall.userName,
+    callReachToReceiver: state.privateCall.callReachToReceiver,
+    startTimer: state.privateCall.startTimer,
+    timer: state.privateCall.timer,
+    interVal: state.privateCall.interVal,
+    receiver: state.privateCall.receiver,
+    roomId: state.privateCall.roomId,
+    openPrivateVideoCall: state.privateCall.openPrivateVideoCall,
   }));
 
   ////////////////// OPEN CAMERA AND MICROPHONE OF RECEIVER //////////////////
@@ -79,9 +79,9 @@ const PrivateVideoCall = ({
         .getUserMedia({ video: videoChat, audio: true })
         .then((stream) => {
           dispatch(getStream(stream));
-          myVideo.current.srcObject = stream;
+          myStream.current.srcObject = stream;
         });
-  }, [dispatch, myVideo, receivingCall, videoChat]);
+  }, [dispatch, myStream, receivingCall, videoChat]);
 
   ////////////////// RESPONSE IF RECEIVER IS ONLINE ///////////////////
   useEffect(() => {
@@ -90,6 +90,9 @@ const PrivateVideoCall = ({
         dispatch(setCallReachToReceiver(true));
       }
     });
+    // return () => {
+    //   socket.disconnect();
+    // };
   }, [socket, dispatch, userInfo]);
 
   ///////////////// CUT THE CALL FROM RECEIVER ///////////////////////
@@ -105,25 +108,28 @@ const PrivateVideoCall = ({
     socket.on("callEnded", (to) => {
       if (to === userInfo.email) {
         cutCall();
-        dispatch(setReceiver(false));
         dispatch(isCallEnded(true));
         dispatch(setStartTimer(false));
         dispatch(setVideoCallIsOpen(false));
         dispatch(isReceivingCall(false));
         dispatch(isCallAccepted(false));
         connectionRef.current && connectionRef.current.destroy();
-        userVideo.current = null;
+        userStream.current = null;
         (timer.s > 0 || timer.m > 0 || timer.h > 0) &&
           end(interVal) &&
           dispatch(setCallTimer({ s: 0, m: 0, h: 0 }));
         !receiver && window.location.reload();
+        dispatch(setReceiver(false));
       }
     });
+    // return () => {
+    //   socket.disconnect();
+    // };
   }, [
     socket,
     receiver,
     connectionRef,
-    userVideo,
+    userStream,
     userInfo,
     dispatch,
     stream,
@@ -154,7 +160,7 @@ const PrivateVideoCall = ({
         dispatch(setVideoCallIsOpen(false));
         dispatch(setCallReachToReceiver(false));
         connectionRef.current && connectionRef.current.destroy();
-        userVideo.current = null;
+        userStream.current = null;
         socket.emit("cutCall", {
           to: receiverInfo.email,
         });
@@ -174,7 +180,7 @@ const PrivateVideoCall = ({
     stream,
     timer,
     userInfo.email,
-    userVideo,
+    userStream,
     videoChat,
   ]);
 
@@ -217,7 +223,7 @@ const PrivateVideoCall = ({
     });
 
     peer.on("stream", (stream) => {
-      userVideo.current.srcObject = stream;
+      userStream.current.srcObject = stream;
     });
     peer.signal(callerSignal);
     connectionRef.current = peer;
@@ -241,12 +247,12 @@ const PrivateVideoCall = ({
     dispatch(isReceivingCall(false));
     dispatch(isCallAccepted(false));
     connectionRef.current && connectionRef.current.destroy();
-    userVideo.current = null;
-    dispatch(setReceiver(false));
+    userStream.current = null;
     socket.emit("cutCall", {
       to: receiverInfo.email,
     });
     !receiver && window.location.reload();
+    dispatch(setReceiver(false));
   };
 
   return (
@@ -255,7 +261,7 @@ const PrivateVideoCall = ({
         {videoChat ? (
           <>
             {callAccepted && !callEnded ? (
-              <video playsInline ref={userVideo} autoPlay className="video" />
+              <video playsInline ref={userStream} autoPlay className="video" />
             ) : (
               <>
                 <img
@@ -292,9 +298,9 @@ const PrivateVideoCall = ({
               <video
                 playsInline
                 muted
-                ref={myVideo}
+                ref={myStream}
                 autoPlay
-                className="myVideo__after_callReceive"
+                className="myStream__after_callReceive"
               />
             )}
           </>
@@ -328,9 +334,9 @@ const PrivateVideoCall = ({
                 </h6>
               </div>
             )}
-            <audio muted ref={myVideo} autoPlay></audio>
+            <audio muted ref={myStream} autoPlay></audio>
             {callAccepted && !callEnded && (
-              <audio ref={userVideo} autoPlay></audio>
+              <audio ref={userStream} autoPlay></audio>
             )}
           </>
         )}

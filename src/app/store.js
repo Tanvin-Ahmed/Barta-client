@@ -9,5 +9,5 @@ const initialState = {};
 export const store = createStore(
   rootReducer,
   initialState,
-  composeWithDevTools(applyMiddleware(logger, thunk))
+  composeWithDevTools(applyMiddleware(thunk))
 );

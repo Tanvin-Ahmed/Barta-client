@@ -23,7 +23,7 @@
   width: 0.7rem;
   background-color: rgb(255, 157, 0);
   border-radius: 50%;
-  left: 30%;
+  left: 0%;
   top: 70%;
 }
 
@@ -164,12 +164,17 @@
   left: 92%;
 }
 
-.react-options {
+.react_options {
   position: absolute;
   background-color: rgb(255, 160, 125);
   border-radius: 5rem;
   height: 2rem;
   z-index: 1200;
+}
+
+.react_options_receiver {
+  position: absolute;
+  left: -200%;
 }
 
 .chose {
@@ -231,13 +236,14 @@
 .show__document {
   padding: 0.1rem 0.4rem;
   margin-top: 0.4rem;
-  background-image: linear-gradient(
-    to right,
-    rgb(225, 182, 255),
-    rgb(255, 182, 237)
-  );
-  box-shadow: 0px 5px 10px rgba(141, 31, 132, 0.507);
+  background-color: rgb(255, 94, 66);
+  box-shadow: 0px 5px 10px rgba(8, 10, 39, 0.507);
   border-radius: 10px;
+}
+
+.show_user_document {
+  background-color: rgb(25, 6, 59);
+  box-shadow: 0px 5px 10px rgba(77, 87, 105, 0.342);
 }
 
 .document__title {
@@ -263,7 +269,6 @@
 }
 
 .typing__container {
-  margin-left: 1.5rem;
   padding: 0.2rem;
   border-radius: 10px;
   background-color: rgb(255, 76, 44);
