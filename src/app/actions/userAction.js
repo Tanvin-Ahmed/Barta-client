@@ -11,6 +11,9 @@ import {
   GET_RECEIVER_INFO,
   UPDATE_FRIEND_STATUS,
   UPDATE_CHAT_STATUS,
+  OPEN_GROUP_MAKING_SECTION,
+  SELECTED_PEOPLE_TO_CREATE_GROUP,
+  UPDATED_SELECTED_ID_LIST,
 } from "../types";
 
 export const getUserInfo = () => {
@@ -207,5 +210,27 @@ export const updateChatStatus = (updateStatus) => {
   return {
     type: UPDATE_CHAT_STATUS,
     payload: updateStatus,
+  };
+};
+
+// group making tap
+export const setOpenGroupMakingTab = (bool) => {
+  return {
+    type: OPEN_GROUP_MAKING_SECTION,
+    payload: bool,
+  };
+};
+
+export const setSelectedIdInfo = (info) => {
+  return {
+    type: SELECTED_PEOPLE_TO_CREATE_GROUP,
+    payload: info,
+  };
+};
+
+export const updatedSelectedIdList = (list) => {
+  return {
+    type: UPDATED_SELECTED_ID_LIST,
+    payload: list,
   };
 };

@@ -174,8 +174,8 @@ const Chat = ({ socket }) => {
   }, [dispatch]);
 
   //////////////// GET MESSAGE FROM DATABASE //////////////
-  useMemo(() => {
-    dispatch(getOneOneChat({ pageNum: 1, roomId }));
+  useEffect(() => {
+    roomId && dispatch(getOneOneChat({ pageNum: 1, roomId }));
   }, [roomId, dispatch]);
 
   const page = useRef(2);
@@ -240,6 +240,8 @@ const Chat = ({ socket }) => {
         history.push(`/chat/${data.callerDataBaseId}`);
       }
     });
+
+    return () => socket.off("callUser");
   }, [dispatch, socket, receiverInfo, senderInfo, history]);
 
   ////////// MAKE CALL ///////////////

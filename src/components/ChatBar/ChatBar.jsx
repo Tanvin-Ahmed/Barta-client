@@ -18,16 +18,26 @@ const ChatBar = ({ socket }) => {
   const history = useHistory();
   const dispatch = useDispatch();
 
-  const { users, friendList, error, loading, chatList, userInfo } = useSelector(
-    (state) => ({
-      users: state.userReducer.allUserInfo,
-      friendList: state.userReducer.chatList,
-      error: state.userReducer.error,
-      loading: state.userReducer.loading,
-      chatList: state.userReducer.addChatList,
-      userInfo: state.userReducer.userInfo,
-    })
-  );
+  const {
+    users,
+    friendList,
+    error,
+    loading,
+    chatList,
+    userInfo,
+    makeGroup,
+    selectedIdsForGroup,
+  } = useSelector((state) => ({
+    users: state.userReducer.allUserInfo,
+    friendList: state.userReducer.chatList,
+    error: state.userReducer.error,
+    loading: state.userReducer.loading,
+    chatList: state.userReducer.addChatList,
+    userInfo: state.userReducer.userInfo,
+    // group making tab
+    makeGroup: state.userReducer.makeGroup,
+    selectedIdsForGroup: state.userReducer.selectedIdsForGroup,
+  }));
 
   //////////////// Friend List Update ///////////////
   useEffect(() => {
@@ -72,24 +82,25 @@ const ChatBar = ({ socket }) => {
         history.push(`/chat/${data.callerDataBaseId}`);
       }
     });
-    // return () => {
-    //   socket.disconnect();
-    // };
+    return () => socket.off("callUser");
   }, [dispatch, socket, userInfo, friendList, history]);
 
   return (
     <section className="chat__bar">
       <ChatBarHeader userPhotoURL={userInfo?.photoURL} dispatch={dispatch} />
       <div className="list__body">
-        {chatList ? (
+        {chatList && !makeGroup && (
           <ChatList friendList={friendList} history={history} />
-        ) : (
+        )}
+        {((!chatList && !makeGroup) || (!chatList && makeGroup)) && (
           <SearchFriend
             userEmail={userInfo?.email}
             users={users}
             loading={loading}
             history={history}
             dispatch={dispatch}
+            makeGroup={makeGroup}
+            selectedIdsForGroup={selectedIdsForGroup}
           />
         )}
       </div>

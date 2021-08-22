@@ -10,6 +10,9 @@ import {
   GET_RECEIVER_INFO,
   UPDATE_FRIEND_STATUS,
   UPDATE_CHAT_STATUS,
+  OPEN_GROUP_MAKING_SECTION,
+  SELECTED_PEOPLE_TO_CREATE_GROUP,
+  UPDATED_SELECTED_ID_LIST,
 } from "../types";
 
 const initialState = {
@@ -21,6 +24,8 @@ const initialState = {
   success: "",
   loading: false,
   addChatList: true,
+  makeGroup: false,
+  selectedIdsForGroup: [],
 };
 
 const userReducer = (state = initialState, action) => {
@@ -79,6 +84,23 @@ const userReducer = (state = initialState, action) => {
       return {
         ...state,
         receiverInfo: action.payload,
+      };
+
+    // group making tab
+    case OPEN_GROUP_MAKING_SECTION:
+      return {
+        ...state,
+        makeGroup: action.payload,
+      };
+    case SELECTED_PEOPLE_TO_CREATE_GROUP:
+      return {
+        ...state,
+        selectedIdsForGroup: [...state.selectedIdsForGroup, action.payload],
+      };
+    case UPDATED_SELECTED_ID_LIST:
+      return {
+        ...state,
+        selectedIdsForGroup: action.payload,
       };
     default:
       return state;

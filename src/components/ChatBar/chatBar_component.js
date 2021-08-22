@@ -4,8 +4,16 @@ import PeopleIcon from "@material-ui/icons/People";
 import PersonAddIcon from "@material-ui/icons/PersonAdd";
 import GroupAddIcon from "@material-ui/icons/GroupAdd";
 import { Avatar, CardActionArea, IconButton } from "@material-ui/core";
-import { updateChatList } from "../../app/actions/userAction";
-import { handleReceiverInfo, handleSearchForFriend } from "./chatBar_logic";
+import HighlightOffIcon from "@material-ui/icons/HighlightOff";
+import {
+  addIdToCreateGroup,
+  deleteIdFromSelectedId,
+  handleReceiverInfo,
+  handleSearchForFriend,
+  openFriendListTab,
+  openGroupMakingTab,
+  openSearchToMakeFriendTab,
+} from "./chatBar_logic";
 import { Spinner } from "react-bootstrap";
 
 export const ChatBarHeader = ({ userPhotoURL, dispatch }) => {
@@ -31,7 +39,7 @@ export const ChatBarHeader = ({ userPhotoURL, dispatch }) => {
         <div>
           <CardActionArea
             style={{ padding: "0.6rem", borderRadius: "50%" }}
-            onClick={() => dispatch(updateChatList(true))}
+            onClick={() => openFriendListTab(dispatch)}
           >
             <PeopleIcon className="text-light" size="small" />
           </CardActionArea>
@@ -39,13 +47,16 @@ export const ChatBarHeader = ({ userPhotoURL, dispatch }) => {
         <div>
           <CardActionArea
             style={{ padding: "0.6rem", borderRadius: "50%" }}
-            onClick={() => dispatch(updateChatList(false))}
+            onClick={() => openSearchToMakeFriendTab(dispatch)}
           >
             <PersonAddIcon className="text-light" size="small" />
           </CardActionArea>
         </div>
         <div>
-          <CardActionArea style={{ padding: "0.6rem", borderRadius: "50%" }}>
+          <CardActionArea
+            style={{ padding: "0.6rem", borderRadius: "50%" }}
+            onClick={() => openGroupMakingTab(dispatch)}
+          >
             <GroupAddIcon className="text-light" size="small" />
           </CardActionArea>
         </div>
@@ -89,6 +100,8 @@ export const SearchFriend = ({
   loading,
   history,
   dispatch,
+  makeGroup,
+  selectedIdsForGroup,
 }) => {
   return (
     <>
@@ -100,19 +113,48 @@ export const SearchFriend = ({
           placeholder="Add new Friend"
         />
       </div>
+      <div className="my-1" />
+      {makeGroup && selectedIdsForGroup.length > 0 && (
+        <div className="selectedId__container rounded">
+          {selectedIdsForGroup?.map((selectedId) => (
+            <div key={selectedId.id} className="selected_id">
+              <HighlightOffIcon
+                onClick={() =>
+                  deleteIdFromSelectedId(
+                    dispatch,
+                    selectedId?.id,
+                    selectedIdsForGroup
+                  )
+                }
+                className="times_for_selectedId"
+                size="small"
+              />
+              <Avatar src={selectedId?.photoURL} />
+            </div>
+          ))}
+        </div>
+      )}
       <div className="users__list mt-2">
         {loading ? (
           <div className="loadingSpinner">
             <Spinner animation="grow" variant="warning" />
           </div>
         ) : (
-          users !== [] &&
+          users.length > 0 &&
           users?.map((otherUser) => {
             if (otherUser.email !== userEmail) {
               return (
                 <CardActionArea
                   key={otherUser._id}
-                  onClick={() => handleReceiverInfo(otherUser, history)}
+                  onClick={() => {
+                    !makeGroup
+                      ? handleReceiverInfo(otherUser, history)
+                      : addIdToCreateGroup(
+                          dispatch,
+                          otherUser,
+                          selectedIdsForGroup
+                        );
+                  }}
                   className="px-3 d-flex justify-content-start align-items-center text-light"
                 >
                   <div className="mr-3">

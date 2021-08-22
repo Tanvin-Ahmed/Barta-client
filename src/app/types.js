@@ -35,6 +35,13 @@ export const SELECTED_FILES = "selected_files";
 export const OPEN_OPTIONS_FOR_CHAT = "open_options_for_chat";
 export const REACT_TAB_TOGGLE = "react_tab_toggle";
 
+// chat bar page interaction
+export const OPEN_GROUP_MAKING_SECTION = "open_group_making_section";
+export const SEARCH_PEOPLE_TO_CREATE_GROUP = "search_peOPLE_to_create_group";
+export const SELECTED_PEOPLE_TO_CREATE_GROUP =
+  "selected_peOPLE_to_create_group";
+export const UPDATED_SELECTED_ID_LIST = "updated_selected_id_list";
+
 // private call
 export const OPEN_PRIVATE_VIDEO_CALL = "open_private_video_call";
 export const MY_ID = "my_id";

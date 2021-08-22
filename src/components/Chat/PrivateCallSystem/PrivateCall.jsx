@@ -90,9 +90,7 @@ const PrivateVideoCall = ({
         dispatch(setCallReachToReceiver(true));
       }
     });
-    // return () => {
-    //   socket.disconnect();
-    // };
+    return () => socket.off("call-reach-to-user");
   }, [socket, dispatch, userInfo]);
 
   ///////////////// CUT THE CALL FROM RECEIVER ///////////////////////
@@ -118,13 +116,14 @@ const PrivateVideoCall = ({
         (timer.s > 0 || timer.m > 0 || timer.h > 0) &&
           end(interVal) &&
           dispatch(setCallTimer({ s: 0, m: 0, h: 0 }));
-        !receiver && window.location.reload();
+        !receiver &&
+          setTimeout(() => {
+            window.location.reload();
+          }, 10);
         dispatch(setReceiver(false));
       }
     });
-    // return () => {
-    //   socket.disconnect();
-    // };
+    return () => socket.off("callEnded");
   }, [
     socket,
     receiver,
@@ -166,7 +165,7 @@ const PrivateVideoCall = ({
         });
       }, 40000);
     } else {
-      clearTimeout(setTime.current.time);
+      callAccepted && clearTimeout(setTime.current.time);
     }
   }, [
     callAccepted,
@@ -251,7 +250,10 @@ const PrivateVideoCall = ({
     socket.emit("cutCall", {
       to: receiverInfo.email,
     });
-    !receiver && window.location.reload();
+    !receiver &&
+      setTimeout(() => {
+        window.location.reload();
+      }, 10);
     dispatch(setReceiver(false));
   };
 

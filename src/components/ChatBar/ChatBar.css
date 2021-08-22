@@ -70,3 +70,30 @@
   background-color: rgb(255, 157, 0);
   border-radius: 50%;
 }
+
+/* group making tab */
+.selectedId__container {
+  background: rgba(255, 255, 255, 0.281);
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 0.4rem;
+  max-height: 6rem;
+  overflow-y: auto;
+}
+
+.selected_id {
+  margin: 0.4rem 0.5rem;
+  position: relative;
+}
+
+.times_for_selectedId {
+  position: absolute;
+  z-index: 1200;
+  right: -20%;
+  top: 0;
+  color: #ff1744;
+  cursor: pointer;
+  background-color: rgba(248, 248, 248, 0.863);
+  border-radius: 50%;
+}
