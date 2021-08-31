@@ -24,6 +24,7 @@ const Login = () => {
           displayName: result.displayName,
           photoURL: result.photoURL,
           chatList: [],
+          groups: [],
           status: "active",
           goOffLine: new Date().toUTCString(),
           timeStamp: new Date().toUTCString(),

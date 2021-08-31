@@ -4,7 +4,8 @@ import {
   CHAT_UPLOAD_PERCENTAGE,
   CLICK_UPLOAD_OPTION,
   DELETE_CHAT_MESSAGE,
-  GET_MESSAGE_PROGRESS,
+  GET_GROUP_CHAT,
+  GET_MESSAGE_SPINNER,
   GET_ONE_ONE_CHAT,
   GET_ONE_ONE_CHAT_FROM_SOCKET,
   IS_TYPE,
@@ -35,8 +36,7 @@ export const postOneOneChat = (chat) => {
 
     axios
       .post("http://localhost:5000/chatMessage/postOneOneChat", chat, options)
-      .then((data) => {
-        console.log("Data loaded successfully");
+      .then(() => {
         dispatch({
           type: CHAT_UPLOAD_PERCENTAGE,
           payload: 100,
@@ -58,7 +58,6 @@ export const postOneOneChat = (chat) => {
 };
 
 export const uploadFiles = (chosenFiles) => {
-  // socket.emit("upload-files", chosenFiles);
   return (dispatch) => {
     const options = {
       onUploadProgress: ({ loaded, total }) => {
@@ -75,8 +74,7 @@ export const uploadFiles = (chosenFiles) => {
 
     axios
       .post("http://localhost:5000/chatMessage/upload", chosenFiles, options)
-      .then((data) => {
-        console.log("Data loaded successfully");
+      .then(() => {
         dispatch({
           type: CHAT_UPLOAD_PERCENTAGE,
           payload: 100,
@@ -97,46 +95,25 @@ export const uploadFiles = (chosenFiles) => {
   };
 };
 
-// let previousDataId = "";
-
 export const getOneOneChat = (data) => {
-  console.log("get data from server", data);
   return (dispatch) => {
-    const options = {
-      onDownloadProgress: ({ loaded, total }) => {
-        let percent = Math.floor((loaded * 100) / total);
-        if (percent < 100) {
-          dispatch({
-            type: GET_MESSAGE_PROGRESS,
-            payload: percent,
-          });
-        }
-      },
-    };
-
+    dispatch({
+      type: GET_ONE_ONE_CHAT,
+      payload: [],
+    });
+    dispatch({
+      type: GET_MESSAGE_SPINNER,
+      payload: true,
+    });
     axios
-      .post(
-        `http://localhost:5000/chatMessage/getOneOneChat/${data?.roomId}`,
-        {
-          pageNum: data?.pageNum,
-        },
-        options
-      )
+      .post(`http://localhost:5000/chatMessage/getOneOneChat/${data?.roomId}`, {
+        pageNum: data?.pageNum,
+      })
       .then((data) => {
-        // if (previousDataId !== data.data[0]?._id) {
-        //   previousDataId = data.data[0]?._id;
-        // progress
         dispatch({
-          type: GET_MESSAGE_PROGRESS,
-          payload: 100,
+          type: GET_MESSAGE_SPINNER,
+          payload: false,
         });
-        setTimeout(() => {
-          dispatch({
-            type: GET_MESSAGE_PROGRESS,
-            payload: 0,
-          });
-        }, 50);
-
         // data
         const chat = data?.data?.reverse();
         dispatch({
@@ -154,17 +131,16 @@ export const getOneOneChat = (data) => {
             type: REFETCH_MESSAGE,
             payload: false,
           });
-          // }
         }
       })
       .catch((err) => {
         dispatch({
-          type: CHAT_ERROR,
-          payload: err.message,
+          type: GET_MESSAGE_SPINNER,
+          payload: false,
         });
         dispatch({
-          type: GET_MESSAGE_PROGRESS,
-          payload: 0,
+          type: CHAT_ERROR,
+          payload: err.message,
         });
       });
   };
@@ -339,5 +315,74 @@ export const setRoomId = (id) => {
   return {
     type: SET_ROOM_ID,
     payload: id,
+  };
+};
+
+// group message
+export const getGroupMessage = (data) => {
+  return (dispatch) => {
+    // const options = {
+    //   onDownloadProgress: ({ loaded, total }) => {
+    //     let percent = Math.floor((loaded * 100) / total);
+    //     if (percent < 100) {
+    //       dispatch({
+    //         type: GET_MESSAGE_PROGRESS,
+    //         payload: percent,
+    //       });
+    //     }
+    //   },
+    // };
+    dispatch({
+      type: GET_ONE_ONE_CHAT,
+      payload: [],
+    });
+    dispatch({
+      type: GET_MESSAGE_SPINNER,
+      payload: true,
+    });
+    axios
+      .post(
+        `http://localhost:5000/groupChat/messages/${data?.roomId}`,
+        {
+          pageNum: data?.pageNum,
+        }
+        // options
+      )
+      .then((data) => {
+        // progress
+        dispatch({
+          type: GET_MESSAGE_SPINNER,
+          payload: false,
+        });
+        // data
+        const chat = data?.data?.reverse();
+        dispatch({
+          type: GET_ONE_ONE_CHAT,
+          payload: chat,
+        });
+
+        if (chat?.length === 9) {
+          dispatch({
+            type: REFETCH_MESSAGE,
+            payload: true,
+          });
+        } else {
+          dispatch({
+            type: REFETCH_MESSAGE,
+            payload: false,
+          });
+          // }
+        }
+      })
+      .catch((err) => {
+        dispatch({
+          type: CHAT_ERROR,
+          payload: err.message,
+        });
+        dispatch({
+          type: GET_MESSAGE_SPINNER,
+          payload: false,
+        });
+      });
   };
 };

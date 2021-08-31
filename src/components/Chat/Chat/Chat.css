@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Lobster&display=swap");
+
 .chat {
   display: flex;
   flex-direction: column;
@@ -49,6 +51,36 @@
   flex: 1;
   padding: 0 1.5rem;
   position: relative;
+}
+
+.chat__body .chatBody__spinner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1500;
+}
+
+.chat__body .message__notAvailable {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1500;
+  color: rgba(255, 255, 255, 0.596);
+  font-size: 120%;
+  font-family: "Lobster", cursive;
+  letter-spacing: 2px;
+}
+
+.react-scroll-to-bottom--css-tnqbh-1n7m0yu {
+  -ms-overflow-style: none; /* for Internet Explorer, Edge */
+  scrollbar-width: none; /* for Firefox */
+  overflow-y: scroll;
+}
+
+.react-scroll-to-bottom--css-tnqbh-1n7m0yu::-webkit-scrollbar {
+  display: none; /* for Chrome, Safari, and Opera */
 }
 
 .chat__text {

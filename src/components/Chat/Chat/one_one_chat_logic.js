@@ -12,6 +12,7 @@ import {
   uploadFiles,
 } from "../../../app/actions/messageAction";
 import {
+  getGroupIdForChatBar,
   getReceiverInfo,
   postFriendInfo,
   updateChatList,
@@ -28,6 +29,10 @@ export const screen = (dispatch) => {
 
 export const getUsersData = async (dispatch, id) => {
   await dispatch(getReceiverInfo(id));
+};
+
+export const getGroupInfo = (dispatch, groupName) => {
+  dispatch(getGroupIdForChatBar(groupName, ""));
 };
 
 export const getRoomId = (dispatch) => {

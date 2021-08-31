@@ -7,7 +7,6 @@ import Login from "../Login/Login";
 import PrivateRoute from "../PrivateRoute/PrivateRoute";
 
 import { useDispatch } from "react-redux";
-import { getFriendInfo } from "../../app/actions/userAction";
 
 const Home = ({ socket }) => {
   const dispatch = useDispatch();
@@ -15,7 +14,6 @@ const Home = ({ socket }) => {
   // ////////////////// post user info ///////////////////////
   useEffect(() => {
     let userInfo = JSON.parse(localStorage.getItem("barta/user"));
-    dispatch(getFriendInfo(userInfo?.email));
     if (socket === null && !userInfo?.email) return;
     socket.emit("user-info", { email: userInfo?.email });
   }, [dispatch, socket]);

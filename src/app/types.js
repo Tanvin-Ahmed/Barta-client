@@ -1,4 +1,5 @@
 // user
+export const SET_SPINNER_FOR_CHAT_LIST = "set_spinner_for_chat_list";
 export const GET_FRIEND_INFO = "get_friend_info";
 export const POST_USER_INFO = "post_user_info";
 export const ERROR_USER_INFO = "error_user_info";
@@ -26,7 +27,7 @@ export const UPDATE_CHAT_REACT = "update_chat_react";
 export const DELETE_CHAT_MESSAGE = "delete_chat_message";
 export const SET_ROOM_ID = "set_room_id";
 export const REFETCH_MESSAGE = "refetch_message";
-export const GET_MESSAGE_PROGRESS = "get_message_progress";
+export const GET_MESSAGE_SPINNER = "get_message_spinner";
 
 // file upload
 export const SELECTED_FILES = "selected_files";
@@ -41,6 +42,7 @@ export const SEARCH_PEOPLE_TO_CREATE_GROUP = "search_peOPLE_to_create_group";
 export const SELECTED_PEOPLE_TO_CREATE_GROUP =
   "selected_peOPLE_to_create_group";
 export const UPDATED_SELECTED_ID_LIST = "updated_selected_id_list";
+export const FINAL_STEP_TO_CREATE_GROUP = "final_step_to_create_group";
 
 // private call
 export const OPEN_PRIVATE_VIDEO_CALL = "open_private_video_call";
@@ -62,3 +64,18 @@ export const CALL_TIMER = "call_timer";
 export const START_TIMER = "start_timer";
 export const SET_INTERVAL = "set_interval";
 export const SET_RECEIVER = "set_receiver";
+
+// group making tab
+export const GO_TO_GROUP_LIST = "go_to_group_list";
+export const SET_GROUP_LIST_FROM_DATABASE = "get_group_list_from_database";
+export const GET_GROUP_INFO_FROM_SOCKET = "get_group_info_from_socket";
+export const SET_GROUP_NAME = "set_group_name";
+export const GROUP_CREATED_SUCCESSFULLY = "set_group_created_successfully";
+export const GROUP_CREATING_SPINNER = "set_group_creating_spinner";
+export const CLEAR_SELECTED_ID_FOR_GROUP = "clear_selected_id_for_group";
+export const CLEAR_GROUP_CREATED_SUCCESSFULLY_STATUS =
+  "set_group_created_successfully_status";
+
+// group info
+export const GET_GROUP_INFO = "get_group_info";
+export const SET_SPINNER_FOR_GROUP_LIST = "set_spinner_for_group_list";

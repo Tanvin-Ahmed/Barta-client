@@ -14,7 +14,7 @@ import {
   DELETE_CHAT_MESSAGE,
   SET_ROOM_ID,
   REFETCH_MESSAGE,
-  GET_MESSAGE_PROGRESS,
+  GET_MESSAGE_SPINNER,
 } from "../types";
 
 const initialState = {
@@ -22,7 +22,7 @@ const initialState = {
   groupMessage: [],
   error: "",
   uploadPercentage: 0,
-  getMessageProgress: 0,
+  getMessageSpinner: false,
   largeScreen: true,
   typing: false,
   clickUploadOption: false,
@@ -38,12 +38,12 @@ const messageReducer = (state = initialState, action) => {
     case GET_ONE_ONE_CHAT:
       return {
         ...state,
-        oneOneMessage: [...state.oneOneMessage, ...action.payload],
+        oneOneMessage: action.payload,
       };
-    case GET_MESSAGE_PROGRESS:
+    case GET_MESSAGE_SPINNER:
       return {
         ...state,
-        getMessageProgress: action.payload,
+        getMessageSpinner: action.payload,
       };
     case REFETCH_MESSAGE:
       return {

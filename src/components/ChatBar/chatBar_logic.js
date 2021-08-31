@@ -1,5 +1,8 @@
 import {
+  createGroup,
   getAllUserInfo,
+  setFinalStepToCreateGroup,
+  setOpenGroupList,
   setOpenGroupMakingTab,
   setSelectedIdInfo,
   updateChatList,
@@ -10,6 +13,7 @@ import {
 export const openFriendListTab = (dispatch) => {
   dispatch(updateChatList(true));
   dispatch(setOpenGroupMakingTab(false));
+  dispatch(setOpenGroupList(false));
 };
 
 export const openSearchToMakeFriendTab = (dispatch) => {
@@ -20,6 +24,13 @@ export const openSearchToMakeFriendTab = (dispatch) => {
 export const openGroupMakingTab = (dispatch) => {
   dispatch(updateChatList(false));
   dispatch(setOpenGroupMakingTab(true));
+  dispatch(setOpenGroupList(false));
+};
+
+export const openGroupListTab = (dispatch) => {
+  dispatch(updateChatList(false));
+  dispatch(setOpenGroupMakingTab(false));
+  dispatch(setOpenGroupList(true));
 };
 
 export const isUserOnline = (user, friendList, dispatch) => {
@@ -42,11 +53,19 @@ export const handleSearchForFriend = (e, userEmail, dispatch) => {
 };
 
 export const handleReceiverInfo = (receiver, history) => {
+  sessionStorage.removeItem("barta/groupName");
   sessionStorage.setItem(
     "barta/receiver",
     JSON.stringify({ email: receiver.email })
   );
   history.push(`/chat/${receiver._id}`);
+};
+
+export const handleGroupInfo = (groupName, history) => {
+  sessionStorage.removeItem("barta/receiver");
+  sessionStorage.setItem("barta/groupName", JSON.stringify({ groupName }));
+  const groupNameURL = groupName.split(" ").join("(*Φ皿Φ*)");
+  history.push(`/chat/${groupNameURL}`);
 };
 
 // group making tab
@@ -66,6 +85,7 @@ export const addIdToCreateGroup = (
     dispatch(
       setSelectedIdInfo({
         id: otherUser._id,
+        email: otherUser.email,
         photoURL: otherUser?.photoURL,
       })
     );
@@ -77,4 +97,24 @@ export const deleteIdFromSelectedId = (dispatch, id, selectedIdsForGroup) => {
     (selectedId) => selectedId.id !== id
   );
   dispatch(updatedSelectedIdList(updatedSelectedId));
+};
+
+export const createGroupForFirst = (
+  selectedIdInfo,
+  userInfo,
+  groupName,
+  dispatch
+) => {
+  if (groupName.trim() === "") return alert("Group name is required");
+
+  const GroupPeopleInfo = [userInfo, ...selectedIdInfo];
+  console.log(GroupPeopleInfo);
+  let selectedUsersEmail = [];
+  for (let i = 0; i < GroupPeopleInfo.length; i++) {
+    const user = GroupPeopleInfo[i];
+    selectedUsersEmail.push(user.email);
+  }
+
+  dispatch(createGroup(selectedUsersEmail, groupName));
+  dispatch(setFinalStepToCreateGroup(false));
 };

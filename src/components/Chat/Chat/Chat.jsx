@@ -5,15 +5,11 @@ import { useParams } from "react-router-dom";
 import { useHistory } from "react-router";
 import Peer from "simple-peer";
 import {
-  deleteChatMessage,
-  getOneOneChatMessageFromSocket,
+  getGroupInfo,
   getRoomId,
   getUsersData,
-  handleIsFriendTyping,
   handleOneOneChat,
-  receiverStatusFromSocket,
   screen,
-  updateReact,
 } from "./one_one_chat_logic";
 import {
   ChatBody,
@@ -41,6 +37,7 @@ import {
 } from "../../../app/actions/privateCallAction";
 import {
   deleteMessage,
+  getGroupMessage,
   getOneOneChat,
   getOneOneChatFromSocket,
   isTyping,
@@ -48,7 +45,6 @@ import {
   updateReactInChat,
 } from "../../../app/actions/messageAction";
 import { start } from "../PrivateCallSystem/timer";
-import LinearProgress from "@material-ui/core/LinearProgress";
 import { updateChatStatus } from "../../../app/actions/userAction";
 
 const Chat = ({ socket }) => {
@@ -56,13 +52,16 @@ const Chat = ({ socket }) => {
   const { id } = useParams();
   const history = useHistory();
 
-  useMemo(() => {
-    getUsersData(dispatch, id);
+  useEffect(() => {
+    id && JSON.parse(sessionStorage.getItem("barta/groupName"))?.groupName
+      ? getGroupInfo(dispatch, id?.split("(*Φ皿Φ*)")?.join(" "))
+      : getUsersData(dispatch, id);
   }, [dispatch, id]);
 
   const {
     senderInfo,
     receiverInfo,
+    groupInfo,
     addChatList,
     chatMessage,
     uploadPercentage,
@@ -73,7 +72,7 @@ const Chat = ({ socket }) => {
     isOpenOptions,
     reactTabIsOpen,
     reFetchMessage,
-    getMessageProgress,
+    getMessageSpinner,
     openPrivateVideoCall,
     myId,
     idToCall,
@@ -84,6 +83,7 @@ const Chat = ({ socket }) => {
     // private chat
     senderInfo: state.userReducer.userInfo,
     receiverInfo: state.userReducer.receiverInfo,
+    groupInfo: state.userReducer.groupInfo,
     addChatList: state.userReducer.addChatList,
     chatMessage: state.messageReducer.oneOneMessage,
     uploadPercentage: state.messageReducer.uploadPercentage,
@@ -94,7 +94,7 @@ const Chat = ({ socket }) => {
     isOpenOptions: state.messageReducer.isOpenOptions,
     reactTabIsOpen: state.messageReducer.reactTabIsOpen,
     reFetchMessage: state.messageReducer.reFetchMessage,
-    getMessageProgress: state.messageReducer.getMessageProgress,
+    getMessageSpinner: state.messageReducer.getMessageSpinner,
 
     // private video call
     openPrivateVideoCall: state.privateCall.openPrivateVideoCall,
@@ -106,11 +106,47 @@ const Chat = ({ socket }) => {
   }));
   const [inputText, setInputText] = useState("");
 
+  ////////// GET ROOM ID //////////
   const roomId = useMemo(() => {
-    return getRoomId(dispatch);
-  }, [dispatch]);
+    if (id) {
+      if (JSON.parse(sessionStorage.getItem("barta/groupName"))?.groupName) {
+        return id?.split("(*Φ皿Φ*)")?.join(" ");
+      } else {
+        return getRoomId(dispatch);
+      }
+    }
+  }, [dispatch, id]);
 
-  ////////////// GET MESSAGE //////////////////
+  //////////////// GET MESSAGE FROM DATABASE //////////////
+  useEffect(() => {
+    if (roomId) {
+      if (JSON.parse(sessionStorage.getItem("barta/groupName"))?.groupName) {
+        dispatch(getGroupMessage({ pageNum: 1, roomId }));
+      } else {
+        dispatch(getOneOneChat({ pageNum: 1, roomId }));
+      }
+    }
+  }, [roomId, dispatch, id]);
+
+  const page = useRef(2);
+  useEffect(() => {
+    const onScroll = (e) => {
+      const scroll = e.target.document.querySelector(
+        ".react-scroll-to-bottom--css-tnqbh-1n7m0yu"
+      )?.scrollTop;
+      console.log(scroll);
+      if (scroll === 0 && reFetchMessage) {
+        dispatch(getOneOneChat({ pageNum: page.current, roomId }));
+        dispatch(stopReFetchMessage());
+        page.current++;
+      }
+    };
+
+    window.addEventListener("scroll", onScroll);
+    return window.removeEventListener("scroll", onScroll);
+  }, [dispatch, roomId, reFetchMessage]);
+
+  ////////////// GET MESSAGE FROM SOCKET //////////////////
   useEffect(() => {
     socket.on("one_one_chatMessage", (message) => {
       dispatch(getOneOneChatFromSocket(message));
@@ -172,29 +208,6 @@ const Chat = ({ socket }) => {
     window.addEventListener("resize", screen(dispatch));
     return () => window.removeEventListener("resize", screen(dispatch));
   }, [dispatch]);
-
-  //////////////// GET MESSAGE FROM DATABASE //////////////
-  useEffect(() => {
-    roomId && dispatch(getOneOneChat({ pageNum: 1, roomId }));
-  }, [roomId, dispatch]);
-
-  const page = useRef(2);
-  useEffect(() => {
-    const onScroll = (e) => {
-      const scroll = e.target.document.querySelector(
-        ".react-scroll-to-bottom--css-tnqbh-1n7m0yu"
-      )?.scrollTop;
-      console.log(scroll);
-      if (scroll === 0 && reFetchMessage) {
-        dispatch(getOneOneChat({ pageNum: page.current, roomId }));
-        dispatch(stopReFetchMessage());
-        page.current++;
-      }
-    };
-
-    window.addEventListener("scroll", onScroll);
-    return window.removeEventListener("scroll", onScroll);
-  }, [dispatch, roomId, reFetchMessage]);
 
   ////////////// SEND MESSAGE //////////////
   const handleOnEnter = () => {
@@ -311,13 +324,12 @@ const Chat = ({ socket }) => {
             addChatList={addChatList}
             largeScreen={largeScreen}
             callUser={callUser}
+            // for group
+            groupInfo={groupInfo}
           />
 
           {uploadPercentage > 0 && (
             <UploadProgressBar uploadPercentage={uploadPercentage} />
-          )}
-          {getMessageProgress > 0 && (
-            <LinearProgress variant="determinate" value={getMessageProgress} />
           )}
           <ChatBody
             chatMessage={chatMessage}
@@ -327,6 +339,7 @@ const Chat = ({ socket }) => {
             dispatch={dispatch}
             isOpenOptions={isOpenOptions}
             reactTabIsOpen={reactTabIsOpen}
+            getMessageSpinner={getMessageSpinner}
           />
 
           {chosenFiles[0] && (
