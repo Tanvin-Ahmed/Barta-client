@@ -11,9 +11,7 @@ import {
   setCallTimer,
   setReceiver,
   setStartTimer,
-  setVideoCallIsOpen,
-  setVideoOpen,
-  setVoiceOpen,
+  setPrivateCallIsOpen,
 } from "../../../app/actions/privateCallAction";
 import { Buttons } from "./Component";
 import "./PrivateCall.css";
@@ -21,6 +19,11 @@ import call_bg from "../../../img/bg/call_bg.jpg";
 import ringtone from "../../../audios/Facebook_messenger_ringtone.mp3";
 import { end, start } from "./timer.js";
 import Timer from "./Timer.jsx";
+import {
+  cutCallByOtherUser,
+  callNotReceive,
+  stopBothVideoAndAudio,
+} from "./callLogic";
 
 const PrivateVideoCall = ({
   socket,
@@ -68,7 +71,7 @@ const PrivateVideoCall = ({
     timer: state.privateCall.timer,
     interVal: state.privateCall.interVal,
     receiver: state.privateCall.receiver,
-    roomId: state.privateCall.roomId,
+    roomId: state.messageReducer.roomId,
     openPrivateVideoCall: state.privateCall.openPrivateVideoCall,
   }));
 
@@ -95,32 +98,17 @@ const PrivateVideoCall = ({
 
   ///////////////// CUT THE CALL FROM RECEIVER ///////////////////////
   useEffect(() => {
-    const cutCall = () => {
-      stream?.getTracks()?.forEach((track) => {
-        if (track.readyState === "live") {
-          track.stop();
-        }
-      });
-    };
-
     socket.on("callEnded", (to) => {
       if (to === userInfo.email) {
-        cutCall();
-        dispatch(isCallEnded(true));
-        dispatch(setStartTimer(false));
-        dispatch(setVideoCallIsOpen(false));
-        dispatch(isReceivingCall(false));
-        dispatch(isCallAccepted(false));
-        connectionRef.current && connectionRef.current.destroy();
-        userStream.current = null;
-        (timer.s > 0 || timer.m > 0 || timer.h > 0) &&
-          end(interVal) &&
-          dispatch(setCallTimer({ s: 0, m: 0, h: 0 }));
-        !receiver &&
-          setTimeout(() => {
-            window.location.reload();
-          }, 10);
-        dispatch(setReceiver(false));
+        cutCallByOtherUser(
+          dispatch,
+          connectionRef,
+          timer,
+          receiver,
+          stream,
+          userStream,
+          interVal
+        );
       }
     });
     return () => socket.off("callEnded");
@@ -137,36 +125,31 @@ const PrivateVideoCall = ({
   ]);
 
   ///////////////// CUT THE CALL AFTER FIXED TIME TO RINGING ///////////////////
-  let setTime = useRef({ database: true, time: null });
+  const setTime = useRef(null);
+  const database = useRef(true);
   useEffect(() => {
-    if (openPrivateVideoCall && !receiver && !callAccepted) {
-      setTime.current.time = setTimeout(() => {
-        stream?.getTracks()?.forEach((track) => {
-          if (track.readyState === "live") {
-            track.stop();
-          }
-        });
-        setTime.current.database &&
-          setCallInfoInDatabase({
-            id: roomId,
-            sender: userInfo.email,
-            receiver: receiverInfo.email,
-            callDuration: timer,
-            callDescription: videoChat ? "Video Call" : "Audio Call",
-            timeStamp: new Date().toUTCString(),
-          });
-        setTime.current.database = false;
-        dispatch(setVideoCallIsOpen(false));
-        dispatch(setCallReachToReceiver(false));
-        connectionRef.current && connectionRef.current.destroy();
-        userStream.current = null;
-        socket.emit("cutCall", {
-          to: receiverInfo.email,
-        });
+    if (openPrivateVideoCall && !receiver) {
+      setTime.current = setTimeout(() => {
+        if (!callAccepted) {
+          callNotReceive(
+            database.current,
+            stream,
+            dispatch,
+            connectionRef,
+            userStream,
+            receiverInfo.email,
+            userInfo.email,
+            roomId,
+            timer,
+            videoChat,
+            socket
+          );
+        } else {
+          return;
+        }
       }, 40000);
-    } else {
-      callAccepted && clearTimeout(setTime.current.time);
     }
+    return () => clearTimeout(setTime.current);
   }, [
     callAccepted,
     openPrivateVideoCall,
@@ -177,33 +160,10 @@ const PrivateVideoCall = ({
     roomId,
     socket,
     stream,
-    timer,
     userInfo.email,
     userStream,
     videoChat,
   ]);
-
-  // stop both mic and camera
-  const stopBothVideoAndAudio = () => {
-    stream?.getTracks()?.forEach((track) => {
-      if (track.readyState === "live") {
-        track.stop();
-      }
-    });
-  };
-
-  // handle video
-  const handleVideoMute = () => {
-    stream.getVideoTracks()[0].enabled = !videoOpen;
-    dispatch(setVideoOpen(!videoOpen));
-    dispatch(getStream(stream));
-  };
-  // handle audio
-  const handleAudioMute = () => {
-    stream.getAudioTracks()[0].enabled = !voiceOpen;
-    dispatch(setVoiceOpen(!voiceOpen));
-    dispatch(getStream(stream));
-  };
 
   const answerCall = () => {
     dispatch(isCallAccepted(true));
@@ -228,21 +188,23 @@ const PrivateVideoCall = ({
     connectionRef.current = peer;
   };
 
-  const leaveCall = async () => {
-    stopBothVideoAndAudio();
+  const leaveCall = () => {
+    stopBothVideoAndAudio(stream);
     end(interVal);
-    await setCallInfoInDatabase({
+    setCallInfoInDatabase({
       id: roomId,
       sender: receiver ? caller : userInfo.email,
       receiver: receiver ? userInfo.email : receiverInfo.email,
-      callDuration: timer,
+      callDuration: callAccepted
+        ? { ...timer, duration: true }
+        : { duration: false },
       callDescription: videoChat ? "Video Call" : "Audio Call",
       timeStamp: new Date().toUTCString(),
     });
     dispatch(setCallTimer({ s: 0, m: 0, h: 0 }));
     dispatch(isCallEnded(true));
     dispatch(setStartTimer(false));
-    dispatch(setVideoCallIsOpen(false));
+    dispatch(setPrivateCallIsOpen(false));
     dispatch(isReceivingCall(false));
     dispatch(isCallAccepted(false));
     connectionRef.current && connectionRef.current.destroy();
@@ -354,8 +316,8 @@ const PrivateVideoCall = ({
           voiceOpen={voiceOpen}
           receivingCall={receivingCall}
           callAccepted={callAccepted}
-          handleAudioMute={handleAudioMute}
-          handleVideoMute={handleVideoMute}
+          stream={stream}
+          dispatch={dispatch}
           answerCall={answerCall}
           leaveCall={leaveCall}
           videoChat={videoChat}

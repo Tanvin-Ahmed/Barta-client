@@ -108,7 +108,6 @@ export const createGroupForFirst = (
   if (groupName.trim() === "") return alert("Group name is required");
 
   const GroupPeopleInfo = [userInfo, ...selectedIdInfo];
-  console.log(GroupPeopleInfo);
   let selectedUsersEmail = [];
   for (let i = 0; i < GroupPeopleInfo.length; i++) {
     const user = GroupPeopleInfo[i];

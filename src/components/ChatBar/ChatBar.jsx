@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import "./ChatBar.css";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router";
@@ -11,14 +11,6 @@ import {
   SearchFriend,
 } from "./chatBar_component";
 import {
-  getCaller,
-  getCallerSignal,
-  getUserName,
-  isReceivingCall,
-  isVideoChat,
-  setReceiver,
-} from "../../app/actions/privateCallAction";
-import {
   clearGroupCreateSuccessfullyStatus,
   clearSelectedIdsForGroup,
   getFriendInfo,
@@ -26,6 +18,8 @@ import {
   getGroupIdForChatBar,
   setGroupsInfoFromDatabase,
 } from "../../app/actions/userAction";
+import { callReached } from "../Chat/PrivateCallSystem/callLogic";
+import { isReceivingCall } from "../../app/actions/privateCallAction";
 
 const ChatBar = ({ socket }) => {
   const history = useHistory();
@@ -69,16 +63,19 @@ const ChatBar = ({ socket }) => {
   }));
 
   //////////////// Show Friend List or Group List /////////////
+  const fetchGroupList = useRef(true);
+  const fetchFriendList = useRef(true);
   useEffect(() => {
     chatList &&
-      userInfo?.email &&
-      friendList.length === 0 &&
+      fetchFriendList.current &&
       dispatch(getFriendInfo(userInfo?.email));
     openGroupList &&
-      userInfo?.email &&
-      groups.length === 0 &&
+      fetchGroupList.current &&
       dispatch(setGroupsInfoFromDatabase(userInfo?.email));
-  }, [userInfo.email, dispatch, chatList, openGroupList, groups, friendList]);
+
+    if (chatList) fetchFriendList.current = false;
+    if (openGroupList) fetchGroupList.current = false;
+  }, [userInfo?.email, dispatch, chatList, openGroupList]);
 
   //////////////// Friend List Update ///////////////
   useEffect(() => {
@@ -112,27 +109,13 @@ const ChatBar = ({ socket }) => {
     if (socket === null) return;
     socket.on("callUser", (data) => {
       if (data.userToCall === userInfo.email) {
-        sessionStorage.setItem(
-          "barta/receiver",
-          JSON.stringify({ email: data.from })
-        );
-        dispatch(setReceiver(true));
-        dispatch(isReceivingCall(true));
-        dispatch(getCaller(data.from));
-        dispatch(getUserName(data.name));
-        dispatch(getCallerSignal(data.signal));
-        data.callType === "video"
-          ? dispatch(isVideoChat(true))
-          : dispatch(isVideoChat(false));
-
-        socket.emit("call-reach-to-me", data.from);
-        history.push(`/chat/${data.callerDataBaseId}`);
+        callReached(data, dispatch, socket, history);
       }
     });
     return () => socket.off("callUser");
   }, [dispatch, socket, userInfo, friendList, history]);
 
-  ///////// CLEAR ALL THING TO CREATE GROUP AFTER CREATE GROUP /////////
+  ///////// CLEAR ALL THING TO CREATING GROUP AFTER CREATED GROUP /////////
   useEffect(() => {
     let setTime;
     if (groupCreated) {

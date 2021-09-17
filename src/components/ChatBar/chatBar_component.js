@@ -54,7 +54,7 @@ export const ChatBarHeader = ({
         </div>
       </div>
       <div className="add__friend mt-2 d-flex justify-content-around align-items-center flex-wrap">
-        <div>
+        <div title="Friend list">
           <CardActionArea
             className={chatList && "listTab__open"}
             style={{ padding: "0.6rem", borderRadius: "50%" }}
@@ -63,7 +63,7 @@ export const ChatBarHeader = ({
             <PersonOutlineIcon className="text-light" size="small" />
           </CardActionArea>
         </div>
-        <div>
+        <div title="Group list">
           <CardActionArea
             className={openGroupList && "listTab__open"}
             style={{ padding: "0.6rem", borderRadius: "50%" }}
@@ -131,7 +131,7 @@ export const ChatList = ({
             ))
         )}
       </div>
-      <div className="make__newFriend__button">
+      <div title="Make new friend" className="make__newFriend__button">
         <CardActionArea
           style={{
             padding: "0.6rem",
@@ -169,6 +169,8 @@ export const GroupList = ({
           <div className="chatBar__progress">
             <CircularProgress style={{ color: "rgb(18, 3, 45)" }} />
           </div>
+        ) : groups.length === 0 ? (
+          <h3 className="group_not_available">Create new Group</h3>
         ) : (
           groups
             ?.filter((val) => {
@@ -199,7 +201,7 @@ export const GroupList = ({
             ))
         )}
       </div>
-      <div className="make__newFriend__button">
+      <div title="Make new Group" className="make__newFriend__button">
         <CardActionArea
           style={{
             padding: "0.6rem",

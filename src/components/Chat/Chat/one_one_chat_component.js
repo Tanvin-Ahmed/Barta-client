@@ -13,7 +13,6 @@ import CircularProgress from "@material-ui/core/CircularProgress";
 import {
   deleteChosenFiles,
   fileUpload,
-  handleDeleteMessage,
   handleIsType,
   handleReactions,
   options,
@@ -23,6 +22,7 @@ import AddCircleIcon from "@material-ui/icons/AddCircle";
 import InsertPhotoIcon from "@material-ui/icons/InsertPhoto";
 import VideoLibraryIcon from "@material-ui/icons/VideoLibrary";
 import {
+  deleteChat,
   download,
   isClickUploadOption,
 } from "../../../app/actions/messageAction";
@@ -46,6 +46,8 @@ export const ChatHeader = ({
   callUser,
   // group chat
   groupInfo,
+  // settings
+  history,
 }) => {
   return (
     <div className="chat__header">
@@ -100,9 +102,11 @@ export const ChatHeader = ({
           <VideoCallIcon className="icon__button" />
         </IconButton>
         <IconButton
+          title="Settings"
           variant="contained"
           size="small"
           className="icon text-light"
+          onClick={() => history.push("/chat-settings")}
         >
           <MoreVertIcon className="icon__button" />
         </IconButton>
@@ -133,7 +137,7 @@ const Options = ({ dispatch, reactTabIsOpen, message, sender }) => {
           <IconButton
             variant="contained"
             size="small"
-            onClick={() => handleDeleteMessage(dispatch, message)}
+            onClick={() => deleteChat(message)}
             className="icon mx-1"
           >
             <DeleteIcon className="icon__button text-light" />
@@ -270,7 +274,7 @@ export const ChatBody = ({
                   {message.receiver && (
                     <>
                       <div className="d-flex justify-content-center align-items-center">
-                        {message?.callDuration?.s > 0 ? (
+                        {message?.callDuration?.duration ? (
                           message?.sender === senderInfo.email ? (
                             <CallMadeIcon
                               className="mr-2"
@@ -303,7 +307,7 @@ export const ChatBody = ({
                         )}
                         <h6>{message?.callDescription}</h6>
                       </div>
-                      {message?.callDuration?.s > 0 && (
+                      {message?.callDuration?.duration && (
                         <small>
                           <Timer timer={message?.callDuration} />
                         </small>

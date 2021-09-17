@@ -350,6 +350,7 @@ export const createGroup = (selectedUserEmail, groupName) => {
     const groupInfo = {
       groupName: `${groupName}◉_◉${Date.now()}`,
       photoURL: "",
+      members: selectedUserEmail,
       status: "active",
       timeStamp: new Date().toUTCString(),
     };

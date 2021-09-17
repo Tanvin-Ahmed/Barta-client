@@ -12,13 +12,11 @@ export const GET_RECEIVER_INFO = "get_receiver_info";
 export const UPDATE_FRIEND_STATUS = "update_friend_status";
 export const UPDATE_CHAT_STATUS = "update_chat_status";
 // message
-export const GET_ONE_ONE_CHAT = "get_one_one_chat";
-export const GET_GROUP_CHAT = "get_group_chat";
+export const GET_MESSAGES_FROM_DB = "get_message_from_db";
 export const POST_ONE_ONE_CHAT = "post_one_one_chat";
-export const POST_GROUP_CHAT = "post_group_chat";
 export const CHAT_ERROR = "chat_error";
 export const CHAT_UPLOAD_PERCENTAGE = "chat_upload_percentage";
-export const GET_ONE_ONE_CHAT_FROM_SOCKET = "get_one_one_chat_from_socket";
+export const GET_NEW_MESSAGE_FROM_SOCKET = "get_new_message_from_socket";
 export const SCREEN_SIZE = "screen_size";
 export const IS_TYPE = "is_type";
 export const CLICK_UPLOAD_OPTION = "click_upload_option";
@@ -45,7 +43,8 @@ export const UPDATED_SELECTED_ID_LIST = "updated_selected_id_list";
 export const FINAL_STEP_TO_CREATE_GROUP = "final_step_to_create_group";
 
 // private call
-export const OPEN_PRIVATE_VIDEO_CALL = "open_private_video_call";
+export const OPEN_PRIVATE_CALL = "open_private_call";
+export const OPEN_GROUP_CALL = "open_group_call";
 export const MY_ID = "my_id";
 export const USER_ID = "user_id";
 export const READ_STREAM = "read_stream";
@@ -64,6 +63,13 @@ export const CALL_TIMER = "call_timer";
 export const START_TIMER = "start_timer";
 export const SET_INTERVAL = "set_interval";
 export const SET_RECEIVER = "set_receiver";
+
+// group call
+export const SET_PEERS_FOR_GROUP_CALL = "set_peers_for_group_call";
+export const ACCEPTOR_SET_PEERS_FOR_GROUP_CALL =
+  "acceptor_set_peers_for_group_call";
+export const RECEIVING_GROUP_CALL = "recording_group_call";
+export const SET_CALLER_NAME = "set_caller_name";
 
 // group making tab
 export const GO_TO_GROUP_LIST = "go_to_group_list";

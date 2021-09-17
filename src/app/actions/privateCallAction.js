@@ -9,22 +9,50 @@ import {
   GET_MY_NAME,
   GET_USER_NAME,
   MY_ID,
-  OPEN_PRIVATE_VIDEO_CALL,
+  OPEN_GROUP_CALL,
+  OPEN_PRIVATE_CALL,
   READ_STREAM,
   RECEIVING_CALL,
+  RECEIVING_GROUP_CALL,
   SET_INTERVAL,
+  SET_PEERS_FOR_GROUP_CALL,
   SET_RECEIVER,
   START_TIMER,
   USER_ID,
   VIDEO_CHAT,
   VIDEO_OPEN,
   VOICE_OPEN,
+  GET_ROOM_ID_OF_RECEIVING_GROUP_CALL,
+  ACCEPTOR_SET_PEERS_FOR_GROUP_CALL,
+  SET_CALLER_NAME,
 } from "../types";
 
-export const setVideoCallIsOpen = (toggle) => {
+export const setPrivateCallIsOpen = (toggle) => {
   return {
-    type: OPEN_PRIVATE_VIDEO_CALL,
+    type: OPEN_PRIVATE_CALL,
     payload: toggle,
+  };
+};
+
+export const setGroupCallIsOpen = (toggle) => {
+  return {
+    type: OPEN_GROUP_CALL,
+    payload: toggle,
+  };
+};
+export const setPeersForGroupCall = (peers, from = "") => {
+  return (dispatch) => {
+    if (from === "receive-signal") {
+      dispatch({
+        type: ACCEPTOR_SET_PEERS_FOR_GROUP_CALL,
+        payload: peers,
+      });
+    } else {
+      dispatch({
+        type: SET_PEERS_FOR_GROUP_CALL,
+        payload: peers,
+      });
+    }
   };
 };
 
@@ -70,10 +98,17 @@ export const getStream = (stream) => {
   };
 };
 
-export const isReceivingCall = (call) => {
+export const isReceivingCall = (bool) => {
   return {
     type: RECEIVING_CALL,
-    payload: call,
+    payload: bool,
+  };
+};
+
+export const setReceivingGroupCall = (bool) => {
+  return {
+    type: RECEIVING_GROUP_CALL,
+    payload: bool,
   };
 };
 
@@ -151,6 +186,13 @@ export const setReceiver = (bol) => {
   return {
     type: SET_RECEIVER,
     payload: bol,
+  };
+};
+
+export const setCallerName = (name) => {
+  return {
+    type: SET_CALLER_NAME,
+    payload: name,
   };
 };
 

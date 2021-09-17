@@ -1,12 +1,10 @@
 import {
-  deleteChat,
   deleteReact,
   getChosenFiles,
   getScreenSize,
   openOptions,
-  postOneOneChat,
+  sendMessageInDatabase,
   reactTabToggle,
-  setRoomId,
   updateChatMessage,
   updatePreReact,
   uploadFiles,
@@ -35,7 +33,7 @@ export const getGroupInfo = (dispatch, groupName) => {
   dispatch(getGroupIdForChatBar(groupName, ""));
 };
 
-export const getRoomId = (dispatch) => {
+export const getRoomId = () => {
   const sender = JSON.parse(localStorage.getItem("barta/user"))?.email?.split(
     "@"
   );
@@ -44,19 +42,16 @@ export const getRoomId = (dispatch) => {
   )?.email?.split("@");
   const ascendingSort = [sender[0], receiver[0]].sort();
   const roomId = `${ascendingSort[0]}_${ascendingSort[1]}`;
-  dispatch(setRoomId(roomId));
   return roomId;
 };
 
 export const handleIsType = (e, socket, senderEmail) => {
   if (e._reactName === "onFocus") {
-    console.log("typing :", true);
     socket.emit("typing", {
       email: senderEmail,
       type: true,
     });
   } else if (e._reactName === "onBlur") {
-    console.log("typing :", false);
     socket.emit("typing", {
       email: senderEmail,
       type: false,
@@ -64,7 +59,7 @@ export const handleIsType = (e, socket, senderEmail) => {
   }
 };
 
-export const handleOneOneChat = (
+export const handleSendMessage = (
   roomId,
   addChatList,
   setInputText,
@@ -96,7 +91,7 @@ export const handleOneOneChat = (
       react: [],
       timeStamp: new Date().toUTCString(),
     };
-    dispatch(postOneOneChat(chat));
+    dispatch(sendMessageInDatabase(chat));
 
     setInputText("");
   }
@@ -162,8 +157,4 @@ export const handleReactions = (dispatch, message, sender, react) => {
     updateChatMessage({ id: message._id, reactInfo: { sender, react } });
   }
   toggleReactTab(dispatch, false);
-};
-
-export const handleDeleteMessage = (dispatch, message) => {
-  dispatch(deleteChat(message));
 };

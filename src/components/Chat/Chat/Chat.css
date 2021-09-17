@@ -169,7 +169,7 @@
   justify-content: space-around;
   align-items: center;
   position: absolute;
-  top: 76%;
+  top: 73%;
   background-color: rgb(29, 32, 54);
   width: 100%;
 }
@@ -326,6 +326,12 @@
   .icon {
     width: 1.5rem;
     height: 1.5rem;
+  }
+}
+
+@media (max-width: 488px) {
+  .upload__file {
+    top: 75%;
   }
 }
 

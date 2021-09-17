@@ -4,10 +4,9 @@ import {
   CHAT_UPLOAD_PERCENTAGE,
   CLICK_UPLOAD_OPTION,
   DELETE_CHAT_MESSAGE,
-  GET_GROUP_CHAT,
   GET_MESSAGE_SPINNER,
-  GET_ONE_ONE_CHAT,
-  GET_ONE_ONE_CHAT_FROM_SOCKET,
+  GET_MESSAGES_FROM_DB,
+  GET_NEW_MESSAGE_FROM_SOCKET,
   IS_TYPE,
   OPEN_OPTIONS_FOR_CHAT,
   REACT_TAB_TOGGLE,
@@ -19,7 +18,7 @@ import {
 } from "../types";
 import FileServer from "file-saver";
 
-export const postOneOneChat = (chat) => {
+export const sendMessageInDatabase = (chat) => {
   return (dispatch) => {
     const options = {
       onUploadProgress: ({ loaded, total }) => {
@@ -34,8 +33,15 @@ export const postOneOneChat = (chat) => {
       },
     };
 
+    let URL;
+    if (JSON.parse(sessionStorage.getItem("barta/groupName"))?.groupName) {
+      URL = "http://localhost:5000/groupChat/messages/post";
+    } else {
+      URL = "http://localhost:5000/chatMessage/postOneOneChat";
+    }
+
     axios
-      .post("http://localhost:5000/chatMessage/postOneOneChat", chat, options)
+      .post(URL, chat, options)
       .then(() => {
         dispatch({
           type: CHAT_UPLOAD_PERCENTAGE,
@@ -72,8 +78,15 @@ export const uploadFiles = (chosenFiles) => {
       },
     };
 
+    let destination;
+    if (JSON.parse(sessionStorage.getItem("barta/groupName"))?.groupName) {
+      destination = "groupChat";
+    } else {
+      destination = "chatMessage";
+    }
+
     axios
-      .post("http://localhost:5000/chatMessage/upload", chosenFiles, options)
+      .post(`http://localhost:5000/${destination}/upload`, chosenFiles, options)
       .then(() => {
         dispatch({
           type: CHAT_UPLOAD_PERCENTAGE,
@@ -95,20 +108,43 @@ export const uploadFiles = (chosenFiles) => {
   };
 };
 
-export const getOneOneChat = (data) => {
+export const getMessagesFromDatabase = (data) => {
   return (dispatch) => {
+    // const options = {
+    //   onDownloadProgress: ({ loaded, total }) => {
+    //     let percent = Math.floor((loaded * 100) / total);
+    //     if (percent < 100) {
+    //       dispatch({
+    //         type: GET_MESSAGE_PROGRESS,
+    //         payload: percent,
+    //       });
+    //     }
+    //   },
+    // };
     dispatch({
-      type: GET_ONE_ONE_CHAT,
+      type: GET_MESSAGES_FROM_DB,
       payload: [],
     });
     dispatch({
       type: GET_MESSAGE_SPINNER,
       payload: true,
     });
+
+    let URL;
+    if (JSON.parse(sessionStorage.getItem("barta/groupName"))?.groupName) {
+      URL = `http://localhost:5000/groupChat/messages/${data?.roomId}`;
+    } else {
+      URL = `http://localhost:5000/chatMessage/getOneOneChat/${data?.roomId}`;
+    }
+
     axios
-      .post(`http://localhost:5000/chatMessage/getOneOneChat/${data?.roomId}`, {
-        pageNum: data?.pageNum,
-      })
+      .post(
+        URL,
+        {
+          pageNum: data?.pageNum,
+        }
+        // options
+      )
       .then((data) => {
         dispatch({
           type: GET_MESSAGE_SPINNER,
@@ -117,7 +153,7 @@ export const getOneOneChat = (data) => {
         // data
         const chat = data?.data?.reverse();
         dispatch({
-          type: GET_ONE_ONE_CHAT,
+          type: GET_MESSAGES_FROM_DB,
           payload: chat,
         });
 
@@ -154,70 +190,103 @@ export const stopReFetchMessage = () => {
 };
 
 export const download = (filename) => {
+  let destination;
+  if (JSON.parse(sessionStorage.getItem("barta/groupName"))?.groupName) {
+    destination = "groupChat";
+  } else {
+    destination = "chatMessage";
+  }
   axios({
     method: "GET",
-    url: `http://localhost:5000/chatMessage/file/${filename}`,
+    url: `http://localhost:5000/${destination}/file/${filename}`,
     responseType: "blob",
   })
     .then((response) => {
-      console.log(response.data);
       FileServer.saveAs(response.data, filename);
     })
     .catch((err) => alert("file is not saved, please try again."));
 };
 
 export const updateChatMessage = (react) => {
+  let destination;
+  if (JSON.parse(sessionStorage.getItem("barta/groupName"))?.groupName) {
+    destination = "groupChat";
+  } else {
+    destination = "chatMessage";
+  }
   axios
-    .put("http://localhost:5000/chatMessage/updateChatMessage", react)
+    .put(`http://localhost:5000/${destination}/updateChatMessage`, react)
     .then(() => console.log("update message successfully"))
     .catch(() => alert("react not set, please try again"));
 };
 
 export const updatePreReact = (react) => {
+  let destination;
+  if (JSON.parse(sessionStorage.getItem("barta/groupName"))?.groupName) {
+    destination = "groupChat";
+  } else {
+    destination = "chatMessage";
+  }
   axios
-    .put("http://localhost:5000/chatMessage/updateOnlyReact", react)
+    .put(`http://localhost:5000/${destination}/updateOnlyReact`, react)
     .then(() => console.log("update message successfully"))
     .catch(() => alert("react not set, please try again"));
 };
 
 export const deleteReact = (react) => {
+  let destination;
+  if (JSON.parse(sessionStorage.getItem("barta/groupName"))?.groupName) {
+    destination = "groupChat";
+  } else {
+    destination = "chatMessage";
+  }
   axios
-    .put("http://localhost:5000/chatMessage/removeReact", react)
+    .put(`http://localhost:5000/${destination}/removeReact`, react)
     .then(() => console.log("update message successfully"))
     .catch(() => alert("react not remove, please try again"));
 };
 
 const deleteChatMessage = (id) => {
+  let destination;
+  if (JSON.parse(sessionStorage.getItem("barta/groupName"))?.groupName) {
+    destination = "groupChat";
+  } else {
+    destination = "chatMessage";
+  }
   axios
-    .delete(`http://localhost:5000/chatMessage/deleteChatMessage/${id}`)
+    .delete(`http://localhost:5000/${destination}/deleteChatMessage/${id}`)
     .then(() => console.log("deleted successfully"))
     .catch(() => alert("failed to delete, please try again"));
 };
 
 export const deleteChat = (message) => {
-  return (dispatch) => {
-    if (message?.files?.length > 0) {
-      for (let i = 0; i < message?.files.length; i++) {
-        const id = message?.files[i].fileId;
-        axios
-          .delete(`http://localhost:5000/chatMessage/file/delete/${id}`)
-          .then(() => {
-            console.log("delete file successfully");
-            if (i === message?.files?.length - 1) {
-              deleteChatMessage(message._id);
-            }
-          })
-          .catch(() => alert("file not deleted, please try again"));
-      }
-    } else {
-      deleteChatMessage(message?._id);
+  let destination;
+  if (JSON.parse(sessionStorage.getItem("barta/groupName"))?.groupName) {
+    destination = "groupChat";
+  } else {
+    destination = "chatMessage";
+  }
+  if (message?.files?.length > 0) {
+    for (let i = 0; i < message?.files.length; i++) {
+      const id = message?.files[i].fileId;
+      axios
+        .delete(`http://localhost:5000/${destination}/file/delete/${id}`)
+        .then(() => {
+          console.log("delete file successfully");
+          if (i === message?.files?.length - 1) {
+            deleteChatMessage(message._id);
+          }
+        })
+        .catch(() => alert("file not deleted, please try again"));
     }
-  };
+  } else {
+    deleteChatMessage(message?._id);
+  }
 };
 
-export const getOneOneChatFromSocket = (message) => {
+export const getNewMessageFromSocket = (message) => {
   return {
-    type: GET_ONE_ONE_CHAT_FROM_SOCKET,
+    type: GET_NEW_MESSAGE_FROM_SOCKET,
     payload: message,
   };
 };
@@ -315,74 +384,5 @@ export const setRoomId = (id) => {
   return {
     type: SET_ROOM_ID,
     payload: id,
-  };
-};
-
-// group message
-export const getGroupMessage = (data) => {
-  return (dispatch) => {
-    // const options = {
-    //   onDownloadProgress: ({ loaded, total }) => {
-    //     let percent = Math.floor((loaded * 100) / total);
-    //     if (percent < 100) {
-    //       dispatch({
-    //         type: GET_MESSAGE_PROGRESS,
-    //         payload: percent,
-    //       });
-    //     }
-    //   },
-    // };
-    dispatch({
-      type: GET_ONE_ONE_CHAT,
-      payload: [],
-    });
-    dispatch({
-      type: GET_MESSAGE_SPINNER,
-      payload: true,
-    });
-    axios
-      .post(
-        `http://localhost:5000/groupChat/messages/${data?.roomId}`,
-        {
-          pageNum: data?.pageNum,
-        }
-        // options
-      )
-      .then((data) => {
-        // progress
-        dispatch({
-          type: GET_MESSAGE_SPINNER,
-          payload: false,
-        });
-        // data
-        const chat = data?.data?.reverse();
-        dispatch({
-          type: GET_ONE_ONE_CHAT,
-          payload: chat,
-        });
-
-        if (chat?.length === 9) {
-          dispatch({
-            type: REFETCH_MESSAGE,
-            payload: true,
-          });
-        } else {
-          dispatch({
-            type: REFETCH_MESSAGE,
-            payload: false,
-          });
-          // }
-        }
-      })
-      .catch((err) => {
-        dispatch({
-          type: CHAT_ERROR,
-          payload: err.message,
-        });
-        dispatch({
-          type: GET_MESSAGE_SPINNER,
-          payload: false,
-        });
-      });
   };
 };

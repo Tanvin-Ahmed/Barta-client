@@ -7,14 +7,15 @@ import "./PrivateCall.css";
 import MicIcon from "@material-ui/icons/Mic";
 import VideocamIcon from "@material-ui/icons/Videocam";
 import PhoneInTalkIcon from "@material-ui/icons/PhoneInTalk";
+import { handleAudioMute, handleVideoMute } from "./callLogic";
 
 export const Buttons = ({
   videoOpen,
   voiceOpen,
   receivingCall,
   callAccepted,
-  handleAudioMute,
-  handleVideoMute,
+  stream,
+  dispatch,
   answerCall,
   leaveCall,
   videoChat,
@@ -22,47 +23,33 @@ export const Buttons = ({
   return (
     <div className="button__group d-flex justify-content-center align-items-center">
       {/* voice mute */}
-      {voiceOpen ? (
-        <IconButton
-          className="audio__video_mute_button m-2"
-          variant="contained"
-          size="small"
-          onClick={handleAudioMute}
-        >
+      <IconButton
+        className="audio__video_mute_button m-2"
+        variant="contained"
+        size="small"
+        onClick={() => handleAudioMute(stream, voiceOpen, dispatch)}
+      >
+        {voiceOpen ? (
           <MicIcon style={{ color: "gray" }} />
-        </IconButton>
-      ) : (
+        ) : (
+          <MicOffIcon style={{ color: "gray" }} />
+        )}
+      </IconButton>
+      {/* video mute */}
+      {videoChat ? (
         <IconButton
           className="audio__video_mute_button m-2"
           variant="contained"
           size="small"
-          onClick={handleAudioMute}
+          onClick={() => handleVideoMute(stream, videoOpen, dispatch)}
         >
-          <MicOffIcon style={{ color: "gray" }} />
-        </IconButton>
-      )}
-      {/* video mute */}
-      {videoOpen
-        ? videoChat && (
-            <IconButton
-              className="audio__video_mute_button m-2"
-              variant="contained"
-              size="small"
-              onClick={handleVideoMute}
-            >
-              <VideocamIcon style={{ color: "gray" }} />
-            </IconButton>
-          )
-        : videoChat && (
-            <IconButton
-              className="audio__video_mute_button m-2"
-              variant="contained"
-              size="small"
-              onClick={handleVideoMute}
-            >
-              <VideocamOffIcon style={{ color: "gray" }} />
-            </IconButton>
+          {videoOpen ? (
+            <VideocamIcon style={{ color: "gray" }} />
+          ) : (
+            <VideocamOffIcon style={{ color: "gray" }} />
           )}
+        </IconButton>
+      ) : null}
       {/* call end */}
       {receivingCall && !callAccepted ? (
         <div className="d-flex justify-content-center align-items-center">

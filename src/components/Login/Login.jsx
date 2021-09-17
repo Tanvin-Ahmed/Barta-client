@@ -18,7 +18,6 @@ const Login = () => {
   const signIn = () => {
     SignInWithGoogle()
       .then((result) => {
-        console.log(result);
         const user = {
           email: result.email,
           displayName: result.displayName,

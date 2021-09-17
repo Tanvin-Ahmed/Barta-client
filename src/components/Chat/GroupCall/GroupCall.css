@@ -1,0 +1,22 @@
+.group__call {
+  position: relative;
+  height: 95vh;
+  width: 40rem;
+  overflow-x: hidden;
+  overflow-y: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.group__call .user_video {
+  width: 45%;
+  margin: 0.3rem;
+  border-radius: 5px;
+}
+
+@media only screen and (max-width: 680px) {
+  .group__call {
+    width: 95%;
+  }
+}

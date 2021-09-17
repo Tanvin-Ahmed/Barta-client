@@ -1,9 +1,8 @@
 import {
-  GET_ONE_ONE_CHAT,
-  GET_GROUP_CHAT,
+  GET_MESSAGES_FROM_DB,
   CHAT_ERROR,
   CHAT_UPLOAD_PERCENTAGE,
-  GET_ONE_ONE_CHAT_FROM_SOCKET,
+  GET_NEW_MESSAGE_FROM_SOCKET,
   SCREEN_SIZE,
   IS_TYPE,
   CLICK_UPLOAD_OPTION,
@@ -18,8 +17,7 @@ import {
 } from "../types";
 
 const initialState = {
-  oneOneMessage: [],
-  groupMessage: [],
+  chatMessages: [],
   error: "",
   uploadPercentage: 0,
   getMessageSpinner: false,
@@ -35,10 +33,10 @@ const initialState = {
 
 const messageReducer = (state = initialState, action) => {
   switch (action.type) {
-    case GET_ONE_ONE_CHAT:
+    case GET_MESSAGES_FROM_DB:
       return {
         ...state,
-        oneOneMessage: action.payload,
+        chatMessages: action.payload,
       };
     case GET_MESSAGE_SPINNER:
       return {
@@ -49,11 +47,6 @@ const messageReducer = (state = initialState, action) => {
       return {
         ...state,
         reFetchMessage: action.payload,
-      };
-    case GET_GROUP_CHAT:
-      return {
-        ...state,
-        groupMessage: action.payload,
       };
     case CHAT_ERROR:
       return {
@@ -67,22 +60,22 @@ const messageReducer = (state = initialState, action) => {
         uploadPercentage: action.payload,
       };
 
-    case GET_ONE_ONE_CHAT_FROM_SOCKET:
+    case GET_NEW_MESSAGE_FROM_SOCKET:
       return {
         ...state,
-        oneOneMessage: [...state.oneOneMessage, action.payload],
+        chatMessages: [...state.chatMessages, action.payload],
       };
 
     case UPDATE_CHAT_REACT:
       return {
         ...state,
-        oneOneMessage: action.payload,
+        chatMessages: action.payload,
       };
 
     case DELETE_CHAT_MESSAGE:
       return {
         ...state,
-        oneOneMessage: action.payload,
+        chatMessages: action.payload,
       };
 
     case SCREEN_SIZE:
