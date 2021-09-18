@@ -31,6 +31,17 @@ const Home = ({ socket }) => {
   const [receivingGroupCall, setReceivingGroupCall] = useState(false);
   const [removeGroupCallModal, setRemoveGroupCallModal] = useState(true);
 
+  // reload issue ///
+  useEffect(() => {
+    const reload = (e) => {
+      console.log(e);
+      e.returnValue = "Data will be lost if you leave the page, are you sure?";
+    };
+    window.addEventListener("beforeunload", reload);
+
+    return () => window.removeEventListener("beforeunload", reload);
+  }, []);
+
   // ////////////////// post user info ///////////////////////
   useEffect(() => {
     let userInfo = JSON.parse(localStorage.getItem("barta/user"));
@@ -63,7 +74,6 @@ const Home = ({ socket }) => {
   useEffect(() => {
     // socket.emit("is user present in group call", roomId);
     socket.on("total user", ({ usersInThisRoom, roomID }) => {
-      console.log(usersInThisRoom, roomID);
       if (roomID !== roomIdOfReceivingGroupCall) return;
       if (usersInThisRoom.length) dispatch(setShowCallButtons(false));
       else dispatch(setShowCallButtons(true));
