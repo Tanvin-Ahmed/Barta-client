@@ -1,9 +1,19 @@
 import React, { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getStream } from "../../../app/actions/privateCallAction";
+import {
+  getStream,
+  isCallAccepted,
+} from "../../../app/actions/privateCallAction";
 import { acceptGroupCall } from "../PrivateCallSystem/callLogic";
 import { Buttons } from "../PrivateCallSystem/Component";
 import "./GroupCall.css";
+import { stopBothVideoAndAudio } from "../PrivateCallSystem/callLogic";
+import {
+  setCallerName,
+  setGroupCallIsOpen,
+  setPeersForGroupCall,
+  setReceivingGroupCall,
+} from "../../../app/actions/groupCallAction";
 
 const UserVideo = ({ peerObj }) => {
   const ref = useRef(null);
@@ -15,10 +25,10 @@ const UserVideo = ({ peerObj }) => {
   }, [peerObj]);
 
   return (
-    <video className="user_video" playsInline ref={ref} autoPlay></video>
-    // <div className="text-center">
-    //   <h6>{peerObj?.peerName}</h6>
-    // </div>
+    <div className="text-center">
+      <video className="user_video" playsInline ref={ref} autoPlay></video>
+      <h6>{peerObj?.peerName}</h6>
+    </div>
   );
 };
 
@@ -27,56 +37,75 @@ const GroupCall = ({
   myStream,
   groupPeersRef,
   roomIdOfReceivingGroupCall,
+  setRoomIdOfReceivingGroupCall,
+  setReceivingGroupCall,
+  receivingGroupCall,
 }) => {
   const dispatch = useDispatch();
   const {
     stream,
-    receivingGroupCall,
     videoChat,
     userInfo,
     peersForGroupCall,
     videoOpen,
     voiceOpen,
     callAccepted,
-    callerName,
   } = useSelector((state) => ({
     stream: state.privateCall.stream,
-    receivingGroupCall: state.privateCall.receivingGroupCall,
     videoChat: state.privateCall.videoChat,
     userInfo: state.userReducer.userInfo,
-    peersForGroupCall: state.privateCall.peersForGroupCall,
+    peersForGroupCall: state.groupCallReducer.peersForGroupCall,
     videoOpen: state.privateCall.videoOpen,
     voiceOpen: state.privateCall.voiceOpen,
     callAccepted: state.privateCall.callAccepted,
-    callerName: state.privateCall.callerName,
   }));
 
-  useEffect(() => {
-    receivingGroupCall &&
-      navigator.mediaDevices
-        .getUserMedia({
-          video: videoChat ? { facingMode: "user" } : false,
-          audio: true,
-        })
-        .then((stream) => {
-          myStream.current.srcObject = stream;
-          dispatch(getStream(stream));
-        })
-        .catch((err) => alert(err.message));
-  }, [receivingGroupCall, videoChat, myStream, dispatch]);
-
+  /////// ACCEPT CALL ///////
   const acceptCall = () => {
     acceptGroupCall(
       dispatch,
       socket,
       roomIdOfReceivingGroupCall,
       userInfo,
-      stream,
-      groupPeersRef
+      groupPeersRef,
+      myStream,
+      videoChat
     );
   };
 
-  console.log(peersForGroupCall);
+  //////////// CUT CALL FROM USER //////////////
+  useEffect(() => {
+    socket.on("user left", (id) => {
+      const peerObj = groupPeersRef.current.find((p) => p.peerID === id);
+      if (peerObj) {
+        peerObj.peer.destroy();
+      }
+      const peers = groupPeersRef.current.filter((p) => p.peerID !== id);
+      groupPeersRef.current = peers;
+      dispatch(setPeersForGroupCall(peers));
+    });
+  }, [socket, dispatch, groupPeersRef]);
+
+  //////// CUT CALL ///////
+  const leaveCall = () => {
+    stopBothVideoAndAudio(stream);
+    myStream.current.srcObject = null;
+    dispatch(getStream(null));
+    dispatch(isCallAccepted(false));
+    groupPeersRef.current.forEach((peerObj) => {
+      peerObj?.peer?.destroy();
+    });
+    groupPeersRef.current = [];
+    dispatch(setPeersForGroupCall([]));
+    socket.emit("cut call", userInfo?.email);
+    if (receivingGroupCall) {
+      setReceivingGroupCall(false);
+      dispatch(setCallerName(""));
+      setRoomIdOfReceivingGroupCall("");
+    } else {
+      dispatch(setGroupCallIsOpen(false));
+    }
+  };
 
   return (
     <section className="group__call">
@@ -100,7 +129,7 @@ const GroupCall = ({
           stream={stream}
           dispatch={dispatch}
           answerCall={acceptCall}
-          // leaveCall={leaveCall}
+          leaveCall={leaveCall}
           videoChat={videoChat}
         />
       </div>

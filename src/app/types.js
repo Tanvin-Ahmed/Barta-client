@@ -68,8 +68,8 @@ export const SET_RECEIVER = "set_receiver";
 export const SET_PEERS_FOR_GROUP_CALL = "set_peers_for_group_call";
 export const ACCEPTOR_SET_PEERS_FOR_GROUP_CALL =
   "acceptor_set_peers_for_group_call";
-export const RECEIVING_GROUP_CALL = "recording_group_call";
 export const SET_CALLER_NAME = "set_caller_name";
+export const SET_SHOW_BUTTON = "set_show_button";
 
 // group making tab
 export const GO_TO_GROUP_LIST = "go_to_group_list";

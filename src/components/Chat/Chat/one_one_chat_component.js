@@ -38,6 +38,29 @@ import CallMissedOutgoingIcon from "@material-ui/icons/CallMissedOutgoing";
 import CallMissedIcon from "@material-ui/icons/CallMissed";
 import Timer from "../PrivateCallSystem/Timer.jsx";
 
+const CallButtons = ({ callUser }) => {
+  return (
+    <>
+      <IconButton
+        variant="contained"
+        size="small"
+        onClick={() => callUser(false)}
+        className="icon text-light"
+      >
+        <CallIcon className="icon__button" />
+      </IconButton>
+      <IconButton
+        variant="contained"
+        size="small"
+        onClick={() => callUser(true)}
+        className="icon text-light"
+      >
+        <VideoCallIcon className="icon__button" />
+      </IconButton>
+    </>
+  );
+};
+
 export const ChatHeader = ({
   receiverInfo,
   addChatList,
@@ -46,6 +69,8 @@ export const ChatHeader = ({
   callUser,
   // group chat
   groupInfo,
+  showCallButtons,
+  acceptCall,
   // settings
   history,
 }) => {
@@ -85,22 +110,17 @@ export const ChatHeader = ({
         </div>
       </div>
       <div className="chat__options">
-        <IconButton
-          variant="contained"
-          size="small"
-          onClick={() => callUser(false)}
-          className="icon text-light"
-        >
-          <CallIcon className="icon__button" />
-        </IconButton>
-        <IconButton
-          variant="contained"
-          size="small"
-          onClick={() => callUser(true)}
-          className="icon text-light"
-        >
-          <VideoCallIcon className="icon__button" />
-        </IconButton>
+        {JSON.parse(sessionStorage.getItem("barta/groupName"))?.groupName ? (
+          showCallButtons ? (
+            <CallButtons callUser={callUser} />
+          ) : (
+            <button onClick={acceptCall} type="button" className="join__button">
+              Join
+            </button>
+          )
+        ) : (
+          <CallButtons callUser={callUser} />
+        )}
         <IconButton
           title="Settings"
           variant="contained"

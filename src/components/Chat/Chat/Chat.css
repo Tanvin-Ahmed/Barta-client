@@ -19,6 +19,20 @@
   justify-content: center;
 }
 
+.join__button {
+  outline: none;
+  font-family: sans-serif;
+  color: #fff;
+  background-color: rgb(37, 146, 255);
+  padding: 0 0.4rem;
+  border-radius: 5px;
+  font-weight: 400;
+  letter-spacing: 2px;
+  border: none;
+  margin-right: 0.4rem;
+  font-size: 14px;
+}
+
 .chat .chat__header .header__info .online {
   position: absolute;
   height: 0.7rem;

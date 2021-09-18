@@ -15,10 +15,10 @@ import {
   getUserName,
   getCallerSignal,
   isVideoChat,
-  setPeersForGroupCall,
 } from "../../../app/actions/privateCallAction";
 import { end, start } from "./timer.js";
 import Peer from "simple-peer";
+import { setPeersForGroupCall } from "../../../app/actions/groupCallAction";
 
 // stop both mic and camera
 export const stopBothVideoAndAudio = (stream) => {
@@ -233,6 +233,7 @@ export const makeGroupCall = (
   groupPeersRef,
   videoChat
 ) => {
+  myStream.current.srcObject = stream;
   dispatch(getStream(stream));
   const members = groupInfo.members.filter(
     (member) => member !== senderInfo?.email
@@ -250,8 +251,6 @@ export const makeGroupCall = (
     userID: senderInfo?.email,
     userName: senderInfo?.displayName,
   });
-
-  myStream.current.srcObject = stream;
 
   socket.on("user joined", (payload) => {
     // console.log("user joined", payload, senderInfo?.email);
@@ -292,90 +291,96 @@ export const acceptGroupCall = (
   socket,
   roomIdOfReceivingGroupCall,
   userInfo,
-  stream,
-  groupPeersRef
+  groupPeersRef,
+  myStream,
+  videoChat
 ) => {
   dispatch(isCallAccepted(true));
-  // console.log("join room", roomIdOfReceivingGroupCall, userInfo);
-  socket.emit("join room", {
-    roomID: roomIdOfReceivingGroupCall,
-    userID: userInfo?.email,
-    userName: userInfo?.displayName,
-  });
+  navigator.mediaDevices
+    .getUserMedia({
+      video: videoChat ? { facingMode: "user" } : false,
+      audio: true,
+    })
+    .then((stream) => {
+      dispatch(getStream(stream));
+      myStream.current.srcObject = stream;
 
-  socket.on("all users", ({ usersInThisRoom, roomID }) => {
-    const users = usersInThisRoom;
-    if (roomIdOfReceivingGroupCall !== roomID) return;
-    if (!users.length) return;
-    // console.log("all users", users);
-    const peers = [];
-    users.forEach((otherID) => {
-      const peer = createPeer(
-        roomIdOfReceivingGroupCall,
-        otherID?.id,
-        userInfo?.email,
-        userInfo?.displayName,
-        stream,
-        socket
-      );
-      groupPeersRef.current.push({
-        peerID: otherID?.id,
-        peerName: otherID?.name,
-        peer,
+      socket.emit("join room", {
+        roomID: roomIdOfReceivingGroupCall,
+        userID: userInfo?.email,
+        userName: userInfo?.displayName,
       });
-      peers.push({
-        peerID: otherID?.id,
-        peerName: otherID?.name,
-        peer,
-      });
-    });
-    dispatch(setPeersForGroupCall(peers));
-  });
 
-  socket.on("user joined", (payload) => {
-    // console.log("user joined", payload, userInfo?.email);
-    if (roomIdOfReceivingGroupCall === payload.roomID) {
-      if (payload.userToSignal === userInfo?.email) {
-        const peer = addPeer(
-          payload.signal,
-          payload.callerID,
-          stream,
-          socket,
-          payload.roomID,
-          userInfo?.email
-        );
-        groupPeersRef.current.push({
-          peerID: payload.callerID,
-          peerName: payload.callerName,
-          peer,
+      socket.on("all users", ({ usersInThisRoom, roomID }) => {
+        const users = usersInThisRoom;
+        if (roomIdOfReceivingGroupCall !== roomID) return;
+        if (!users.length) return;
+
+        const peers = [];
+        users.forEach((otherID) => {
+          const peer = createPeer(
+            roomIdOfReceivingGroupCall,
+            otherID?.id,
+            userInfo?.email,
+            userInfo?.displayName,
+            stream,
+            socket
+          );
+          groupPeersRef.current.push({
+            peerID: otherID?.id,
+            peerName: otherID?.name,
+            peer,
+          });
+          peers.push({
+            peerID: otherID?.id,
+            peerName: otherID?.name,
+            peer,
+          });
         });
+        dispatch(setPeersForGroupCall(peers));
+      });
 
-        dispatch(
-          setPeersForGroupCall(
-            {
+      socket.on("user joined", (payload) => {
+        if (roomIdOfReceivingGroupCall === payload.roomID) {
+          if (payload.userToSignal === userInfo?.email) {
+            const peer = addPeer(
+              payload.signal,
+              payload.callerID,
+              stream,
+              socket,
+              payload.roomID,
+              userInfo?.email
+            );
+            groupPeersRef.current.push({
               peerID: payload.callerID,
               peerName: payload.callerName,
               peer,
-            },
-            "receive-signal"
-          )
-        );
-      }
-    }
-  });
+            });
 
-  socket.on("receiving returned signal", (payload) => {
-    // console.log(
-    //   "receiving returned signal",
-    //   payload,
-    //   roomIdOfReceivingGroupCall,
-    //   userInfo.email
-    // );
-    if (payload.roomID === roomIdOfReceivingGroupCall) {
-      if (payload.callerID === userInfo.email) {
-        const item = groupPeersRef.current.find((p) => p.peerID === payload.id);
-        item.peer.signal(payload.signal);
-      }
-    }
-  });
+            dispatch(
+              setPeersForGroupCall(
+                {
+                  peerID: payload.callerID,
+                  peerName: payload.callerName,
+                  peer,
+                },
+                "receive-signal"
+              )
+            );
+          }
+        }
+      });
+
+      socket.on("receiving returned signal", (payload) => {
+        if (payload.roomID === roomIdOfReceivingGroupCall) {
+          if (payload.callerID === userInfo.email) {
+            const item = groupPeersRef.current.find(
+              (p) => p.peerID === payload.id
+            );
+            item.peer.signal(payload.signal);
+          }
+        }
+      });
+    })
+    .catch((err) => alert(err.message));
 };

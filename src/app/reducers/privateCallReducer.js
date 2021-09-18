@@ -1,5 +1,4 @@
 import {
-  ACCEPTOR_SET_PEERS_FOR_GROUP_CALL,
   CALLER,
   CALLER_SIGNAL,
   CALL_ACCEPTED,
@@ -7,17 +6,12 @@ import {
   CALL_REACH_TO_RECEIVER,
   CALL_TIMER,
   GET_MY_NAME,
-  GET_ROOM_ID_OF_RECEIVING_GROUP_CALL,
   GET_USER_NAME,
   MY_ID,
-  OPEN_GROUP_CALL,
   OPEN_PRIVATE_CALL,
   READ_STREAM,
   RECEIVING_CALL,
-  RECEIVING_GROUP_CALL,
-  SET_CALLER_NAME,
   SET_INTERVAL,
-  SET_PEERS_FOR_GROUP_CALL,
   SET_RECEIVER,
   START_TIMER,
   USER_ID,
@@ -28,12 +22,10 @@ import {
 
 const initialState = {
   openPrivateCall: false,
-  openGroupCall: false,
   myId: "", // private call
   idToCall: "", // for private call
   stream: null,
   receivingCall: false,
-  receivingGroupCall: false,
   caller: "", // private call caller id
   callerSignal: null,
   callAccepted: false,
@@ -48,8 +40,6 @@ const initialState = {
   startTimer: false,
   interVal: null,
   receiver: false,
-  peersForGroupCall: [],
-  callerName: "", // group call caller name
 };
 
 const privateCall = (state = initialState, action) => {
@@ -63,21 +53,6 @@ const privateCall = (state = initialState, action) => {
       return {
         ...state,
         openPrivateCall: action.payload,
-      };
-    case OPEN_GROUP_CALL:
-      return {
-        ...state,
-        openGroupCall: action.payload,
-      };
-    case SET_PEERS_FOR_GROUP_CALL:
-      return {
-        ...state,
-        peersForGroupCall: action.payload,
-      };
-    case ACCEPTOR_SET_PEERS_FOR_GROUP_CALL:
-      return {
-        ...state,
-        peersForGroupCall: [...state.peersForGroupCall, action.payload],
       };
     case MY_ID:
       return {
@@ -98,11 +73,6 @@ const privateCall = (state = initialState, action) => {
       return {
         ...state,
         receivingCall: action.payload,
-      };
-    case RECEIVING_GROUP_CALL:
-      return {
-        ...state,
-        receivingGroupCall: action.payload,
       };
     case CALLER:
       return {
@@ -168,11 +138,6 @@ const privateCall = (state = initialState, action) => {
       return {
         ...state,
         receiver: action.payload,
-      };
-    case SET_CALLER_NAME:
-      return {
-        state,
-        callerName: action.payload,
       };
     default:
       return state;

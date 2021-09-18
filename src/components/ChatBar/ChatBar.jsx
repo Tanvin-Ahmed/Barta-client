@@ -9,6 +9,8 @@ import {
   FinalProcessToCreateGroup,
   GroupList,
   SearchFriend,
+  MakeNewFriendButton,
+  MakeNewGroupButton,
 } from "./chatBar_component";
 import {
   clearGroupCreateSuccessfullyStatus,
@@ -19,7 +21,6 @@ import {
   setGroupsInfoFromDatabase,
 } from "../../app/actions/userAction";
 import { callReached } from "../Chat/PrivateCallSystem/callLogic";
-import { isReceivingCall } from "../../app/actions/privateCallAction";
 
 const ChatBar = ({ socket }) => {
   const history = useHistory();
@@ -138,20 +139,24 @@ const ChatBar = ({ socket }) => {
       />
       <div className="list__body">
         {chatList && !makeGroup && !openGroupList && (
-          <ChatList
-            friendList={friendList}
-            history={history}
-            dispatch={dispatch}
-            spinnerForChatList={spinnerForChatList}
-          />
+          <>
+            <ChatList
+              friendList={friendList}
+              history={history}
+              spinnerForChatList={spinnerForChatList}
+            />
+            <MakeNewFriendButton dispatch={dispatch} />
+          </>
         )}
         {!chatList && !makeGroup && openGroupList && (
-          <GroupList
-            groups={groups}
-            history={history}
-            dispatch={dispatch}
-            spinnerForGroupList={spinnerForGroupList}
-          />
+          <>
+            <GroupList
+              groups={groups}
+              history={history}
+              spinnerForGroupList={spinnerForGroupList}
+            />
+            <MakeNewGroupButton dispatch={dispatch} />
+          </>
         )}
         {((!chatList && !makeGroup && !openGroupList) ||
           (!chatList && makeGroup && !finalStepToCreateGroup)) && (

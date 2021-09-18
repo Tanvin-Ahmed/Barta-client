@@ -25,7 +25,6 @@ import {
   getMyName,
   getUserId,
   isVideoChat,
-  setGroupCallIsOpen,
   setPrivateCallIsOpen,
 } from "../../../app/actions/privateCallAction";
 import {
@@ -39,12 +38,19 @@ import {
 } from "../../../app/actions/messageAction";
 import { updateChatStatus } from "../../../app/actions/userAction";
 import {
+  acceptGroupCall,
   callReached,
   makeCall,
   makeGroupCall,
 } from "../PrivateCallSystem/callLogic";
+import { setGroupCallIsOpen } from "../../../app/actions/groupCallAction";
 
-const Chat = ({ socket, myStream, groupPeersRef }) => {
+const Chat = ({
+  socket,
+  myStream,
+  groupPeersRef,
+  roomIdOfReceivingGroupCall,
+}) => {
   const dispatch = useDispatch();
   const { id } = useParams();
   const history = useHistory();
@@ -76,8 +82,8 @@ const Chat = ({ socket, myStream, groupPeersRef }) => {
     myName,
     receivingCall,
     timer,
-    peersForGroupCall,
-    openGroupCall,
+    videoChat,
+    showCallButtons,
   } = useSelector((state) => ({
     // private chat
     senderInfo: state.userReducer.userInfo,
@@ -102,8 +108,10 @@ const Chat = ({ socket, myStream, groupPeersRef }) => {
     myName: state.privateCall.myName,
     receivingCall: state.privateCall.receivingCall,
     timer: state.privateCall.timer,
-    peersForGroupCall: state.privateCall.peersForGroupCall,
-    openGroupCall: state.privateCall.openGroupCall,
+    videoChat: state.privateCall.videoChat,
+
+    // group call
+    showCallButtons: state.groupCallReducer.showCallButtons,
   }));
   const [inputText, setInputText] = useState("");
 
@@ -299,6 +307,19 @@ const Chat = ({ socket, myStream, groupPeersRef }) => {
     }
   };
 
+  ///////////// JOIN GROUP CALL //////////
+  const acceptCall = () => {
+    acceptGroupCall(
+      dispatch,
+      socket,
+      roomIdOfReceivingGroupCall,
+      senderInfo,
+      groupPeersRef,
+      myStream,
+      videoChat
+    );
+  };
+
   return (
     <section className="chat">
       {openPrivateCall || receivingCall || userStream.current ? (
@@ -318,6 +339,8 @@ const Chat = ({ socket, myStream, groupPeersRef }) => {
             callUser={callUser}
             // for group
             groupInfo={groupInfo}
+            showCallButtons={showCallButtons}
+            acceptCall={acceptCall}
             // settings
             history={history}
           />
