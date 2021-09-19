@@ -11,10 +11,7 @@ import ChatSettings from "../Chat/ChatSettings/ChatSettings";
 import { isVideoChat } from "../../app/actions/privateCallAction";
 import GroupCall from "../Chat/GroupCall/GroupCall";
 import NotificationModalForGroupCall from "../Chat/GroupCall/NotificationModalForGroupCall/NotificationModalForGroupCall";
-import {
-  setCallerName,
-  setShowCallButtons,
-} from "../../app/actions/groupCallAction";
+import { setCallerName } from "../../app/actions/groupCallAction";
 
 const Home = ({ socket }) => {
   const myStream = useRef(null);
@@ -30,17 +27,6 @@ const Home = ({ socket }) => {
     useState("");
   const [receivingGroupCall, setReceivingGroupCall] = useState(false);
   const [removeGroupCallModal, setRemoveGroupCallModal] = useState(true);
-
-  // reload issue ///
-  useEffect(() => {
-    const reload = (e) => {
-      console.log(e);
-      e.returnValue = "Data will be lost if you leave the page, are you sure?";
-    };
-    window.addEventListener("beforeunload", reload);
-
-    return () => window.removeEventListener("beforeunload", reload);
-  }, []);
 
   // ////////////////// post user info ///////////////////////
   useEffect(() => {
@@ -71,16 +57,17 @@ const Home = ({ socket }) => {
     return () => socket.off("group call for you");
   }, [socket, dispatch, userInfo?.email]);
 
-  useEffect(() => {
-    // socket.emit("is user present in group call", roomId);
-    socket.on("total user", ({ usersInThisRoom, roomID }) => {
-      if (roomID !== roomIdOfReceivingGroupCall) return;
-      if (usersInThisRoom.length) dispatch(setShowCallButtons(false));
-      else dispatch(setShowCallButtons(true));
-    });
+  // useEffect(() => {
+  //   // socket.emit("is user present in group call", roomId);
+  //   socket.on("total user", ({ usersInThisRoom, roomID }) => {
+  //     if (roomID !== roomIdOfReceivingGroupCall || roomID !== roomId) return;
+  //     setRoomIdOfReceivingGroupCall(roomID);
+  //     if (usersInThisRoom.length) dispatch(setShowCallButtons(false));
+  //     else dispatch(setShowCallButtons(true));
+  //   });
 
-    return () => socket.off("total user");
-  }, [socket, roomIdOfReceivingGroupCall, dispatch]);
+  //   return () => socket.off("total user");
+  // }, [socket, roomIdOfReceivingGroupCall, dispatch, roomId]);
 
   return (
     <section className="home">

@@ -67,15 +67,36 @@ const ChatBar = ({ socket }) => {
   const fetchGroupList = useRef(true);
   const fetchFriendList = useRef(true);
   useEffect(() => {
-    chatList &&
-      fetchFriendList.current &&
-      dispatch(getFriendInfo(userInfo?.email));
-    openGroupList &&
-      fetchGroupList.current &&
-      dispatch(setGroupsInfoFromDatabase(userInfo?.email));
+    const getData = () => {
+      if (navigator.onLine) {
+        chatList &&
+          fetchFriendList.current &&
+          dispatch(getFriendInfo(userInfo?.email));
+        openGroupList &&
+          fetchGroupList.current &&
+          dispatch(setGroupsInfoFromDatabase(userInfo?.email));
 
-    if (chatList) fetchFriendList.current = false;
-    if (openGroupList) fetchGroupList.current = false;
+        if (chatList) fetchFriendList.current = false;
+        if (openGroupList) fetchGroupList.current = false;
+      }
+    };
+    const conditionOfNetwork = () => {
+      fetchFriendList.current = true;
+      fetchGroupList.current = true;
+      getData();
+    };
+    const webpageLoad = () => {
+      window.addEventListener("online", conditionOfNetwork);
+      window.addEventListener("offline", conditionOfNetwork);
+    };
+    window.addEventListener("load", webpageLoad);
+    getData();
+
+    return () => {
+      window.removeEventListener("load", webpageLoad);
+      window.removeEventListener("online", conditionOfNetwork);
+      window.removeEventListener("offline", conditionOfNetwork);
+    };
   }, [userInfo?.email, dispatch, chatList, openGroupList]);
 
   //////////////// Friend List Update ///////////////

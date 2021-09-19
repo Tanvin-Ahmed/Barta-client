@@ -12,7 +12,6 @@ import {
   setCallerName,
   setGroupCallIsOpen,
   setPeersForGroupCall,
-  setReceivingGroupCall,
 } from "../../../app/actions/groupCallAction";
 
 const UserVideo = ({ peerObj }) => {
@@ -27,7 +26,7 @@ const UserVideo = ({ peerObj }) => {
   return (
     <div className="text-center">
       <video className="user_video" playsInline ref={ref} autoPlay></video>
-      <h6>{peerObj?.peerName}</h6>
+      <h6 className="text-light">{peerObj?.peerName}</h6>
     </div>
   );
 };

@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useDispatch } from "react-redux";
 import { getUserInfo } from "./app/actions/userAction";
 import io from "socket.io-client";
+import PopupMessage from "./components/PopupMessage/PopupMessage";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -12,6 +13,7 @@ const App = () => {
     dispatch(getUserInfo());
   }, [dispatch]);
 
+  const [showPopup, setShowPopup] = useState(true);
   const [socket, setSocket] = useState(null);
 
   useEffect(() => {
@@ -44,7 +46,33 @@ const App = () => {
     return () => document.removeEventListener("keydown", preventReload);
   }, []);
 
-  return <div className="App">{socket && <Home socket={socket} />}</div>;
+  // reload issue ///
+  // useEffect(() => {
+  //   const reload = (e) => {
+  //     e.returnValue = "Data will be lost if you leave the page, are you sure?";
+  //   };
+  //   window.addEventListener("beforeunload", reload);
+
+  //   return () => window.removeEventListener("beforeunload", reload);
+  // }, []);
+
+  // popup-message
+  useEffect(() => {
+    const message = JSON.parse(sessionStorage.getItem("barta/popup-message"));
+    if (message === true || message === false) {
+      setShowPopup(message);
+    }
+  }, []);
+
+  return (
+    <div className="App">
+      {showPopup ? (
+        <PopupMessage setShowPopup={setShowPopup} />
+      ) : (
+        socket && <Home socket={socket} />
+      )}
+    </div>
+  );
 };
 
 export default App;

@@ -121,6 +121,7 @@ const Chat = ({
       if (JSON.parse(sessionStorage.getItem("barta/groupName"))?.groupName) {
         const ID = id?.split("(*Φ皿Φ*)")?.join(" ");
         dispatch(setRoomId(ID));
+        // socket.emit("after reload get user data of group call", ID);
         return ID;
       } else {
         const ID = getRoomId();

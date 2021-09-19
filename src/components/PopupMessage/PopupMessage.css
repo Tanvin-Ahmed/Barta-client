@@ -1,0 +1,48 @@
+@import url("https://fonts.googleapis.com/css2?family=Lobster&display=swap");
+
+.PopupMessage {
+  position: relative;
+  height: 95vh;
+  width: 40rem;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 10px;
+  background-color: rgb(255, 255, 255);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+  background: rgba(255, 255, 255, 0.109);
+  color: #fff;
+  font-family: sans-serif;
+}
+
+.PopupMessage img {
+  width: 45%;
+}
+.PopupMessage h3 {
+  font-family: "Lobster", cursive;
+  letter-spacing: 1px;
+}
+
+.PopupMessage .popup__close {
+  outline: none;
+  border: none;
+  border-radius: 5px;
+  padding: 0.3rem 0.5rem;
+  font-weight: 500;
+  font-size: 16px;
+  letter-spacing: 1px;
+  background-color: rgb(37, 36, 59);
+  color: rgb(255, 255, 255);
+  transition: all 0.5s;
+}
+
+.PopupMessage .popup__close:hover {
+  background-color: rgb(20, 20, 36);
+}
+
+@media (max-width: 680px) {
+  .PopupMessage {
+    width: 95%;
+  }
+}
