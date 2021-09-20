@@ -15,6 +15,7 @@ import {
   SELECTED_FILES,
   SET_ROOM_ID,
   UPDATE_CHAT_REACT,
+  GET_OLD_MESSAGES_FROM_DB,
 } from "../types";
 import FileServer from "file-saver";
 
@@ -108,7 +109,7 @@ export const uploadFiles = (chosenFiles) => {
   };
 };
 
-export const getMessagesFromDatabase = (data) => {
+export const getMessagesFromDatabase = (data, oldMessage = false) => {
   return (dispatch) => {
     // const options = {
     //   onDownloadProgress: ({ loaded, total }) => {
@@ -121,10 +122,12 @@ export const getMessagesFromDatabase = (data) => {
     //     }
     //   },
     // };
-    dispatch({
-      type: GET_MESSAGES_FROM_DB,
-      payload: [],
-    });
+    if (!oldMessage) {
+      dispatch({
+        type: GET_MESSAGES_FROM_DB,
+        payload: [],
+      });
+    }
     dispatch({
       type: GET_MESSAGE_SPINNER,
       payload: true,
@@ -152,12 +155,19 @@ export const getMessagesFromDatabase = (data) => {
         });
         // data
         const chat = data?.data?.reverse();
-        dispatch({
-          type: GET_MESSAGES_FROM_DB,
-          payload: chat,
-        });
+        if (oldMessage) {
+          dispatch({
+            type: GET_OLD_MESSAGES_FROM_DB,
+            payload: chat,
+          });
+        } else {
+          dispatch({
+            type: GET_MESSAGES_FROM_DB,
+            payload: chat,
+          });
+        }
 
-        if (chat?.length === 9) {
+        if (chat?.length === 35) {
           dispatch({
             type: REFETCH_MESSAGE,
             payload: true,

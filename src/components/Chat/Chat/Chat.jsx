@@ -56,9 +56,23 @@ const Chat = ({
   const history = useHistory();
 
   useEffect(() => {
-    id && JSON.parse(sessionStorage.getItem("barta/groupName"))?.groupName
-      ? getGroupInfo(dispatch, id?.split("(*Φ皿Φ*)")?.join(" "))
-      : getUsersData(dispatch, id);
+    const refetchData = () => {
+      id && JSON.parse(sessionStorage.getItem("barta/groupName"))?.groupName
+        ? getGroupInfo(dispatch, id?.split("(*Φ皿Φ*)")?.join(" "))
+        : getUsersData(dispatch, id);
+    };
+    const reloadWebpage = () => {
+      window.addEventListener("online", refetchData);
+      window.addEventListener("offline", refetchData);
+    };
+    window.addEventListener("load", reloadWebpage);
+    refetchData();
+
+    return () => {
+      window.removeEventListener("load", reloadWebpage);
+      window.removeEventListener("online", refetchData);
+      window.removeEventListener("offline", refetchData);
+    };
   }, [dispatch, id]);
 
   const {
@@ -121,7 +135,6 @@ const Chat = ({
       if (JSON.parse(sessionStorage.getItem("barta/groupName"))?.groupName) {
         const ID = id?.split("(*Φ皿Φ*)")?.join(" ");
         dispatch(setRoomId(ID));
-        // socket.emit("after reload get user data of group call", ID);
         return ID;
       } else {
         const ID = getRoomId();
@@ -133,28 +146,53 @@ const Chat = ({
 
   //////////////// GET MESSAGE FROM DATABASE //////////////
   useEffect(() => {
-    if (roomId) {
-      dispatch(getMessagesFromDatabase({ pageNum: 1, roomId }));
-    }
+    const refetchData = () => {
+      if (roomId) {
+        dispatch(getMessagesFromDatabase({ pageNum: 1, roomId }, false));
+      }
+    };
+    const reloadWebpage = () => {
+      window.addEventListener("online", refetchData);
+      window.addEventListener("offline", refetchData);
+    };
+    window.addEventListener("load", reloadWebpage);
+    refetchData();
+
+    return () => {
+      window.removeEventListener("load", reloadWebpage);
+      window.removeEventListener("online", refetchData);
+      window.removeEventListener("offline", refetchData);
+    };
   }, [roomId, dispatch, id]);
 
   const page = useRef(2);
-  useEffect(() => {
-    const onScroll = (e) => {
-      const scroll = e.target.document.querySelector(
-        ".react-scroll-to-bottom--css-tnqbh-1n7m0yu"
-      )?.scrollTop;
-      console.log(scroll);
-      if (scroll === 0 && reFetchMessage) {
-        dispatch(getMessagesFromDatabase({ pageNum: page.current, roomId }));
-        dispatch(stopReFetchMessage());
-        page.current++;
-      }
-    };
+  const getOldMessage = () => {
+    if (reFetchMessage) {
+      dispatch(
+        getMessagesFromDatabase({ pageNum: page.current, roomId }, true)
+      );
+      dispatch(stopReFetchMessage());
+      page.current++;
+    }
+  };
+  // useEffect(() => {
+  //   const onScroll = (e) => {
+  //     const scroll = e.target.document.querySelector(
+  //       ".react-scroll-to-bottom--css-rcops-1n7m0yu"
+  //     ).scrollTop;
+  //     console.log(scroll);
+  //     if (scroll === 0 && reFetchMessage) {
+  //       dispatch(
+  //         getMessagesFromDatabase({ pageNum: page.current, roomId }, true)
+  //       );
+  //       dispatch(stopReFetchMessage());
+  //       page.current++;
+  //     }
+  //   };
+  //   document.addEventListener("scroll", onScroll);
 
-    window.addEventListener("scroll", onScroll);
-    return window.removeEventListener("scroll", onScroll);
-  }, [dispatch, roomId, reFetchMessage]);
+  //   return () => document.removeEventListener("scroll", onScroll);
+  // }, [dispatch, roomId, reFetchMessage]);
 
   ////////////// GET MESSAGE FROM SOCKET //////////////////
   useEffect(() => {
@@ -358,6 +396,8 @@ const Chat = ({
             isOpenOptions={isOpenOptions}
             reactTabIsOpen={reactTabIsOpen}
             getMessageSpinner={getMessageSpinner}
+            getOldMessage={getOldMessage}
+            reFetchMessage={reFetchMessage}
           />
 
           {chosenFiles[0] && (

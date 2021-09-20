@@ -14,6 +14,7 @@ import {
   SET_ROOM_ID,
   REFETCH_MESSAGE,
   GET_MESSAGE_SPINNER,
+  GET_OLD_MESSAGES_FROM_DB,
 } from "../types";
 
 const initialState = {
@@ -37,6 +38,11 @@ const messageReducer = (state = initialState, action) => {
       return {
         ...state,
         chatMessages: action.payload,
+      };
+    case GET_OLD_MESSAGES_FROM_DB:
+      return {
+        ...state,
+        chatMessages: [...action.payload, ...state.chatMessages],
       };
     case GET_MESSAGE_SPINNER:
       return {

@@ -3,7 +3,7 @@ import TimeAgo from "timeago-react";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 import CallIcon from "@material-ui/icons/Call";
 import VideoCallIcon from "@material-ui/icons/VideoCall";
-import { Avatar, IconButton } from "@material-ui/core";
+import { Avatar, CardActionArea, IconButton } from "@material-ui/core";
 import ScrollToBottom from "react-scroll-to-bottom";
 import { css } from "@emotion/css";
 import InputEmoji from "react-input-emoji";
@@ -245,208 +245,228 @@ export const ChatBody = ({
   isOpenOptions,
   reactTabIsOpen,
   getMessageSpinner,
+  getOldMessage,
+  reFetchMessage,
 }) => {
   return (
     <>
       <ScrollToBottom className={`${ROOT_CSS} chat__body`}>
-        {getMessageSpinner ? (
+        {getMessageSpinner && (
           <div className="chatBody__spinner">
-            <CircularProgress style={{ color: "rgb(18, 3, 45)" }} />
+            <div className="chatBody__spinner_container">
+              <CircularProgress style={{ color: "rgb(18, 3, 45)" }} />
+            </div>
           </div>
-        ) : chatMessage.length === 0 ? (
+        )}
+        {chatMessage.length === 0 && !getMessageSpinner && (
           <p className="message__notAvailable">NO MESSAGE AVAILABLE!</p>
-        ) : (
-          chatMessage?.map((message) => (
-            <div
-              key={message?._id}
-              style={{ width: "100%" }}
-              className={
-                message?.sender === senderInfo.email
-                  ? "d-flex d-flex justify-content-end align-items-center"
-                  : "d-flex flex-row-reverse justify-content-end align-items-center"
-              }
-              onMouseOver={() => options(dispatch, true, message?._id)}
-              onMouseLeave={() => options(dispatch, false, message?._id)}
-            >
-              {isOpenOptions?.bool && isOpenOptions?.id === message?._id && (
-                <Options
-                  dispatch={dispatch}
-                  reactTabIsOpen={reactTabIsOpen}
-                  message={message}
-                  sender={senderInfo?.email}
-                />
-              )}
+        )}
+        <>
+          <div className="d-flex justify-content-center align-items-center">
+            {reFetchMessage && (
+              <CardActionArea
+                title="get old message"
+                className="oldMessageLoad__btn"
+                onClick={getOldMessage}
+              >
+                <ReplayIcon size="small" className="text-light" />
+              </CardActionArea>
+            )}
+          </div>
+          {chatMessage.length > 0 &&
+            chatMessage?.map((message) => (
               <div
-                key={message._id}
+                key={message?._id}
+                style={{ width: "100%" }}
                 className={
                   message?.sender === senderInfo.email
-                    ? "chat__text myChat"
-                    : "chat__text"
+                    ? "d-flex d-flex justify-content-end align-items-center"
+                    : "d-flex flex-row-reverse justify-content-end align-items-center"
                 }
+                onMouseOver={() => options(dispatch, true, message?._id)}
+                onMouseLeave={() => options(dispatch, false, message?._id)}
               >
-                <p className="name">
-                  {message?.sender === senderInfo?.email
-                    ? `${senderInfo?.displayName?.split(" ")[0]}`
-                    : `${receiverInfo?.displayName?.split(" ")[0]}`}
-                </p>
-                <div>
-                  {message?.message}
-                  {message.receiver && (
-                    <>
-                      <div className="d-flex justify-content-center align-items-center">
-                        {message?.callDuration?.duration ? (
-                          message?.sender === senderInfo.email ? (
-                            <CallMadeIcon
+                {isOpenOptions?.bool && isOpenOptions?.id === message?._id && (
+                  <Options
+                    dispatch={dispatch}
+                    reactTabIsOpen={reactTabIsOpen}
+                    message={message}
+                    sender={senderInfo?.email}
+                  />
+                )}
+                <div
+                  key={message._id}
+                  className={
+                    message?.sender === senderInfo.email
+                      ? "chat__text myChat"
+                      : "chat__text"
+                  }
+                >
+                  <p className="name">
+                    {message?.sender === senderInfo?.email
+                      ? `${senderInfo?.displayName?.split(" ")[0]}`
+                      : `${receiverInfo?.displayName?.split(" ")[0]}`}
+                  </p>
+                  <div>
+                    {message?.message}
+                    {message.receiver && (
+                      <>
+                        <div className="d-flex justify-content-center align-items-center">
+                          {message?.callDuration?.duration ? (
+                            message?.sender === senderInfo.email ? (
+                              <CallMadeIcon
+                                className="mr-2"
+                                variant="contained"
+                                size="small"
+                                style={{ color: "blue" }}
+                              />
+                            ) : (
+                              <CallReceivedIcon
+                                className="mr-2"
+                                variant="contained"
+                                size="small"
+                                style={{ color: "green" }}
+                              />
+                            )
+                          ) : message?.sender === senderInfo.email ? (
+                            <CallMissedOutgoingIcon
                               className="mr-2"
                               variant="contained"
                               size="small"
-                              style={{ color: "blue" }}
+                              style={{ color: "red" }}
                             />
                           ) : (
-                            <CallReceivedIcon
+                            <CallMissedIcon
                               className="mr-2"
                               variant="contained"
                               size="small"
-                              style={{ color: "green" }}
+                              style={{ color: "red" }}
                             />
-                          )
-                        ) : message?.sender === senderInfo.email ? (
-                          <CallMissedOutgoingIcon
-                            className="mr-2"
-                            variant="contained"
-                            size="small"
-                            style={{ color: "red" }}
-                          />
-                        ) : (
-                          <CallMissedIcon
-                            className="mr-2"
-                            variant="contained"
-                            size="small"
-                            style={{ color: "red" }}
-                          />
+                          )}
+                          <h6>{message?.callDescription}</h6>
+                        </div>
+                        {message?.callDuration?.duration && (
+                          <small>
+                            <Timer timer={message?.callDuration} />
+                          </small>
                         )}
-                        <h6>{message?.callDescription}</h6>
-                      </div>
-                      {message?.callDuration?.duration && (
-                        <small>
-                          <Timer timer={message?.callDuration} />
-                        </small>
-                      )}
-                    </>
-                  )}
-                  {message?.files?.length > 0 ? (
-                    <SRLWrapper options={option}>
-                      {message.files?.map((file, index) => {
-                        if (file.contentType.split("/")[0] === "image") {
-                          return (
-                            <a
-                              key={index}
-                              href={`http://localhost:5000/chatMessage/file/${file?.filename}`}
-                            >
-                              <img
-                                key={file.fileId}
-                                className="chat__img"
-                                src={`http://localhost:5000/chatMessage/file/${file?.filename}`}
-                                alt={`${index + 1}`}
-                              />
-                            </a>
-                          );
-                        } else if (file.contentType.split("/")[0] === "video") {
-                          return (
-                            <div
-                              key={index}
-                              className="d-flex justify-content-center align-items-center"
-                            >
-                              <IconButton
-                                variant="contained"
-                                size="small"
-                                onClick={() => download(file.filename)}
-                                className="icon download__icon text-light"
+                      </>
+                    )}
+                    {message?.files?.length > 0 ? (
+                      <SRLWrapper options={option}>
+                        {message.files?.map((file, index) => {
+                          if (file.contentType.split("/")[0] === "image") {
+                            return (
+                              <a
+                                key={index}
+                                href={`http://localhost:5000/chatMessage/file/${file?.filename}`}
                               >
-                                <ArrowDownwardIcon />
-                              </IconButton>
-                              <video
-                                key={file.fileId}
-                                className="chat__img"
-                                src={`http://localhost:5000/chatMessage/file/${file?.filename}`}
-                                controls
-                                controlsList="nodownload"
-                              ></video>
-                            </div>
-                          );
-                        } else if (
-                          file.contentType.split("/")[0] === "application"
-                        ) {
-                          return (
-                            <div
-                              key={index}
-                              className={`d-flex justify-content-between align-items-center show__document ${
-                                message?.sender === senderInfo.email &&
-                                "show_user_document"
-                              }`}
-                            >
-                              <IconButton
-                                variant="contained"
-                                size="small"
-                                onClick={() => download(file.filename)}
-                                className="icon download__icon text-light"
+                                <img
+                                  key={file.fileId}
+                                  className="chat__img"
+                                  src={`http://localhost:5000/chatMessage/file/${file?.filename}`}
+                                  alt={`${index + 1}`}
+                                />
+                              </a>
+                            );
+                          } else if (
+                            file.contentType.split("/")[0] === "video"
+                          ) {
+                            return (
+                              <div
+                                key={index}
+                                className="d-flex justify-content-center align-items-center"
                               >
-                                <ArrowDownwardIcon />
-                              </IconButton>
-                              <div className="document__title">
-                                {file.filename}
+                                <IconButton
+                                  variant="contained"
+                                  size="small"
+                                  onClick={() => download(file.filename)}
+                                  className="icon download__icon text-light"
+                                >
+                                  <ArrowDownwardIcon />
+                                </IconButton>
+                                <video
+                                  key={file.fileId}
+                                  className="chat__img"
+                                  src={`http://localhost:5000/chatMessage/file/${file?.filename}`}
+                                  controls
+                                  controlsList="nodownload"
+                                ></video>
                               </div>
-                            </div>
-                          );
+                            );
+                          } else if (
+                            file.contentType.split("/")[0] === "application"
+                          ) {
+                            return (
+                              <div
+                                key={index}
+                                className={`d-flex justify-content-between align-items-center show__document ${
+                                  message?.sender === senderInfo.email &&
+                                  "show_user_document"
+                                }`}
+                              >
+                                <IconButton
+                                  variant="contained"
+                                  size="small"
+                                  onClick={() => download(file.filename)}
+                                  className="icon download__icon text-light"
+                                >
+                                  <ArrowDownwardIcon />
+                                </IconButton>
+                                <div className="document__title">
+                                  {file.filename}
+                                </div>
+                              </div>
+                            );
+                          }
+                          return null;
+                        })}
+                      </SRLWrapper>
+                    ) : null}
+                    <p className="time">
+                      {new Date(message?.timeStamp).toLocaleString()}
+                    </p>
+                  </div>
+                  <div className="tooltip__hover">
+                    {message?.react?.length > 0 && (
+                      <div
+                        className={
+                          message?.sender === senderInfo.email
+                            ? "reaction"
+                            : "reaction reaction__receiver"
                         }
-                        return null;
-                      })}
-                    </SRLWrapper>
-                  ) : null}
-                  <p className="time">
-                    {new Date(message?.timeStamp).toLocaleString()}
-                  </p>
-                </div>
-                <div className="tooltip__hover">
-                  {message?.react?.length > 0 && (
-                    <div
-                      className={
-                        message?.sender === senderInfo.email
-                          ? "reaction"
-                          : "reaction reaction__receiver"
-                      }
-                    >
-                      {message?.react[0]?.react === message?.react[1]?.react
-                        ? message?.react[0]?.react
-                        : message?.react?.map((r, index) => {
-                            return <div key={index}>{r?.react}</div>;
-                          })}
-                      {message?.react?.length > 0 && (
-                        <>{message?.react?.length}</>
-                      )}
-                      <div className="message__tooltip">
-                        {message?.react?.map((r, i) => (
-                          <div
-                            key={i}
-                            className="d-flex justify-content-between align-items-center react__display"
-                          >
+                      >
+                        {message?.react[0]?.react === message?.react[1]?.react
+                          ? message?.react[0]?.react
+                          : message?.react?.map((r, index) => {
+                              return <div key={index}>{r?.react}</div>;
+                            })}
+                        {message?.react?.length > 0 && (
+                          <>{message?.react?.length}</>
+                        )}
+                        <div className="message__tooltip">
+                          {message?.react?.map((r, i) => (
                             <div
-                              style={{ fontWeight: "bold", width: "100%" }}
-                              className="m-1"
+                              key={i}
+                              className="d-flex justify-content-between align-items-center react__display"
                             >
-                              {r.sender}
+                              <div
+                                style={{ fontWeight: "bold", width: "100%" }}
+                                className="m-1"
+                              >
+                                {r.sender}
+                              </div>
+                              <div>{r.react}</div>
                             </div>
-                            <div>{r.react}</div>
-                          </div>
-                        ))}
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-          ))
-        )}
+            ))}
+        </>
         {typing && (
           <div className="typing__container">
             <div className="typing">typing...</div>

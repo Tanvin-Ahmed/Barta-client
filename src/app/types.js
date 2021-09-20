@@ -13,6 +13,7 @@ export const UPDATE_FRIEND_STATUS = "update_friend_status";
 export const UPDATE_CHAT_STATUS = "update_chat_status";
 // message
 export const GET_MESSAGES_FROM_DB = "get_message_from_db";
+export const GET_OLD_MESSAGES_FROM_DB = "get_old_message_from_db";
 export const POST_ONE_ONE_CHAT = "post_one_one_chat";
 export const CHAT_ERROR = "chat_error";
 export const CHAT_UPLOAD_PERCENTAGE = "chat_upload_percentage";
