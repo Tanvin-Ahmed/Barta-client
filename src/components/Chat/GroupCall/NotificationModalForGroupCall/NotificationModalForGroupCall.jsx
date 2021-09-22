@@ -5,7 +5,7 @@ import PhoneInTalkIcon from "@material-ui/icons/PhoneInTalk";
 import CloseIcon from "@material-ui/icons/Close";
 import { acceptGroupCall } from "../../PrivateCallSystem/callLogic";
 import { useDispatch, useSelector } from "react-redux";
-import { setRemoveGroupCallModal } from "../../../../app/actions/groupCallAction";
+import ringtone from "../../../../audios/Facebook_messenger_ringtone.mp3";
 
 const NotificationModalForGroupCall = ({
   socket,
@@ -41,6 +41,7 @@ const NotificationModalForGroupCall = ({
 
   return (
     <>
+      <audio src={ringtone} autoPlay loop />
       <section className="groupCall__notification p-2 bg-primary d-flex flex-column justify-content-around">
         <div className="container text-center">
           <div className="text-light">

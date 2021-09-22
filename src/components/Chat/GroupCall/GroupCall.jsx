@@ -14,7 +14,7 @@ import {
   setPeersForGroupCall,
 } from "../../../app/actions/groupCallAction";
 
-const UserVideo = ({ peerObj }) => {
+const UserVideo = ({ peerObj, user, totalUser }) => {
   const ref = useRef(null);
 
   useEffect(() => {
@@ -24,8 +24,31 @@ const UserVideo = ({ peerObj }) => {
   }, [peerObj]);
 
   return (
-    <div className="text-center">
-      <video className="user_video" playsInline ref={ref} autoPlay></video>
+    <div
+      className={
+        totalUser + 1 === user + 1
+          ? totalUser + 1 === 2
+            ? "twoUser__video"
+            : (user + 1) % 2 === 0
+            ? "even__user"
+            : "odd_user"
+          : "more__user"
+      }
+    >
+      <video
+        className={
+          totalUser + 1 === user + 1
+            ? totalUser + 1 === 2
+              ? "twoUser__video"
+              : (user + 1) % 2 === 0
+              ? "even__user"
+              : "odd_user"
+            : "more__user"
+        }
+        playsInline
+        ref={ref}
+        autoPlay
+      ></video>
       <h6 className="text-light">{peerObj?.peerName}</h6>
     </div>
   );
@@ -107,18 +130,48 @@ const GroupCall = ({
   };
 
   return (
-    <section className="group__call">
-      <video
-        className="user_video"
-        playsInline
-        autoPlay
-        ref={myStream}
-        muted
-      ></video>
-      {peersForGroupCall?.length > 0 &&
-        peersForGroupCall.map((peerObj, index) => (
-          <UserVideo key={index} peerObj={peerObj} />
-        ))}
+    <section className="room">
+      <div
+        className={
+          peersForGroupCall?.length > 0
+            ? "room__container"
+            : "onlyCaller__present"
+        }
+      >
+        <div
+          className={
+            peersForGroupCall?.length + 1 === 1
+              ? "user__video"
+              : peersForGroupCall?.length + 1 === 2
+              ? "twoUser__video"
+              : "more__user"
+          }
+        >
+          <video
+            className={
+              peersForGroupCall?.length + 1 === 1
+                ? "user__video"
+                : peersForGroupCall?.length + 1 === 2
+                ? "twoUser__video"
+                : "more__user"
+            }
+            playsInline
+            autoPlay
+            ref={myStream}
+            muted
+          ></video>
+          <h6>Me</h6>
+        </div>
+        {peersForGroupCall?.length > 0 &&
+          peersForGroupCall.map((peerObj, index) => (
+            <UserVideo
+              key={index}
+              peerObj={peerObj}
+              user={index + 1}
+              totalUser={peersForGroupCall.length}
+            />
+          ))}
+      </div>
       <div className="buttons__position">
         <Buttons
           videoOpen={videoOpen}
