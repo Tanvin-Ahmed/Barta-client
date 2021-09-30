@@ -27,6 +27,7 @@ const ChatBar = ({ socket }) => {
   const dispatch = useDispatch();
 
   const {
+    friendNotAvailable,
     users,
     friendList,
     error,
@@ -34,6 +35,7 @@ const ChatBar = ({ socket }) => {
     spinnerForChatList,
     chatList,
     userInfo,
+    userStatusToReceiveOtherCall,
     openGroupList,
     spinnerForGroupList,
     groups,
@@ -44,6 +46,7 @@ const ChatBar = ({ socket }) => {
     groupCreated,
     groupCreatingSpinner,
   } = useSelector((state) => ({
+    friendNotAvailable: state.userReducer.friendNotAvailable,
     users: state.userReducer.allUserInfo,
     friendList: state.userReducer.chatList,
     error: state.userReducer.error,
@@ -51,6 +54,9 @@ const ChatBar = ({ socket }) => {
     spinnerForChatList: state.userReducer.spinnerForChatList,
     chatList: state.userReducer.addChatList,
     userInfo: state.userReducer.userInfo,
+    // private call
+    userStatusToReceiveOtherCall:
+      state.privateCall.userStatusToReceiveOtherCall,
     // group making tab
     openGroupList: state.userReducer.openGroupList,
     spinnerForGroupList: state.userReducer.spinnerForGroupList,
@@ -131,11 +137,24 @@ const ChatBar = ({ socket }) => {
     if (socket === null) return;
     socket.on("callUser", (data) => {
       if (data.userToCall === userInfo.email) {
-        callReached(data, dispatch, socket, history);
+        callReached(
+          data,
+          dispatch,
+          socket,
+          history,
+          userStatusToReceiveOtherCall
+        );
       }
     });
     return () => socket.off("callUser");
-  }, [dispatch, socket, userInfo, friendList, history]);
+  }, [
+    dispatch,
+    socket,
+    userInfo,
+    friendList,
+    history,
+    userStatusToReceiveOtherCall,
+  ]);
 
   ///////// CLEAR ALL THING TO CREATING GROUP AFTER CREATED GROUP /////////
   useEffect(() => {
@@ -165,6 +184,7 @@ const ChatBar = ({ socket }) => {
               friendList={friendList}
               history={history}
               spinnerForChatList={spinnerForChatList}
+              friendNotAvailable={friendNotAvailable}
             />
             <MakeNewFriendButton dispatch={dispatch} />
           </>

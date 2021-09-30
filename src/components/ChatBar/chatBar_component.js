@@ -10,6 +10,7 @@ import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import CheckCircleOutlineIcon from "@material-ui/icons/CheckCircleOutline";
 import PersonOutlineIcon from "@material-ui/icons/PersonOutline";
+import Dropdown from "../DropdownMenu/Dropdown";
 import {
   addIdToCreateGroup,
   createGroupForFirst,
@@ -48,9 +49,7 @@ export const ChatBarHeader = ({
           <h3 className="text-center text-light">Barta</h3>
         </div>
         <div className="more__options">
-          <IconButton>
-            <MoreVertIcon className="text-light" size="small" />
-          </IconButton>
+          <Dropdown />
         </div>
       </div>
       <div className="add__friend mt-2 d-flex justify-content-around align-items-center flex-wrap">
@@ -77,7 +76,12 @@ export const ChatBarHeader = ({
   );
 };
 
-export const ChatList = ({ friendList, history, spinnerForChatList }) => {
+export const ChatList = ({
+  friendList,
+  history,
+  spinnerForChatList,
+  friendNotAvailable,
+}) => {
   const [searchTerm, setSearchTerm] = useState("");
   return (
     <div className="friendList__container">
@@ -94,6 +98,8 @@ export const ChatList = ({ friendList, history, spinnerForChatList }) => {
           <div className="chatBar__progress">
             <CircularProgress style={{ color: "rgb(18, 3, 45)" }} />
           </div>
+        ) : friendNotAvailable ? (
+          <p className="friend__notAvailable">{friendNotAvailable}</p>
         ) : (
           friendList
             ?.filter((val) => {
@@ -165,7 +171,7 @@ export const GroupList = ({ groups, history, spinnerForGroupList }) => {
             <CircularProgress style={{ color: "rgb(18, 3, 45)" }} />
           </div>
         ) : groups.length === 0 ? (
-          <h3 className="group_not_available">Create new Group</h3>
+          <h3 className="group_not_available">No group available</h3>
         ) : (
           groups
             ?.filter((val) => {

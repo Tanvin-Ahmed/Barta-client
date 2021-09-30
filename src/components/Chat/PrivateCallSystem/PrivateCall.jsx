@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -85,6 +85,29 @@ const PrivateVideoCall = ({
           myStream.current.srcObject = stream;
         });
   }, [dispatch, myStream, receivingCall, videoChat]);
+
+  // CALL STATUS //
+  const [callStatus, setCallStatus] = useState("");
+  useEffect(() => {
+    socket.on("call busy", (data) => {
+      if (data.returnTo === userInfo?.email) {
+        setCallStatus(data.status);
+      }
+    });
+
+    return () => socket.off("call busy");
+  }, [socket, userInfo]);
+
+  // RECEIVER CALL YOU 1ST //
+  useEffect(() => {
+    socket.on("receiver call you first", (to) => {
+      if (to === userInfo?.email) {
+        leaveCall();
+      }
+    });
+
+    return () => socket.off("receiver call you first");
+  }, [socket, userInfo]);
 
   ////////////////// RESPONSE IF RECEIVER IS ONLINE ///////////////////
   useEffect(() => {
@@ -189,6 +212,7 @@ const PrivateVideoCall = ({
   };
 
   const leaveCall = () => {
+    setCallStatus("");
     stopBothVideoAndAudio(stream);
     end(interVal);
     setCallInfoInDatabase({
@@ -248,7 +272,9 @@ const PrivateVideoCall = ({
                   <div className="callInfo">
                     <h5>{receiverInfo.displayName}</h5>
                     <h6>
-                      {!startTimer
+                      {callStatus
+                        ? callStatus
+                        : !startTimer
                         ? callReachToReceiver
                           ? "Ringing...."
                           : "Connecting..."

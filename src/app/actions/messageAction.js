@@ -18,6 +18,7 @@ import {
   GET_OLD_MESSAGES_FROM_DB,
 } from "../types";
 import FileServer from "file-saver";
+import path from "path";
 
 export const sendMessageInDatabase = (chat) => {
   return (dispatch) => {
@@ -101,6 +102,12 @@ export const uploadFiles = (chosenFiles) => {
         }, 50);
       })
       .catch((err) => {
+        if (err.response.status === 400) {
+          const msg = err.response.data;
+          alert(msg);
+        } else if (err.response.status === 500) {
+          alert("file not uploaded, please try again");
+        }
         dispatch({
           type: CHAT_ERROR,
           payload: err.message,
@@ -211,10 +218,14 @@ export const download = (filename) => {
     url: `http://localhost:5000/${destination}/file/${filename}`,
     responseType: "blob",
   })
-    .then((response) => {
-      FileServer.saveAs(response.data, filename);
+    .then(({ data }) => {
+      FileServer.saveAs(
+        data,
+        filename?.split("_")?.join(" ")?.split("◉ ◉")[0] +
+          path.extname(filename)
+      );
     })
-    .catch((err) => alert("file is not saved, please try again."));
+    .catch((err) => alert(err.message));
 };
 
 export const updateChatMessage = (react) => {

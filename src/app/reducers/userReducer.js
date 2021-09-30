@@ -25,11 +25,18 @@ import {
   GET_GROUP_INFO,
   SET_SPINNER_FOR_CHAT_LIST,
   SET_SPINNER_FOR_GROUP_LIST,
+  SET_FIND_FRIEND_ERROR,
+  SET_LOGIN_SPINNER,
+  SET_VERIFY_JWT_TOKEN_SPINNER,
+  REMOVE_USER_INFO,
 } from "../types";
 
 const initialState = {
+  tokenVerifySpinner: false,
+  loginSpinner: false,
   userInfo: {},
   allUserInfo: [],
+  friendNotAvailable: "",
   chatList: [],
   spinnerForChatList: false,
   receiverInfo: {},
@@ -52,7 +59,22 @@ const initialState = {
 
 const userReducer = (state = initialState, action) => {
   switch (action.type) {
+    case SET_VERIFY_JWT_TOKEN_SPINNER:
+      return {
+        ...state,
+        tokenVerifySpinner: action.payload,
+      };
+    case SET_LOGIN_SPINNER:
+      return {
+        ...state,
+        loginSpinner: action.payload,
+      };
     case GET_USER_INFO:
+      return {
+        ...state,
+        userInfo: action.payload,
+      };
+    case REMOVE_USER_INFO:
       return {
         ...state,
         userInfo: action.payload,
@@ -66,6 +88,11 @@ const userReducer = (state = initialState, action) => {
       return {
         ...state,
         allUserInfo: action.payload,
+      };
+    case SET_FIND_FRIEND_ERROR:
+      return {
+        ...state,
+        friendNotAvailable: action.payload,
       };
     case SET_SPINNER_FOR_CHAT_LIST:
       return {

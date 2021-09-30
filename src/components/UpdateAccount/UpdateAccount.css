@@ -1,0 +1,61 @@
+.update__account {
+  padding: 1.5rem;
+}
+
+.update__account .camera__icon {
+  position: absolute;
+  bottom: 10%;
+  right: 10%;
+}
+
+.update__account .css-nmspza-MuiFormLabel-root-MuiInputLabel-root {
+  color: #fff !important;
+}
+.update__account .css-o9k5xi-MuiInputBase-root-MuiOutlinedInput-root {
+  color: #fff !important;
+}
+.update__account .css-1o2jng6-MuiOutlinedInput-notchedOutline {
+  border-color: rgb(177, 183, 216) !important;
+}
+.update__account .css-i4bv87-MuiSvgIcon-root {
+  color: #fff !important;
+}
+
+.update__account .form {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.update__account .form__input {
+  color: #fff;
+  outline: none;
+  width: 100%;
+  border: none;
+  padding: 0.3rem 1rem;
+  border-bottom: 2px solid var(--input-border-color);
+  background-color: transparent;
+}
+
+.update__account .form__input::placeholder {
+  color: var(--placeholder-color);
+  font-size: 12px;
+}
+
+.update__account .update__submit {
+  background-color: var(--submit-button-background);
+  color: rgb(231, 231, 231);
+  border-radius: 5px;
+  padding: 0.4rem 2rem;
+  letter-spacing: 1px;
+  font-weight: 500;
+  border: none;
+  font-size: 15px;
+  transition: all 0.5s;
+}
+
+.update__account .update__submit:hover {
+  color: #fff;
+  background-color: rgb(88, 48, 177);
+}

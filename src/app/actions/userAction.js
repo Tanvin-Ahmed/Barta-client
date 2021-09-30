@@ -26,17 +26,67 @@ import {
   GET_GROUP_INFO,
   SET_SPINNER_FOR_CHAT_LIST,
   SET_SPINNER_FOR_GROUP_LIST,
+  SET_FIND_FRIEND_ERROR,
+  SET_LOGIN_SPINNER,
+  SET_VERIFY_JWT_TOKEN_SPINNER,
+  REMOVE_USER_INFO,
 } from "../types";
+import jwt_decode from "jwt-decode";
 
 export const getUserInfo = () => {
-  return async (dispatch) => {
-    let userData = await localStorage.getItem("barta/user");
-    userData = JSON.parse(userData);
+  return (dispatch) => {
+    const token = JSON.parse(localStorage.getItem("accessToken"));
+    if (!token) return;
+    const { _id, displayName, email, status, exp } = jwt_decode(token);
 
-    dispatch({
-      type: GET_USER_INFO,
-      payload: userData,
-    });
+    if (exp * 1000 < new Date().getTime()) {
+      dispatch({
+        type: SET_VERIFY_JWT_TOKEN_SPINNER,
+        payload: true,
+      });
+      localStorage.removeItem("accessToken");
+      axios
+        .post("http://localhost:5000/jwt/get-new-jwt", {
+          _id,
+          displayName,
+          email,
+          status,
+        })
+        .then(({ data }) => {
+          localStorage.setItem("accessToken", JSON.stringify(data));
+          const { _id, displayName, email, status } = jwt_decode(data);
+          const tokenData = { _id, displayName, email, status };
+          dispatch({
+            type: GET_USER_INFO,
+            payload: tokenData,
+          });
+          dispatch({
+            type: SET_VERIFY_JWT_TOKEN_SPINNER,
+            payload: false,
+          });
+        })
+        .catch((err) => {
+          console.log(err.response);
+          dispatch({
+            type: SET_VERIFY_JWT_TOKEN_SPINNER,
+            payload: false,
+          });
+          alert("Authentication failed");
+        });
+    } else {
+      const userData = { _id, displayName, email, status };
+      dispatch({
+        type: GET_USER_INFO,
+        payload: userData,
+      });
+    }
+  };
+};
+
+export const removeUserInfo = () => {
+  return {
+    type: REMOVE_USER_INFO,
+    payload: {},
   };
 };
 
@@ -58,6 +108,12 @@ export const getFriendInfo = (userEmail) => {
         });
       })
       .catch((error) => {
+        if (error.response.status === 400) {
+          dispatch({
+            type: SET_FIND_FRIEND_ERROR,
+            payload: error.response.data,
+          });
+        }
         dispatch({
           type: SET_SPINNER_FOR_CHAT_LIST,
           payload: false,
@@ -173,6 +229,70 @@ export const getAllUserInfo = (searchString) => {
       });
     };
   }
+};
+
+export const sendSignInRequest = (user, history, from) => {
+  return (dispatch) => {
+    dispatch({
+      type: SET_LOGIN_SPINNER,
+      payload: true,
+    });
+    axios
+      .post("http://localhost:5000/user/account/sign-in", user)
+      .then(({ data }) => {
+        dispatch({
+          type: SET_LOGIN_SPINNER,
+          payload: false,
+        });
+        localStorage.setItem("accessToken", JSON.stringify(data));
+        const { _id, displayName, email, status } = jwt_decode(data);
+        const userData = { _id, displayName, email, status };
+        dispatch({
+          type: GET_USER_INFO,
+          payload: userData,
+        });
+        history.replace(from);
+      })
+      .catch(() => {
+        dispatch({
+          type: SET_LOGIN_SPINNER,
+          payload: false,
+        });
+        alert("Sign In failed");
+      });
+  };
+};
+
+export const sendLoginRequest = (user, history, from) => {
+  return (dispatch) => {
+    dispatch({
+      type: SET_LOGIN_SPINNER,
+      payload: true,
+    });
+    axios
+      .post("http://localhost:5000/user/account/login", user)
+      .then(({ data }) => {
+        dispatch({
+          type: SET_LOGIN_SPINNER,
+          payload: false,
+        });
+        localStorage.setItem("accessToken", JSON.stringify(data));
+        const { _id, displayName, email, status } = jwt_decode(data);
+        const userData = { _id, displayName, email, status };
+        dispatch({
+          type: GET_USER_INFO,
+          payload: userData,
+        });
+        history.replace(from);
+      })
+      .catch(() => {
+        dispatch({
+          type: SET_LOGIN_SPINNER,
+          payload: false,
+        });
+        alert("Login Failed");
+      });
+  };
 };
 
 export const postMyInfo = (user) => {

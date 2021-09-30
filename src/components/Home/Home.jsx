@@ -12,16 +12,19 @@ import { isVideoChat } from "../../app/actions/privateCallAction";
 import GroupCall from "../Chat/GroupCall/GroupCall";
 import NotificationModalForGroupCall from "../Chat/GroupCall/NotificationModalForGroupCall/NotificationModalForGroupCall";
 import { setCallerName } from "../../app/actions/groupCallAction";
+import UpdateAccount from "../UpdateAccount/UpdateAccount";
 
 const Home = ({ socket }) => {
   const myStream = useRef(null);
   const groupPeersRef = useRef([]);
   const dispatch = useDispatch();
-  const { userInfo, openGroupCall, callAccepted } = useSelector((state) => ({
-    userInfo: state.userReducer.userInfo,
-    openGroupCall: state.groupCallReducer.openGroupCall,
-    callAccepted: state.privateCall.callAccepted,
-  }));
+  const { userInfo, openGroupCall, acceptedGroupCall, receivingCall } =
+    useSelector((state) => ({
+      userInfo: state.userReducer.userInfo,
+      openGroupCall: state.groupCallReducer.openGroupCall,
+      acceptedGroupCall: state.groupCallReducer.acceptedGroupCall,
+      receivingCall: state.privateCall.receivingCall,
+    }));
 
   const [roomIdOfReceivingGroupCall, setRoomIdOfReceivingGroupCall] =
     useState("");
@@ -30,9 +33,8 @@ const Home = ({ socket }) => {
 
   // ////////////////// post user info ///////////////////////
   useEffect(() => {
-    let userInfo = JSON.parse(localStorage.getItem("barta/user"));
-    socket.emit("user-info", { email: userInfo?.email });
-  }, [dispatch, socket]);
+    userInfo?.email && socket.emit("user-info", { email: userInfo?.email });
+  }, [dispatch, socket, userInfo]);
 
   ////////////////  GROUP CALL ///////////////////
   //************* GROUP CALL RECEIVE OTHER USERS ************//
@@ -55,7 +57,7 @@ const Home = ({ socket }) => {
       }
     );
     return () => socket.off("group call for you");
-  }, [socket, dispatch, userInfo?.email]);
+  }, [socket, dispatch, userInfo?.email, receivingCall, receivingGroupCall]);
 
   // useEffect(() => {
   //   // socket.emit("is user present in group call", roomId);
@@ -73,7 +75,7 @@ const Home = ({ socket }) => {
     <section className="home">
       {socket && (
         <>
-          {(openGroupCall || callAccepted) && (
+          {(openGroupCall || acceptedGroupCall) && (
             <GroupCall
               socket={socket}
               myStream={myStream}
@@ -84,15 +86,17 @@ const Home = ({ socket }) => {
               receivingGroupCall={receivingGroupCall}
             />
           )}
-          {receivingGroupCall && !callAccepted && !removeGroupCallModal && (
-            <NotificationModalForGroupCall
-              socket={socket}
-              roomIdOfReceivingGroupCall={roomIdOfReceivingGroupCall}
-              groupPeersRef={groupPeersRef}
-              myStream={myStream}
-              setRemoveGroupCallModal={setRemoveGroupCallModal}
-            />
-          )}
+          {receivingGroupCall &&
+            !acceptedGroupCall &&
+            !removeGroupCallModal && (
+              <NotificationModalForGroupCall
+                socket={socket}
+                roomIdOfReceivingGroupCall={roomIdOfReceivingGroupCall}
+                groupPeersRef={groupPeersRef}
+                myStream={myStream}
+                setRemoveGroupCallModal={setRemoveGroupCallModal}
+              />
+            )}
           {/* {(openPrivateCall || receivingCall || userStream.current) && (
             <PrivateCall
               socket={socket}
@@ -102,15 +106,18 @@ const Home = ({ socket }) => {
               Peer={Peer}
             />
           )} */}
-          {!openGroupCall && !callAccepted && (
+          {!openGroupCall && !acceptedGroupCall && (
             <Router>
               <Switch>
-                <PrivateRoute exact path="/">
-                  <ChatBar socket={socket} />
-                </PrivateRoute>
                 <Route path="/login">
                   <Login />
                 </Route>
+                <PrivateRoute exact path="/">
+                  <ChatBar socket={socket} />
+                </PrivateRoute>
+                <PrivateRoute path="/update-account">
+                  <UpdateAccount />
+                </PrivateRoute>
                 <PrivateRoute path="/chat/:id">
                   <Chat
                     socket={socket}

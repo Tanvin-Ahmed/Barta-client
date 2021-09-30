@@ -14,6 +14,7 @@ import {
   RECEIVING_CALL,
   SET_INTERVAL,
   SET_RECEIVER,
+  SET_USER_STATUS_TO_RECEIVE_OTHER_CALL,
   START_TIMER,
   USER_ID,
   VIDEO_CHAT,
@@ -159,4 +160,11 @@ export const setCallInfoInDatabase = (callInfo) => {
     .post("http://localhost:5000/chatMessage/postCallInfo", callInfo)
     .then((res) => res)
     .catch((err) => err.message);
+};
+
+export const setUserStatusToReceiveOtherCall = (status) => {
+  return {
+    type: SET_USER_STATUS_TO_RECEIVE_OTHER_CALL,
+    payload: status,
+  };
 };

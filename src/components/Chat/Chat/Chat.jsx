@@ -76,6 +76,7 @@ const Chat = ({
   }, [dispatch, id]);
 
   const {
+    userInfo,
     senderInfo,
     receiverInfo,
     groupInfo,
@@ -97,8 +98,10 @@ const Chat = ({
     receivingCall,
     timer,
     videoChat,
+    userStatusToReceiveOtherCall,
     showCallButtons,
   } = useSelector((state) => ({
+    userInfo: state.userReducer.userInfo,
     // private chat
     senderInfo: state.userReducer.userInfo,
     receiverInfo: state.userReducer.receiverInfo,
@@ -115,7 +118,7 @@ const Chat = ({
     reFetchMessage: state.messageReducer.reFetchMessage,
     getMessageSpinner: state.messageReducer.getMessageSpinner,
 
-    // private video call
+    // private call
     openPrivateCall: state.privateCall.openPrivateCall,
     myId: state.privateCall.myId,
     idToCall: state.privateCall.idToCall,
@@ -123,6 +126,8 @@ const Chat = ({
     receivingCall: state.privateCall.receivingCall,
     timer: state.privateCall.timer,
     videoChat: state.privateCall.videoChat,
+    userStatusToReceiveOtherCall:
+      state.privateCall.userStatusToReceiveOtherCall,
 
     // group call
     showCallButtons: state.groupCallReducer.showCallButtons,
@@ -137,12 +142,12 @@ const Chat = ({
         dispatch(setRoomId(ID));
         return ID;
       } else {
-        const ID = getRoomId();
+        const ID = getRoomId(userInfo?.email);
         dispatch(setRoomId(ID));
         return ID;
       }
     }
-  }, [dispatch, id]);
+  }, [dispatch, id, userInfo]);
 
   //////////////// GET MESSAGE FROM DATABASE //////////////
   useEffect(() => {
@@ -284,65 +289,61 @@ const Chat = ({
   useEffect(() => {
     socket.on("callUser", (data) => {
       if (data.userToCall === senderInfo.email) {
-        callReached(data, dispatch, socket, history);
+        callReached(
+          data,
+          dispatch,
+          socket,
+          history,
+          userStatusToReceiveOtherCall
+        );
       }
     });
 
     return () => socket.off("callUser");
-  }, [dispatch, socket, receiverInfo, senderInfo, history]);
+  }, [
+    dispatch,
+    socket,
+    receiverInfo,
+    senderInfo,
+    history,
+    userStatusToReceiveOtherCall,
+  ]);
 
   ////////// MAKE CALL ///////////////
-  const connectionRef = useRef();
-  const userStream = useRef();
+  const connectionRef = useRef(null);
+  const userStream = useRef(null);
 
   const callUser = (video) => {
     dispatch(isVideoChat(video));
     if (JSON.parse(sessionStorage.getItem("barta/groupName"))?.groupName) {
       dispatch(setGroupCallIsOpen(true));
-      navigator.mediaDevices
-        .getUserMedia({
-          video: video ? { facingMode: "user" } : video,
-          audio: true,
-        })
-        .then((stream) => {
-          makeGroupCall(
-            dispatch,
-            socket,
-            stream,
-            myStream,
-            roomId,
-            senderInfo,
-            groupInfo,
-            groupPeersRef,
-            video
-          );
-        })
-        .catch((err) => alert(err.message));
+      makeGroupCall(
+        dispatch,
+        socket,
+        video,
+        myStream,
+        roomId,
+        senderInfo,
+        groupInfo,
+        groupPeersRef,
+        video
+      );
     } else {
       dispatch(setPrivateCallIsOpen(true));
-      navigator.mediaDevices
-        .getUserMedia({
-          video: video ? { facingMode: "user" } : video,
-          audio: true,
-        })
-        .then((stream) => {
-          makeCall(
-            dispatch,
-            stream,
-            socket,
-            Peer,
-            myStream,
-            userStream,
-            connectionRef,
-            idToCall,
-            myId,
-            myName,
-            senderInfo,
-            video,
-            timer
-          );
-        })
-        .catch((error) => alert(error.message));
+      makeCall(
+        dispatch,
+        socket,
+        Peer,
+        myStream,
+        userStream,
+        connectionRef,
+        idToCall,
+        myId,
+        myName,
+        senderInfo,
+        video,
+        timer
+      );
     }
   };
 

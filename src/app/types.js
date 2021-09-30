@@ -1,7 +1,12 @@
+// login
+export const SET_LOGIN_SPINNER = "set_login_spinner";
+export const SET_VERIFY_JWT_TOKEN_SPINNER = "set_verify_jwt_token_spinner";
+
 // user
 export const SET_SPINNER_FOR_CHAT_LIST = "set_spinner_for_chat_list";
 export const GET_FRIEND_INFO = "get_friend_info";
 export const POST_USER_INFO = "post_user_info";
+export const REMOVE_USER_INFO = "remove_user_info";
 export const ERROR_USER_INFO = "error_user_info";
 export const GET_ALL_USER_INFO = "get_all_user_info";
 export const LOADING_USER_INFO = "loading_user_info";
@@ -11,6 +16,7 @@ export const GET_USER_INFO = "get_user_info";
 export const GET_RECEIVER_INFO = "get_receiver_info";
 export const UPDATE_FRIEND_STATUS = "update_friend_status";
 export const UPDATE_CHAT_STATUS = "update_chat_status";
+export const SET_FIND_FRIEND_ERROR = "set_find_friend_error";
 // message
 export const GET_MESSAGES_FROM_DB = "get_message_from_db";
 export const GET_OLD_MESSAGES_FROM_DB = "get_old_message_from_db";
@@ -64,6 +70,8 @@ export const CALL_TIMER = "call_timer";
 export const START_TIMER = "start_timer";
 export const SET_INTERVAL = "set_interval";
 export const SET_RECEIVER = "set_receiver";
+export const SET_USER_STATUS_TO_RECEIVE_OTHER_CALL =
+  "set_user_status_to_receive_other_call";
 
 // group call
 export const SET_PEERS_FOR_GROUP_CALL = "set_peers_for_group_call";
@@ -71,6 +79,7 @@ export const ACCEPTOR_SET_PEERS_FOR_GROUP_CALL =
   "acceptor_set_peers_for_group_call";
 export const SET_CALLER_NAME = "set_caller_name";
 export const SET_SHOW_BUTTON = "set_show_button";
+export const SET_ACCEPTED_GROUP_CALL = "set_accepted_group_call";
 
 // group making tab
 export const GO_TO_GROUP_LIST = "go_to_group_list";

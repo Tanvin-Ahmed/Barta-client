@@ -1,6 +1,7 @@
 import {
   ACCEPTOR_SET_PEERS_FOR_GROUP_CALL,
   OPEN_GROUP_CALL,
+  SET_ACCEPTED_GROUP_CALL,
   SET_CALLER_NAME,
   SET_PEERS_FOR_GROUP_CALL,
   SET_SHOW_BUTTON,
@@ -39,6 +40,13 @@ export const setCallerName = (name) => {
 export const setShowCallButtons = (bool) => {
   return {
     type: SET_SHOW_BUTTON,
+    payload: bool,
+  };
+};
+
+export const setAcceptedGroupCall = (bool) => {
+  return {
+    type: SET_ACCEPTED_GROUP_CALL,
     payload: bool,
   };
 };

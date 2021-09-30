@@ -33,10 +33,8 @@ export const getGroupInfo = (dispatch, groupName) => {
   dispatch(getGroupIdForChatBar(groupName, ""));
 };
 
-export const getRoomId = () => {
-  const sender = JSON.parse(localStorage.getItem("barta/user"))?.email?.split(
-    "@"
-  );
+export const getRoomId = (email) => {
+  const sender = email?.split("@");
   const receiver = JSON.parse(
     sessionStorage.getItem("barta/receiver")
   )?.email?.split("@");

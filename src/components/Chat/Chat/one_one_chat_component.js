@@ -37,6 +37,7 @@ import CallReceivedIcon from "@material-ui/icons/CallReceived";
 import CallMissedOutgoingIcon from "@material-ui/icons/CallMissedOutgoing";
 import CallMissedIcon from "@material-ui/icons/CallMissed";
 import Timer from "../PrivateCallSystem/Timer.jsx";
+import path from "path";
 
 const CallButtons = ({ callUser }) => {
   return (
@@ -400,7 +401,7 @@ export const ChatBody = ({
                             return (
                               <div
                                 key={index}
-                                className={`d-flex justify-content-between align-items-center show__document ${
+                                className={`d-flex align-items-center show__document ${
                                   message?.sender === senderInfo.email &&
                                   "show_user_document"
                                 }`}
@@ -409,12 +410,16 @@ export const ChatBody = ({
                                   variant="contained"
                                   size="small"
                                   onClick={() => download(file.filename)}
-                                  className="icon download__icon text-light"
+                                  className="icon download__icon text-light mr-3"
                                 >
                                   <ArrowDownwardIcon />
                                 </IconButton>
                                 <div className="document__title">
-                                  {file.filename}
+                                  {file.filename
+                                    ?.split("_")
+                                    ?.join(" ")
+                                    ?.split("◉ ◉")[0] +
+                                    path.extname(file.filename)}
                                 </div>
                               </div>
                             );

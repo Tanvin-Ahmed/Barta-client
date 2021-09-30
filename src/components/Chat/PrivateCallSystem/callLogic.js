@@ -15,10 +15,14 @@ import {
   getUserName,
   getCallerSignal,
   isVideoChat,
+  setUserStatusToReceiveOtherCall,
 } from "../../../app/actions/privateCallAction";
 import { end, start } from "./timer.js";
 import Peer from "simple-peer";
-import { setPeersForGroupCall } from "../../../app/actions/groupCallAction";
+import {
+  setAcceptedGroupCall,
+  setPeersForGroupCall,
+} from "../../../app/actions/groupCallAction";
 
 // stop both mic and camera
 export const stopBothVideoAndAudio = (stream) => {
@@ -44,7 +48,6 @@ export const handleAudioMute = (stream, voiceOpen, dispatch) => {
 
 export const makeCall = (
   dispatch,
-  stream,
   socket,
   Peer,
   myStream,
@@ -57,41 +60,54 @@ export const makeCall = (
   video,
   timer
 ) => {
-  dispatch(getStream(stream));
-  myStream.current.srcObject = stream;
+  dispatch(
+    setUserStatusToReceiveOtherCall({
+      status: "busy",
+      idToCall,
+    })
+  );
+  navigator.mediaDevices
+    .getUserMedia({
+      video: video ? { facingMode: "user" } : video,
+      audio: true,
+    })
+    .then((stream) => {
+      dispatch(getStream(stream));
+      myStream.current.srcObject = stream;
 
-  const peer = new Peer({
-    initiator: true,
-    trickle: false,
-    stream,
-  });
+      const peer = new Peer({
+        initiator: true,
+        trickle: false,
+        stream,
+      });
 
-  peer.on("signal", (signal) => {
-    socket.emit("callUser", {
-      userToCall: idToCall,
-      signal: signal,
-      from: myId,
-      name: myName,
-      callerDataBaseId: senderInfo._id,
-      callType: video ? "video" : "audio",
-    });
-  });
+      peer.on("signal", (signal) => {
+        socket.emit("callUser", {
+          userToCall: idToCall,
+          signal: signal,
+          from: myId,
+          name: myName,
+          callerDataBaseId: senderInfo._id,
+          callType: video ? "video" : "audio",
+        });
+      });
 
-  socket.on("callAccepted", (data) => {
-    if (data.to === senderInfo.email) {
-      dispatch(isCallAccepted(true));
-      dispatch(setStartTimer(true));
-      start(timer, dispatch);
-      dispatch(isReceivingCall(false));
-      peer.signal(data.signal);
-    }
-  });
+      socket.on("callAccepted", (data) => {
+        if (data.to === senderInfo.email) {
+          dispatch(isCallAccepted(true));
+          dispatch(setStartTimer(true));
+          start(timer, dispatch);
+          dispatch(isReceivingCall(false));
+          peer.signal(data.signal);
+        }
+      });
+      peer.on("stream", (stream) => {
+        userStream.current.srcObject = stream;
+      });
 
-  peer.on("stream", (stream) => {
-    userStream.current.srcObject = stream;
-  });
-
-  connectionRef.current = peer;
+      connectionRef.current = peer;
+    })
+    .catch((error) => alert(error.message));
 };
 
 export const cutCallByOtherUser = (
@@ -154,7 +170,33 @@ export const callNotReceive = (
   });
 };
 
-export const callReached = (data, dispatch, socket, history) => {
+export const callReached = (
+  data,
+  dispatch,
+  socket,
+  history,
+  userStatusToReceiveOtherCall
+) => {
+  if (
+    userStatusToReceiveOtherCall?.idToCall &&
+    userStatusToReceiveOtherCall?.idToCall === data.from
+  ) {
+    // cut automatic the call of call maker
+    return socket.emit("receiver call you 1st", data.from);
+  }
+  if (
+    userStatusToReceiveOtherCall?.callerId &&
+    userStatusToReceiveOtherCall.status === "busy" &&
+    userStatusToReceiveOtherCall.callerId !== data.form
+  ) {
+    return socket.emit("user status to receive this call", {
+      returnTo: data.form,
+      status: "User is busy....",
+    });
+  }
+  dispatch(
+    setUserStatusToReceiveOtherCall({ status: "busy", callerId: data.form })
+  );
   sessionStorage.setItem(
     "barta/receiver",
     JSON.stringify({ email: data.from })
@@ -225,7 +267,7 @@ export const addPeer = (
 export const makeGroupCall = (
   dispatch,
   socket,
-  stream,
+  video,
   myStream,
   roomId,
   senderInfo,
@@ -233,57 +275,65 @@ export const makeGroupCall = (
   groupPeersRef,
   videoChat
 ) => {
-  myStream.current.srcObject = stream;
-  dispatch(getStream(stream));
-  const members = groupInfo.members.filter(
-    (member) => member !== senderInfo?.email
-  );
-  socket.emit("members to call", {
-    members: members,
-    callerID: senderInfo?.email,
-    callerName: senderInfo?.displayName,
-    roomID: roomId,
-    callType: videoChat ? "Video Call" : "Audio Call",
-  });
+  navigator.mediaDevices
+    .getUserMedia({
+      video: video ? { facingMode: "user" } : video,
+      audio: true,
+    })
+    .then((stream) => {
+      myStream.current.srcObject = stream;
+      dispatch(getStream(stream));
+      const members = groupInfo.members.filter(
+        (member) => member !== senderInfo?.email
+      );
+      socket.emit("members to call", {
+        members: members,
+        callerID: senderInfo?.email,
+        callerName: senderInfo?.displayName,
+        roomID: roomId,
+        callType: videoChat ? "Video Call" : "Audio Call",
+      });
 
-  socket.emit("join room", {
-    roomID: roomId,
-    userID: senderInfo?.email,
-    userName: senderInfo?.displayName,
-  });
+      socket.emit("join room", {
+        roomID: roomId,
+        userID: senderInfo?.email,
+        userName: senderInfo?.displayName,
+      });
 
-  socket.on("user joined", (payload) => {
-    // console.log("user joined", payload, senderInfo?.email);
-    if (roomId === payload.roomID) {
-      if (payload.userToSignal === senderInfo?.email) {
-        // console.log("user joined", payload);
-        dispatch(isCallAccepted(true));
-        const peer = addPeer(
-          payload.signal,
-          payload.callerID,
-          stream,
-          socket,
-          payload.roomID,
-          senderInfo?.email
-        );
-        groupPeersRef.current.push({
-          peerID: payload.callerID,
-          peerName: payload.callerName,
-          peer,
-        });
-        dispatch(
-          setPeersForGroupCall(
-            {
+      socket.on("user joined", (payload) => {
+        // console.log("user joined", payload, senderInfo?.email);
+        if (roomId === payload.roomID) {
+          if (payload.userToSignal === senderInfo?.email) {
+            // console.log("user joined", payload);
+            dispatch(isCallAccepted(true));
+            const peer = addPeer(
+              payload.signal,
+              payload.callerID,
+              stream,
+              socket,
+              payload.roomID,
+              senderInfo?.email
+            );
+            groupPeersRef.current.push({
               peerID: payload.callerID,
               peerName: payload.callerName,
               peer,
-            },
-            "receive-signal"
-          )
-        );
-      }
-    }
-  });
+            });
+            dispatch(
+              setPeersForGroupCall(
+                {
+                  peerID: payload.callerID,
+                  peerName: payload.callerName,
+                  peer,
+                },
+                "receive-signal"
+              )
+            );
+          }
+        }
+      });
+    })
+    .catch((err) => alert(err.message));
 };
 
 export const acceptGroupCall = (
@@ -295,7 +345,7 @@ export const acceptGroupCall = (
   myStream,
   videoChat
 ) => {
-  dispatch(isCallAccepted(true));
+  dispatch(setAcceptedGroupCall(true));
   navigator.mediaDevices
     .getUserMedia({
       video: videoChat ? { facingMode: "user" } : false,

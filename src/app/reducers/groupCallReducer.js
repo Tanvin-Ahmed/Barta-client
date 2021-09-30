@@ -1,6 +1,7 @@
 import {
   ACCEPTOR_SET_PEERS_FOR_GROUP_CALL,
   OPEN_GROUP_CALL,
+  SET_ACCEPTED_GROUP_CALL,
   SET_CALLER_NAME,
   SET_PEERS_FOR_GROUP_CALL,
   SET_SHOW_BUTTON,
@@ -11,6 +12,7 @@ const initialState = {
   peersForGroupCall: [],
   callerName: "",
   showCallButtons: true,
+  acceptedGroupCall: false,
 };
 
 const groupCallReducer = (state = initialState, action) => {
@@ -39,6 +41,11 @@ const groupCallReducer = (state = initialState, action) => {
       return {
         ...state,
         showCallButtons: action.payload,
+      };
+    case SET_ACCEPTED_GROUP_CALL:
+      return {
+        ...state,
+        acceptedGroupCall: action.payload,
       };
     default:
       return state;

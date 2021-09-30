@@ -1,14 +1,12 @@
 import React, { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  getStream,
-  isCallAccepted,
-} from "../../../app/actions/privateCallAction";
+import { getStream } from "../../../app/actions/privateCallAction";
 import { acceptGroupCall } from "../PrivateCallSystem/callLogic";
 import { Buttons } from "../PrivateCallSystem/Component";
 import "./GroupCall.css";
 import { stopBothVideoAndAudio } from "../PrivateCallSystem/callLogic";
 import {
+  setAcceptedGroupCall,
   setCallerName,
   setGroupCallIsOpen,
   setPeersForGroupCall,
@@ -71,7 +69,7 @@ const GroupCall = ({
     peersForGroupCall,
     videoOpen,
     voiceOpen,
-    callAccepted,
+    acceptedGroupCall,
   } = useSelector((state) => ({
     stream: state.privateCall.stream,
     videoChat: state.privateCall.videoChat,
@@ -79,7 +77,7 @@ const GroupCall = ({
     peersForGroupCall: state.groupCallReducer.peersForGroupCall,
     videoOpen: state.privateCall.videoOpen,
     voiceOpen: state.privateCall.voiceOpen,
-    callAccepted: state.privateCall.callAccepted,
+    acceptedGroupCall: state.groupCallReducer.acceptedGroupCall,
   }));
 
   /////// ACCEPT CALL ///////
@@ -113,7 +111,7 @@ const GroupCall = ({
     stopBothVideoAndAudio(stream);
     myStream.current.srcObject = null;
     dispatch(getStream(null));
-    dispatch(isCallAccepted(false));
+    dispatch(setAcceptedGroupCall(false));
     groupPeersRef.current.forEach((peerObj) => {
       peerObj?.peer?.destroy();
     });
@@ -177,7 +175,7 @@ const GroupCall = ({
           videoOpen={videoOpen}
           voiceOpen={voiceOpen}
           receivingCall={receivingGroupCall}
-          callAccepted={callAccepted}
+          callAccepted={acceptedGroupCall}
           stream={stream}
           dispatch={dispatch}
           answerCall={acceptCall}

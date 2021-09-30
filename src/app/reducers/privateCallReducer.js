@@ -13,6 +13,7 @@ import {
   RECEIVING_CALL,
   SET_INTERVAL,
   SET_RECEIVER,
+  SET_USER_STATUS_TO_RECEIVE_OTHER_CALL,
   START_TIMER,
   USER_ID,
   VIDEO_CHAT,
@@ -40,6 +41,7 @@ const initialState = {
   startTimer: false,
   interVal: null,
   receiver: false,
+  userStatusToReceiveOtherCall: {},
 };
 
 const privateCall = (state = initialState, action) => {
@@ -138,6 +140,11 @@ const privateCall = (state = initialState, action) => {
       return {
         ...state,
         receiver: action.payload,
+      };
+    case SET_USER_STATUS_TO_RECEIVE_OTHER_CALL:
+      return {
+        ...state,
+        userStatusToReceiveOtherCall: action.payload,
       };
     default:
       return state;
