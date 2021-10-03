@@ -19,7 +19,26 @@ const App = () => {
   const [socket, setSocket] = useState(null);
 
   useEffect(() => {
-    dispatch(getUserInfo());
+    const getData = () => {
+      if (navigator.onLine) {
+        dispatch(getUserInfo());
+      }
+    };
+    const conditionOfNetwork = () => {
+      getData();
+    };
+    const webpageLoad = () => {
+      window.addEventListener("online", conditionOfNetwork);
+      window.addEventListener("offline", conditionOfNetwork);
+    };
+    window.addEventListener("load", webpageLoad);
+    getData();
+
+    return () => {
+      window.removeEventListener("load", webpageLoad);
+      window.removeEventListener("online", conditionOfNetwork);
+      window.removeEventListener("offline", conditionOfNetwork);
+    };
   }, [dispatch]);
 
   useEffect(() => {

@@ -61,6 +61,20 @@
   right: 0;
 }
 
+.login__container .css-1kty9di-MuiFormLabel-root-MuiInputLabel-root {
+  color: #fff !important;
+  z-index: 1 !important;
+}
+.login__container .css-o9k5xi-MuiInputBase-root-MuiOutlinedInput-root {
+  color: #fff !important;
+}
+.login__container .css-1o2jng6-MuiOutlinedInput-notchedOutline {
+  border-color: rgb(177, 183, 216) !important;
+}
+.login__container .css-i4bv87-MuiSvgIcon-root {
+  color: #fff !important;
+}
+
 .login__container .submit__button {
   background-color: var(--submit-button-background);
   color: rgb(231, 231, 231);

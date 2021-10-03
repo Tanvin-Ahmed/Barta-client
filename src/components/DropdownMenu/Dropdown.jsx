@@ -11,7 +11,7 @@ import PersonAdd from "@mui/icons-material/PersonAdd";
 import Settings from "@mui/icons-material/Settings";
 import Logout from "@mui/icons-material/Logout";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { removeUserInfo } from "../../app/actions/userAction";
 import { useHistory } from "react-router";
 
@@ -31,6 +31,10 @@ const Dropdown = () => {
     localStorage.removeItem("accessToken");
     dispatch(removeUserInfo());
   };
+
+  const { userInfo } = useSelector((state) => ({
+    userInfo: state.userReducer.userInfo,
+  }));
 
   return (
     <>
@@ -76,12 +80,17 @@ const Dropdown = () => {
         anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
       >
         <MenuItem>
-          <Avatar /> Profile
+          <Avatar
+            src={`http://localhost:5000/user/account/get-profile-img/${userInfo?.photoId}`}
+          />{" "}
+          Profile
         </MenuItem>
         <MenuItem onClick={() => history.push("/update-account")}>
           <Avatar /> Update profile
         </MenuItem>
-        <Divider />
+        <Divider
+          src={`http://localhost:5000/user/account/get-profile-img/${userInfo?.photoId}`}
+        />
         <MenuItem>
           <ListItemIcon>
             <PersonAdd fontSize="small" />

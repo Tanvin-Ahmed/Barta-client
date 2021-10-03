@@ -33,11 +33,27 @@ import {
 } from "../types";
 import jwt_decode from "jwt-decode";
 
+const getUserInfoFromDB = (id) => {
+  return (dispatch) => {
+    axios(`http://localhost:5000/user/account/userInfo/${id}`)
+      .then(({ data }) => {
+        dispatch({
+          type: GET_USER_INFO,
+          payload: data,
+        });
+      })
+      .catch((err) => {
+        alert(err.response.data);
+      });
+  };
+};
+
 export const getUserInfo = () => {
   return (dispatch) => {
     const token = JSON.parse(localStorage.getItem("accessToken"));
     if (!token) return;
     const { _id, displayName, email, status, exp } = jwt_decode(token);
+    dispatch(getUserInfoFromDB(_id));
 
     if (exp * 1000 < new Date().getTime()) {
       dispatch({
@@ -108,10 +124,10 @@ export const getFriendInfo = (userEmail) => {
         });
       })
       .catch((error) => {
-        if (error.response.status === 400) {
+        if (error.response?.status === 400) {
           dispatch({
             type: SET_FIND_FRIEND_ERROR,
-            payload: error.response.data,
+            payload: error.response?.data,
           });
         }
         dispatch({
@@ -244,12 +260,10 @@ export const sendSignInRequest = (user, history, from) => {
           type: SET_LOGIN_SPINNER,
           payload: false,
         });
-        localStorage.setItem("accessToken", JSON.stringify(data));
-        const { _id, displayName, email, status } = jwt_decode(data);
-        const userData = { _id, displayName, email, status };
+        localStorage.setItem("accessToken", JSON.stringify(data.token));
         dispatch({
           type: GET_USER_INFO,
-          payload: userData,
+          payload: data.accountInfo,
         });
         history.replace(from);
       })
@@ -276,12 +290,10 @@ export const sendLoginRequest = (user, history, from) => {
           type: SET_LOGIN_SPINNER,
           payload: false,
         });
-        localStorage.setItem("accessToken", JSON.stringify(data));
-        const { _id, displayName, email, status } = jwt_decode(data);
-        const userData = { _id, displayName, email, status };
+        localStorage.setItem("accessToken", JSON.stringify(data.token));
         dispatch({
           type: GET_USER_INFO,
-          payload: userData,
+          payload: data.accountInfo,
         });
         history.replace(from);
       })
@@ -292,6 +304,41 @@ export const sendLoginRequest = (user, history, from) => {
         });
         alert("Login Failed");
       });
+  };
+};
+
+export const profileUpdate = (pic, info) => {
+  return (dispatch) => {
+    if (!pic && !info) return;
+    // for (var pair of data.entries()) {
+    //   console.log(pair[0] + ", " + pair[1]);
+    // }
+    if (pic) {
+      axios
+        .put("http://localhost:5000/user/account/update-profile-pic", pic)
+        .then(() => {
+          dispatch(getUserInfoFromDB(info._id));
+        })
+        .catch((err) => {
+          if (err.response?.status === 404) {
+            alert(err.response?.data);
+          }
+          console.log(err.response);
+        });
+    }
+
+    info &&
+      axios
+        .put("http://localhost:5000/user/account/update-profile-info", info)
+        .then(() => {
+          dispatch(getUserInfoFromDB(info._id));
+        })
+        .catch((err) => {
+          if (err.response?.status === 404) {
+            alert(err.response?.data);
+          }
+          console.log(err.response);
+        });
   };
 };
 

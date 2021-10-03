@@ -173,6 +173,7 @@ const ChatBar = ({ socket }) => {
     <section className="chat__bar">
       <ChatBarHeader
         userPhotoURL={userInfo?.photoURL}
+        photoId={userInfo?.photoId}
         dispatch={dispatch}
         chatList={chatList}
         openGroupList={openGroupList}

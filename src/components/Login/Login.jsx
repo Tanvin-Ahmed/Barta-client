@@ -12,10 +12,15 @@ import { useForm } from "react-hook-form";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import CircularProgress from "@mui/material/CircularProgress";
+import LocalizationProvider from "@material-ui/lab/LocalizationProvider";
+import DesktopDatePicker from "@material-ui/lab/DesktopDatePicker";
+import { TextField } from "@material-ui/core";
+import AdapterDateFns from "@material-ui/lab/AdapterDateFns";
 
 const Login = () => {
   const [passwordShow, setPasswordShow] = useState("password");
   const [login, setLogin] = useState(true);
+  const [birthday, setBirthday] = useState(null);
   initializationLoginFramework();
 
   const dispatch = useDispatch();
@@ -87,14 +92,17 @@ const Login = () => {
     } else {
       if (data.name.trim() && data.password.trim() && data.confirm.trim()) {
         if (data.password === data.confirm) {
-          // data send to the server
-          userInfo = {
-            displayName: data.name,
-            email: data.email,
-            password: data.password,
-            confirm: data.confirm,
-          };
-          dispatch(sendSignInRequest(userInfo, history, from));
+          if (birthday) {
+            // data send to the server
+            userInfo = {
+              displayName: data.name,
+              email: data.email,
+              password: data.password,
+              confirm: data.confirm,
+              birthday: new Date(birthday).toUTCString(),
+            };
+            dispatch(sendSignInRequest(userInfo, history, from));
+          } else alert("Birthday required");
         } else alert("Password not match!");
       } else alert("Please fill up the form properly.");
     }
@@ -164,21 +172,18 @@ const Login = () => {
             </>
           )}
 
-          {/* <input
-            className="my-2 login__input"
-            type="file"
-            accept="image/*"
-            id="image"
-            {...register("img", { required: true })}
-          />
-          <label className="image__icon" htmlFor="image">
-            <InsertPhotoIcon size="small" className="text-light" />
-          </label>
-          {errors.img && <span>Image is required</span>} */}
-
-          {loginSpinner && (
-            <div className="mt-3 mb-2 d-flex justify-content-center align-items-center">
-              <CircularProgress size="small" />
+          {!login && (
+            <div className="d-flex justify-content-center align-items-center my-2">
+              <LocalizationProvider dateAdapter={AdapterDateFns}>
+                <DesktopDatePicker
+                  style={{ color: "white" }}
+                  label="Birth Day"
+                  inputFormat="MM/dd/yyyy"
+                  value={new Date().toUTCString()}
+                  onChange={(value) => setBirthday(value)}
+                  renderInput={(params) => <TextField {...params} />}
+                />
+              </LocalizationProvider>
             </div>
           )}
 
@@ -188,7 +193,11 @@ const Login = () => {
             </button>
           </div>
         </form>
-        <div className="loading"></div>
+        {loginSpinner && (
+          <div className="mt-3 mb-2 d-flex justify-content-center align-items-center">
+            <CircularProgress size="small" />
+          </div>
+        )}
         <div className="signIn_btn">
           {login ? (
             <>

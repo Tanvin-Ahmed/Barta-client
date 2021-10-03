@@ -32,6 +32,7 @@ import { useState } from "react";
 
 export const ChatBarHeader = ({
   userPhotoURL,
+  photoId,
   dispatch,
   chatList,
   openGroupList,
@@ -41,7 +42,12 @@ export const ChatBarHeader = ({
       <div className="d-flex align-items-center justify-content-between flex-wrap">
         <div className="avatar">
           <IconButton style={{ position: "relative" }}>
-            <Avatar src={userPhotoURL} />
+            <Avatar
+              src={
+                `http://localhost:5000/user/account/get-profile-img/${photoId}` ||
+                userPhotoURL
+              }
+            />
             <div className="onLine" />
           </IconButton>
         </div>
