@@ -43,7 +43,40 @@ const getUserInfoFromDB = (id) => {
         });
       })
       .catch((err) => {
-        alert(err.response.data);
+        alert(err?.response?.data);
+      });
+  };
+};
+
+const getJWTFromServer = (_id, displayName, email, status) => {
+  return (dispatch) => {
+    axios
+      .post("http://localhost:5000/jwt/get-new-jwt", {
+        _id,
+        displayName,
+        email,
+        status,
+      })
+      .then(({ data }) => {
+        localStorage.setItem("accessToken", JSON.stringify(data));
+        const { _id, displayName, email, status } = jwt_decode(data);
+        const tokenData = { _id, displayName, email, status };
+        dispatch({
+          type: GET_USER_INFO,
+          payload: tokenData,
+        });
+        dispatch({
+          type: SET_VERIFY_JWT_TOKEN_SPINNER,
+          payload: false,
+        });
+      })
+      .catch((err) => {
+        console.log(err.response);
+        dispatch({
+          type: SET_VERIFY_JWT_TOKEN_SPINNER,
+          payload: false,
+        });
+        alert("Authentication failed");
       });
   };
 };
@@ -61,34 +94,7 @@ export const getUserInfo = () => {
         payload: true,
       });
       localStorage.removeItem("accessToken");
-      axios
-        .post("http://localhost:5000/jwt/get-new-jwt", {
-          _id,
-          displayName,
-          email,
-          status,
-        })
-        .then(({ data }) => {
-          localStorage.setItem("accessToken", JSON.stringify(data));
-          const { _id, displayName, email, status } = jwt_decode(data);
-          const tokenData = { _id, displayName, email, status };
-          dispatch({
-            type: GET_USER_INFO,
-            payload: tokenData,
-          });
-          dispatch({
-            type: SET_VERIFY_JWT_TOKEN_SPINNER,
-            payload: false,
-          });
-        })
-        .catch((err) => {
-          console.log(err.response);
-          dispatch({
-            type: SET_VERIFY_JWT_TOKEN_SPINNER,
-            payload: false,
-          });
-          alert("Authentication failed");
-        });
+      dispatch(getJWTFromServer(_id, displayName, email, status));
     } else {
       const userData = { _id, displayName, email, status };
       dispatch({

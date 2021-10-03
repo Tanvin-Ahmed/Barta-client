@@ -13,6 +13,7 @@ import GroupCall from "../Chat/GroupCall/GroupCall";
 import NotificationModalForGroupCall from "../Chat/GroupCall/NotificationModalForGroupCall/NotificationModalForGroupCall";
 import { setCallerName } from "../../app/actions/groupCallAction";
 import UpdateAccount from "../UpdateAccount/UpdateAccount";
+import Profile from "../Profile/Profile";
 
 const Home = ({ socket }) => {
   const myStream = useRef(null);
@@ -114,6 +115,9 @@ const Home = ({ socket }) => {
                 </Route>
                 <PrivateRoute exact path="/">
                   <ChatBar socket={socket} />
+                </PrivateRoute>
+                <PrivateRoute path="/view-profile">
+                  <Profile />
                 </PrivateRoute>
                 <PrivateRoute path="/update-account">
                   <UpdateAccount />

@@ -19,6 +19,11 @@ const Dropdown = () => {
   const history = useHistory();
   const dispatch = useDispatch();
   const [anchorEl, setAnchorEl] = useState(null);
+
+  const { userInfo } = useSelector((state) => ({
+    userInfo: state.userReducer.userInfo,
+  }));
+
   const open = Boolean(anchorEl);
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -31,10 +36,6 @@ const Dropdown = () => {
     localStorage.removeItem("accessToken");
     dispatch(removeUserInfo());
   };
-
-  const { userInfo } = useSelector((state) => ({
-    userInfo: state.userReducer.userInfo,
-  }));
 
   return (
     <>
@@ -79,7 +80,7 @@ const Dropdown = () => {
         transformOrigin={{ horizontal: "right", vertical: "top" }}
         anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
       >
-        <MenuItem>
+        <MenuItem onClick={() => history.push("/view-profile")}>
           <Avatar
             src={`http://localhost:5000/user/account/get-profile-img/${userInfo?.photoId}`}
           />{" "}
