@@ -84,7 +84,7 @@ const Dropdown = () => {
       >
         <MenuItem onClick={() => history.push("/view-profile/userInfo")}>
           <Avatar
-            src={`http://localhost:5000/user/account/get-profile-img/${userInfo?.photoId}`}
+            src={`https://barta-the-real-time-chat-app.herokuapp.com/user/account/get-profile-img/${userInfo?.photoId}`}
           />{" "}
           Profile
         </MenuItem>
@@ -92,7 +92,7 @@ const Dropdown = () => {
           <Avatar /> Update profile
         </MenuItem>
         <Divider
-          src={`http://localhost:5000/user/account/get-profile-img/${userInfo?.photoId}`}
+          src={`https://barta-the-real-time-chat-app.herokuapp.com/user/account/get-profile-img/${userInfo?.photoId}`}
         />
         <MenuItem>
           <ListItemIcon>

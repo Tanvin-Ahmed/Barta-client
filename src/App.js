@@ -43,7 +43,7 @@ const App = () => {
 
   // socket
   useEffect(() => {
-    const s = io("http://localhost:5000/");
+    const s = io("https://barta-the-real-time-chat-app.herokuapp.com/");
     setSocket(s);
 
     return () => s.close();

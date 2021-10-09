@@ -42,9 +42,12 @@ let accessToken = "";
 
 const getUserInfoFromDB = (id, token) => {
   return (dispatch) => {
-    axios(`http://localhost:5000/user/account/userInfo/${id}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
+    axios(
+      `https://barta-the-real-time-chat-app.herokuapp.com/user/account/userInfo/${id}`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    )
       .then(({ data }) => {
         dispatch({
           type: GET_USER_INFO,
@@ -63,7 +66,7 @@ export const getJWTFromServer = (token) => {
     localStorage.removeItem("accessToken");
     axios
       .post(
-        "http://localhost:5000/jwt/get-new-jwt",
+        "https://barta-the-real-time-chat-app.herokuapp.com/jwt/get-new-jwt",
         {
           _id,
           displayName,
@@ -143,9 +146,12 @@ export const getFriendInfo = (userEmail) => {
       type: SET_SPINNER_FOR_CHAT_LIST,
       payload: true,
     });
-    axios(`http://localhost:5000/user/account/${userEmail}`, {
-      headers: { Authorization: `Bearer ${accessToken}` },
-    })
+    axios(
+      `https://barta-the-real-time-chat-app.herokuapp.com/user/account/${userEmail}`,
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      }
+    )
       .then((data) => {
         dispatch({
           type: SET_SPINNER_FOR_CHAT_LIST,
@@ -191,7 +197,7 @@ export const updateFriendStatus = (friendList) => {
 export const getFriendInfoFromSocket = (friendEmail) => {
   return (dispatch) => {
     axios(
-      `http://localhost:5000/user/account/getFriendDetailsByEmail/${friendEmail}`,
+      `https://barta-the-real-time-chat-app.herokuapp.com/user/account/getFriendDetailsByEmail/${friendEmail}`,
       {
         headers: { Authorization: `Bearer ${accessToken}` },
       }
@@ -225,7 +231,7 @@ export const postFriendInfo = (roomId, friendData) => {
 
           axios
             .put(
-              `http://localhost:5000/user/account/updateChatList/${email}`,
+              `https://barta-the-real-time-chat-app.herokuapp.com/user/account/updateChatList/${email}`,
               friendInfo,
               {
                 headers: { Authorization: `Bearer ${accessToken}` },
@@ -256,9 +262,12 @@ export const getAllUserInfo = (searchString) => {
         type: LOADING_USER_INFO,
         payload: true,
       });
-      axios(`http://localhost:5000/user/account/allAccount/${searchString}`, {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      })
+      axios(
+        `https://barta-the-real-time-chat-app.herokuapp.com/user/account/allAccount/${searchString}`,
+        {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        }
+      )
         .then((data) => {
           dispatch({
             type: GET_ALL_USER_INFO,
@@ -301,7 +310,10 @@ export const sendSignInRequest = (user, history, from) => {
       payload: true,
     });
     axios
-      .post("http://localhost:5000/user/account/sign-in", user)
+      .post(
+        "https://barta-the-real-time-chat-app.herokuapp.com/user/account/sign-in",
+        user
+      )
       .then(({ data }) => {
         dispatch({
           type: SET_LOGIN_SPINNER,
@@ -336,7 +348,10 @@ export const sendLoginRequest = (user, history, from) => {
       payload: true,
     });
     axios
-      .post("http://localhost:5000/user/account/login", user)
+      .post(
+        "https://barta-the-real-time-chat-app.herokuapp.com/user/account/login",
+        user
+      )
       .then(({ data }) => {
         dispatch({
           type: SET_LOGIN_SPINNER,
@@ -387,9 +402,13 @@ export const profileUpdate = (pic, info) => {
 
     if (pic) {
       axios
-        .put(`http://localhost:5000/${destination}/update-profile-pic`, pic, {
-          headers: { Authorization: `Bearer ${accessToken}` },
-        })
+        .put(
+          `https://barta-the-real-time-chat-app.herokuapp.com/${destination}/update-profile-pic`,
+          pic,
+          {
+            headers: { Authorization: `Bearer ${accessToken}` },
+          }
+        )
         .then(() => {
           dispatch({
             type: SET_PROFILE_UPDATE_SPINNER,
@@ -406,9 +425,13 @@ export const profileUpdate = (pic, info) => {
 
     info &&
       axios
-        .put(`http://localhost:5000/${destination}/update-profile-info`, info, {
-          headers: { Authorization: `Bearer ${accessToken}` },
-        })
+        .put(
+          `https://barta-the-real-time-chat-app.herokuapp.com/${destination}/update-profile-info`,
+          info,
+          {
+            headers: { Authorization: `Bearer ${accessToken}` },
+          }
+        )
         .then(() => {
           !pic &&
             dispatch({
@@ -452,9 +475,13 @@ export const postMyInfo = (user) => {
   return (dispatch) => {
     getUserInfo();
     axios
-      .post("http://localhost:5000/user/account", user, {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      })
+      .post(
+        "https://barta-the-real-time-chat-app.herokuapp.com/user/account",
+        user,
+        {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        }
+      )
       .then((data) => {
         localStorage.setItem(
           "barta/user",
@@ -493,9 +520,12 @@ export const getReceiverInfo = (id) => {
       type: GET_GROUP_INFO,
       payload: {},
     });
-    axios(`http://localhost:5000/user/account/receiverInfo/${id}`, {
-      headers: { Authorization: `Bearer ${accessToken}` },
-    })
+    axios(
+      `https://barta-the-real-time-chat-app.herokuapp.com/user/account/receiverInfo/${id}`,
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      }
+    )
       .then((data) => {
         dispatch({
           type: GET_RECEIVER_INFO,
@@ -532,9 +562,12 @@ export const setGroupsInfoFromDatabase = (userEmail) => {
       type: SET_SPINNER_FOR_GROUP_LIST,
       payload: true,
     });
-    axios(`http://localhost:5000/user/account/groupList/${userEmail}`, {
-      headers: { Authorization: `Bearer ${accessToken}` },
-    })
+    axios(
+      `https://barta-the-real-time-chat-app.herokuapp.com/user/account/groupList/${userEmail}`,
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      }
+    )
       .then((data) => {
         dispatch({
           type: SET_SPINNER_FOR_GROUP_LIST,
@@ -612,7 +645,7 @@ const addGroupNameInGroupMemberProfile = (selectedUserEmail, groupId) => {
     const email = selectedUserEmail[i];
     axios
       .put(
-        `http://localhost:5000/user/account/updateGroupList/${email}`,
+        `https://barta-the-real-time-chat-app.herokuapp.com/user/account/updateGroupList/${email}`,
         {
           member: email?.split("@")[0],
           groupId,
@@ -640,9 +673,13 @@ export const createGroup = (selectedUserEmail, groupName) => {
       timeStamp: new Date().toUTCString(),
     };
     axios
-      .post("http://localhost:5000/groupAccount/newGroup", groupInfo, {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      })
+      .post(
+        "https://barta-the-real-time-chat-app.herokuapp.com/groupAccount/newGroup",
+        groupInfo,
+        {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        }
+      )
       .then((res) => {
         addGroupNameInGroupMemberProfile(selectedUserEmail, res?.data?._id);
         dispatch({
@@ -677,9 +714,12 @@ export const getGroupIdForChatBar = (id, reason = "") => {
       });
     }
 
-    axios(`http://localhost:5000/groupAccount/groupInfo/${id}`, {
-      headers: { Authorization: `Bearer ${accessToken}` },
-    }).then((data) => {
+    axios(
+      `https://barta-the-real-time-chat-app.herokuapp.com/groupAccount/groupInfo/${id}`,
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      }
+    ).then((data) => {
       if (reason === "chatBar") {
         dispatch({
           type: GET_GROUP_INFO_FROM_SOCKET,
@@ -697,9 +737,13 @@ export const getGroupIdForChatBar = (id, reason = "") => {
 
 export const leaveFromGroup = (info) => {
   axios
-    .put("http://localhost:5000/groupAccount/remove-group-member", info, {
-      headers: { Authorization: `Bearer ${accessToken}` },
-    })
+    .put(
+      "https://barta-the-real-time-chat-app.herokuapp.com/groupAccount/remove-group-member",
+      info,
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      }
+    )
     .catch(() => alert("Something is wrong. Please try again"));
 };
 
@@ -715,9 +759,13 @@ export const addMemberInGroup = (data = {}) => {
       payload: true,
     });
     axios
-      .put("http://localhost:5000/groupAccount/add-new-member", data, {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      })
+      .put(
+        "https://barta-the-real-time-chat-app.herokuapp.com/groupAccount/add-new-member",
+        data,
+        {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        }
+      )
       .then(() => {
         dispatch({
           type: SET_ADD_MEMBER_SPINNER,

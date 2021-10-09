@@ -83,9 +83,9 @@ export const ChatHeader = ({
             receiverInfo?.displayName
               ? receiverInfo?.photoURL
                 ? receiverInfo.photoURL
-                : `http://localhost:5000/user/account/get-profile-img/${receiverInfo?.photoId}`
+                : `https://barta-the-real-time-chat-app.herokuapp.com/user/account/get-profile-img/${receiverInfo?.photoId}`
               : groupInfo?.photoId &&
-                `http://localhost:5000/groupAccount/get-profile-img/${groupInfo?.photoId}`
+                `https://barta-the-real-time-chat-app.herokuapp.com/groupAccount/get-profile-img/${groupInfo?.photoId}`
           }
         />
         {addChatList && (
@@ -369,12 +369,12 @@ export const ChatBody = ({
                             return (
                               <a
                                 key={index}
-                                href={`http://localhost:5000/chatMessage/file/${file?.filename}`}
+                                href={`https://barta-the-real-time-chat-app.herokuapp.com/chatMessage/file/${file?.filename}`}
                               >
                                 <img
                                   key={file.fileId}
                                   className="chat__img"
-                                  src={`http://localhost:5000/chatMessage/file/${file?.filename}`}
+                                  src={`https://barta-the-real-time-chat-app.herokuapp.com/chatMessage/file/${file?.filename}`}
                                   alt={`${index + 1}`}
                                 />
                               </a>
@@ -398,7 +398,7 @@ export const ChatBody = ({
                                 <video
                                   key={file.fileId}
                                   className="chat__img"
-                                  src={`http://localhost:5000/chatMessage/file/${file?.filename}`}
+                                  src={`https://barta-the-real-time-chat-app.herokuapp.com/chatMessage/file/${file?.filename}`}
                                   controls
                                   controlsList="nodownload"
                                 ></video>
