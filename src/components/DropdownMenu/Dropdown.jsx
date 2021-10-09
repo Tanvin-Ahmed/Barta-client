@@ -6,7 +6,6 @@ import MenuItem from "@mui/material/MenuItem";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
-import Tooltip from "@mui/material/Tooltip";
 import PersonAdd from "@mui/icons-material/PersonAdd";
 import Settings from "@mui/icons-material/Settings";
 import Logout from "@mui/icons-material/Logout";
@@ -40,11 +39,14 @@ const Dropdown = () => {
   return (
     <>
       <Box sx={{ display: "flex", alignItems: "center", textAlign: "center" }}>
-        <Tooltip title="Account settings">
-          <IconButton onClick={handleClick} size="small" sx={{ ml: 2 }}>
-            <MoreVertIcon className="text-light" size="small" />
-          </IconButton>
-        </Tooltip>
+        <IconButton
+          title="Account settings"
+          onClick={handleClick}
+          size="small"
+          sx={{ ml: 2 }}
+        >
+          <MoreVertIcon className="text-light" size="small" />
+        </IconButton>
       </Box>
       <Menu
         anchorEl={anchorEl}
@@ -80,13 +82,13 @@ const Dropdown = () => {
         transformOrigin={{ horizontal: "right", vertical: "top" }}
         anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
       >
-        <MenuItem onClick={() => history.push("/view-profile")}>
+        <MenuItem onClick={() => history.push("/view-profile/userInfo")}>
           <Avatar
             src={`http://localhost:5000/user/account/get-profile-img/${userInfo?.photoId}`}
           />{" "}
           Profile
         </MenuItem>
-        <MenuItem onClick={() => history.push("/update-account")}>
+        <MenuItem onClick={() => history.push("/update-account/userAccount")}>
           <Avatar /> Update profile
         </MenuItem>
         <Divider

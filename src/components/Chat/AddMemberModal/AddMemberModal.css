@@ -1,0 +1,57 @@
+.AddMember__modal {
+  position: absolute;
+  background-color: #fff;
+  top: 0;
+  width: 85%;
+  left: 7%;
+  padding: 0.5rem;
+  border-radius: 10px;
+  z-index: 200;
+  background-color: rgb(80, 47, 122);
+  color: #fff;
+}
+
+.AddMember__modal .list {
+  height: 80vh;
+  width: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.back_view .view {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 150;
+  background-color: rgba(0, 0, 0, 0.13);
+}
+
+.AddMember__modal p {
+  margin-top: 0.5rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+  font-size: 14px;
+  margin-left: 0.5rem;
+}
+
+.AddMember__modal .selectedMember__container {
+  max-height: 5rem;
+  width: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  background-color: rgb(143, 88, 214);
+  margin-top: 0.5rem;
+  border-radius: 10px;
+}
+
+.AddMember__modal input[type="text"]::placeholder {
+  font-size: 14px;
+}
+
+.AddMember__modal button {
+  font-size: 14px;
+  letter-spacing: 1px;
+  font-weight: 600;
+}

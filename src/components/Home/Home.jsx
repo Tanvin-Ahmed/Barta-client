@@ -14,18 +14,32 @@ import NotificationModalForGroupCall from "../Chat/GroupCall/NotificationModalFo
 import { setCallerName } from "../../app/actions/groupCallAction";
 import UpdateAccount from "../UpdateAccount/UpdateAccount";
 import Profile from "../Profile/Profile";
+import {
+  updateGroupListData,
+  updateProfileDataFromSocket,
+} from "../../app/actions/userAction";
 
 const Home = ({ socket }) => {
   const myStream = useRef(null);
   const groupPeersRef = useRef([]);
   const dispatch = useDispatch();
-  const { userInfo, openGroupCall, acceptedGroupCall, receivingCall } =
-    useSelector((state) => ({
-      userInfo: state.userReducer.userInfo,
-      openGroupCall: state.groupCallReducer.openGroupCall,
-      acceptedGroupCall: state.groupCallReducer.acceptedGroupCall,
-      receivingCall: state.privateCall.receivingCall,
-    }));
+  const {
+    userInfo,
+    openGroupCall,
+    acceptedGroupCall,
+    receivingCall,
+    groups,
+    groupInfo,
+    chatList,
+  } = useSelector((state) => ({
+    userInfo: state.userReducer.userInfo,
+    openGroupCall: state.groupCallReducer.openGroupCall,
+    acceptedGroupCall: state.groupCallReducer.acceptedGroupCall,
+    receivingCall: state.privateCall.receivingCall,
+    groups: state.userReducer.groups,
+    groupInfo: state.userReducer.groupInfo,
+    chatList: state.userReducer.chatList,
+  }));
 
   const [roomIdOfReceivingGroupCall, setRoomIdOfReceivingGroupCall] =
     useState("");
@@ -36,6 +50,25 @@ const Home = ({ socket }) => {
   useEffect(() => {
     userInfo?.email && socket.emit("user-info", { email: userInfo?.email });
   }, [dispatch, socket, userInfo]);
+
+  // update group info
+  useEffect(() => {
+    socket.on("update-group-data", (data) => {
+      const isMyGroup = userInfo?.groups?.find((g) => g.groupId === data._id);
+      if (isMyGroup) {
+        dispatch(updateGroupListData(data, groups, isMyGroup, groupInfo));
+      }
+    });
+
+    return () => socket.off("update-group-data");
+  }, [socket, userInfo, dispatch, groups, groupInfo]);
+
+  // update my profile or friend info
+  useEffect(() => {
+    socket.on("update-profile-data", (data) => {
+      dispatch(updateProfileDataFromSocket(data, userInfo, chatList));
+    });
+  }, [socket, userInfo, dispatch, chatList]);
 
   ////////////////  GROUP CALL ///////////////////
   //************* GROUP CALL RECEIVE OTHER USERS ************//
@@ -116,10 +149,10 @@ const Home = ({ socket }) => {
                 <PrivateRoute exact path="/">
                   <ChatBar socket={socket} />
                 </PrivateRoute>
-                <PrivateRoute path="/view-profile">
+                <PrivateRoute path="/view-profile/:identity">
                   <Profile />
                 </PrivateRoute>
-                <PrivateRoute path="/update-account">
+                <PrivateRoute path="/update-account/:identity">
                   <UpdateAccount />
                 </PrivateRoute>
                 <PrivateRoute path="/chat/:id">
@@ -131,7 +164,7 @@ const Home = ({ socket }) => {
                   />
                 </PrivateRoute>
                 <PrivateRoute path="/chat-settings">
-                  <ChatSettings socket={socket} />
+                  <ChatSettings />
                 </PrivateRoute>
               </Switch>
             </Router>

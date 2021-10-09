@@ -29,9 +29,15 @@ import {
   SET_LOGIN_SPINNER,
   SET_VERIFY_JWT_TOKEN_SPINNER,
   REMOVE_USER_INFO,
+  SET_ACCESS_TOKEN,
+  SET_PROFILE_UPDATE_SPINNER,
+  SET_ADD_MEMBER_SPINNER,
+  SET_ADD_MEMBER_COMPLETE_ICON,
+  SET_ADD_MEMBER_ERROR_ICON,
 } from "../types";
 
 const initialState = {
+  accessToken: "",
   tokenVerifySpinner: false,
   loginSpinner: false,
   userInfo: {},
@@ -44,6 +50,7 @@ const initialState = {
   success: "",
   loading: false,
   addChatList: true,
+  profileUpdateSpinner: false,
   // for group
   openGroupList: false,
   groups: [],
@@ -55,10 +62,18 @@ const initialState = {
   groupCreated: false,
   groupCreatingSpinner: false,
   groupInfo: {},
+  addMemberSpinner: false,
+  completeAddMemberIcon: false,
+  errorToUploadMemberIcon: false,
 };
 
 const userReducer = (state = initialState, action) => {
   switch (action.type) {
+    case SET_ACCESS_TOKEN:
+      return {
+        ...state,
+        accessToken: action.payload,
+      };
     case SET_VERIFY_JWT_TOKEN_SPINNER:
       return {
         ...state,
@@ -83,6 +98,11 @@ const userReducer = (state = initialState, action) => {
       return {
         ...state,
         loading: action.payload,
+      };
+    case SET_PROFILE_UPDATE_SPINNER:
+      return {
+        ...state,
+        profileUpdateSpinner: action.payload,
       };
     case GET_ALL_USER_INFO:
       return {
@@ -210,6 +230,21 @@ const userReducer = (state = initialState, action) => {
       return {
         ...state,
         groupInfo: action.payload,
+      };
+    case SET_ADD_MEMBER_SPINNER:
+      return {
+        ...state,
+        addMemberSpinner: action.payload,
+      };
+    case SET_ADD_MEMBER_COMPLETE_ICON:
+      return {
+        ...state,
+        completeAddMemberIcon: action.payload,
+      };
+    case SET_ADD_MEMBER_ERROR_ICON:
+      return {
+        ...state,
+        errorToUploadMemberIcon: action.payload,
       };
     default:
       return state;

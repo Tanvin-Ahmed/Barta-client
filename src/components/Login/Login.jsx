@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory, useLocation } from "react-router";
 import {
+  accessTokenForGoogle,
   postMyInfo,
   sendLoginRequest,
   sendSignInRequest,
@@ -78,7 +79,6 @@ const Login = () => {
     formState: { errors },
   } = useForm();
   const onSubmit = (data) => {
-    console.log(data);
     let userInfo = {};
     if (login) {
       if (data.password.trim()) {

@@ -61,11 +61,13 @@ export const handleReceiverInfo = (receiver, history) => {
   history.push(`/chat/${receiver._id}`);
 };
 
-export const handleGroupInfo = (groupName, history) => {
+export const handleGroupInfo = (group, history) => {
   sessionStorage.removeItem("barta/receiver");
-  sessionStorage.setItem("barta/groupName", JSON.stringify({ groupName }));
-  const groupNameURL = groupName.split(" ").join("(*Φ皿Φ*)");
-  history.push(`/chat/${groupNameURL}`);
+  sessionStorage.setItem(
+    "barta/groupName",
+    JSON.stringify({ groupName: group?.groupName })
+  );
+  history.push(`/chat/${group._id}`);
 };
 
 // group making tab

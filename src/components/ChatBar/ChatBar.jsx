@@ -35,6 +35,7 @@ const ChatBar = ({ socket }) => {
     spinnerForChatList,
     chatList,
     userInfo,
+    accessToken,
     userStatusToReceiveOtherCall,
     openGroupList,
     spinnerForGroupList,
@@ -54,6 +55,7 @@ const ChatBar = ({ socket }) => {
     spinnerForChatList: state.userReducer.spinnerForChatList,
     chatList: state.userReducer.addChatList,
     userInfo: state.userReducer.userInfo,
+    accessToken: state.userReducer.accessToken,
     // private call
     userStatusToReceiveOtherCall:
       state.privateCall.userStatusToReceiveOtherCall,
@@ -89,21 +91,21 @@ const ChatBar = ({ socket }) => {
     const conditionOfNetwork = () => {
       fetchFriendList.current = true;
       fetchGroupList.current = true;
-      getData();
+      accessToken && getData();
     };
     const webpageLoad = () => {
       window.addEventListener("online", conditionOfNetwork);
       window.addEventListener("offline", conditionOfNetwork);
     };
     window.addEventListener("load", webpageLoad);
-    getData();
+    accessToken && getData();
 
     return () => {
       window.removeEventListener("load", webpageLoad);
       window.removeEventListener("online", conditionOfNetwork);
       window.removeEventListener("offline", conditionOfNetwork);
     };
-  }, [userInfo?.email, dispatch, chatList, openGroupList]);
+  }, [userInfo?.email, dispatch, chatList, openGroupList, accessToken]);
 
   //////////////// Friend List Update ///////////////
   useEffect(() => {
@@ -117,11 +119,13 @@ const ChatBar = ({ socket }) => {
   //////////////// Group List Update ///////////////
   useEffect(() => {
     if (socket === null) return;
-    socket.on("add-group-list", (groupName) => {
-      dispatch(getGroupIdForChatBar(groupName, "chatBar"));
+    socket.on("add-group-list", (groupInfo) => {
+      if (groupInfo.member === userInfo?.email?.split("@")[0]) {
+        dispatch(getGroupIdForChatBar(groupInfo.groupId, "chatBar"));
+      }
     });
     return () => socket.off("add-group-list");
-  }, [socket, dispatch]);
+  }, [socket, dispatch, userInfo]);
 
   //////////////// Update friend Status ///////////////////
   useEffect(() => {

@@ -1,5 +1,4 @@
 import "./ChatBar.css";
-import MoreVertIcon from "@material-ui/icons/MoreVert";
 import PeopleIcon from "@material-ui/icons/People";
 import PersonAddIcon from "@material-ui/icons/PersonAdd";
 import GroupAddIcon from "@material-ui/icons/GroupAdd";
@@ -44,8 +43,9 @@ export const ChatBarHeader = ({
           <IconButton style={{ position: "relative" }}>
             <Avatar
               src={
-                `http://localhost:5000/user/account/get-profile-img/${photoId}` ||
                 userPhotoURL
+                  ? userPhotoURL
+                  : `http://localhost:5000/user/account/get-profile-img/${photoId}`
               }
             />
             <div className="onLine" />
@@ -124,7 +124,13 @@ export const ChatList = ({
                 className="px-3 d-flex justify-content-start align-items-center text-light"
               >
                 <div style={{ position: "relative" }} className="mr-3">
-                  <Avatar src={friend?.photoURL} />
+                  <Avatar
+                    src={
+                      friend?.photoURL
+                        ? friend?.photoURL
+                        : `http://localhost:5000/user/account/get-profile-img/${friend?.photoId}`
+                    }
+                  />
                   <div
                     className={
                       friend?.status === "active" ? "onLine" : "d-none"
@@ -192,11 +198,13 @@ export const GroupList = ({ groups, history, spinnerForGroupList }) => {
             ?.map((group) => (
               <CardActionArea
                 key={group?._id}
-                onClick={() => handleGroupInfo(group?.groupName, history)}
+                onClick={() => handleGroupInfo(group, history)}
                 className="px-3 d-flex justify-content-start align-items-center text-light"
               >
                 <div style={{ position: "relative" }} className="mr-3">
-                  <Avatar src={group?.photoURL} />
+                  <Avatar
+                    src={`http://localhost:5000/groupAccount/get-profile-img/${group?.photoId}`}
+                  />
                   <div
                     className={group?.status === "active" ? "onLine" : "d-none"}
                   />
@@ -267,7 +275,13 @@ export const SearchFriend = ({
                   className="times_for_selectedId"
                   size="small"
                 />
-                <Avatar src={selectedId?.photoURL} />
+                <Avatar
+                  src={
+                    selectedId?.photoURL
+                      ? selectedId?.photoURL
+                      : `http://localhost:5000/user/account/get-profile-img/${selectedId?.photoId}`
+                  }
+                />
               </div>
             ))}
           </div>
@@ -318,7 +332,13 @@ export const SearchFriend = ({
                   className="px-3 d-flex justify-content-start align-items-center text-light"
                 >
                   <div className="mr-3">
-                    <Avatar src={otherUser?.photoURL} />
+                    <Avatar
+                      src={
+                        otherUser?.photoURL
+                          ? otherUser?.photoURL
+                          : `http://localhost:5000/user/account/get-profile-img/${otherUser?.photoId}`
+                      }
+                    />
                   </div>
                   <h6 className="m-4">{otherUser?.displayName}</h6>
                 </CardActionArea>

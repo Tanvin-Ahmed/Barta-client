@@ -33,6 +33,10 @@ export const sendMessageInDatabase = (chat) => {
           });
         }
       },
+      headers: {
+        Authorization:
+          "Bearer " + JSON.parse(localStorage.getItem("accessToken")),
+      },
     };
 
     let URL;
@@ -77,6 +81,10 @@ export const uploadFiles = (chosenFiles) => {
             payload: percent,
           });
         }
+      },
+      headers: {
+        Authorization:
+          "Bearer " + JSON.parse(localStorage.getItem("accessToken")),
       },
     };
 
@@ -152,6 +160,12 @@ export const getMessagesFromDatabase = (data, oldMessage = false) => {
         URL,
         {
           pageNum: data?.pageNum,
+        },
+        {
+          headers: {
+            Authorization:
+              "Bearer " + JSON.parse(localStorage.getItem("accessToken")),
+          },
         }
         // options
       )
@@ -236,7 +250,12 @@ export const updateChatMessage = (react) => {
     destination = "chatMessage";
   }
   axios
-    .put(`http://localhost:5000/${destination}/updateChatMessage`, react)
+    .put(`http://localhost:5000/${destination}/updateChatMessage`, react, {
+      headers: {
+        Authorization:
+          "Bearer " + JSON.parse(localStorage.getItem("accessToken")),
+      },
+    })
     .then(() => console.log("update message successfully"))
     .catch(() => alert("react not set, please try again"));
 };
@@ -249,7 +268,12 @@ export const updatePreReact = (react) => {
     destination = "chatMessage";
   }
   axios
-    .put(`http://localhost:5000/${destination}/updateOnlyReact`, react)
+    .put(`http://localhost:5000/${destination}/updateOnlyReact`, react, {
+      headers: {
+        Authorization:
+          "Bearer " + JSON.parse(localStorage.getItem("accessToken")),
+      },
+    })
     .then(() => console.log("update message successfully"))
     .catch(() => alert("react not set, please try again"));
 };
@@ -262,7 +286,12 @@ export const deleteReact = (react) => {
     destination = "chatMessage";
   }
   axios
-    .put(`http://localhost:5000/${destination}/removeReact`, react)
+    .put(`http://localhost:5000/${destination}/removeReact`, react, {
+      headers: {
+        Authorization:
+          "Bearer " + JSON.parse(localStorage.getItem("accessToken")),
+      },
+    })
     .then(() => console.log("update message successfully"))
     .catch(() => alert("react not remove, please try again"));
 };
@@ -275,7 +304,12 @@ const deleteChatMessage = (id) => {
     destination = "chatMessage";
   }
   axios
-    .delete(`http://localhost:5000/${destination}/deleteChatMessage/${id}`)
+    .delete(`http://localhost:5000/${destination}/deleteChatMessage/${id}`, {
+      headers: {
+        Authorization:
+          "Bearer " + JSON.parse(localStorage.getItem("accessToken")),
+      },
+    })
     .then(() => console.log("deleted successfully"))
     .catch(() => alert("failed to delete, please try again"));
 };
@@ -291,7 +325,12 @@ export const deleteChat = (message) => {
     for (let i = 0; i < message?.files.length; i++) {
       const id = message?.files[i].fileId;
       axios
-        .delete(`http://localhost:5000/${destination}/file/delete/${id}`)
+        .delete(`http://localhost:5000/${destination}/file/delete/${id}`, {
+          headers: {
+            Authorization:
+              "Bearer " + JSON.parse(localStorage.getItem("accessToken")),
+          },
+        })
         .then(() => {
           console.log("delete file successfully");
           if (i === message?.files?.length - 1) {

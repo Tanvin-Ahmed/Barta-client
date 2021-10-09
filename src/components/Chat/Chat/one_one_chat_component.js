@@ -78,7 +78,16 @@ export const ChatHeader = ({
   return (
     <div className="chat__header">
       <div className="header__info">
-        <Avatar src={receiverInfo?.photoURL || groupInfo?.photoURL} />
+        <Avatar
+          src={
+            receiverInfo?.displayName
+              ? receiverInfo?.photoURL
+                ? receiverInfo.photoURL
+                : `http://localhost:5000/user/account/get-profile-img/${receiverInfo?.photoId}`
+              : groupInfo?.photoId &&
+                `http://localhost:5000/groupAccount/get-profile-img/${groupInfo?.photoId}`
+          }
+        />
         {addChatList && (
           <div
             className={
@@ -150,8 +159,8 @@ const Options = ({ dispatch, reactTabIsOpen, message, sender }) => {
       <div
         className={
           message?.sender === sender
-            ? "d-flex justify-content-center align-items-center"
-            : "d-flex flex-row-reverse justify-content-center align-items-center"
+            ? "chatOptions__show"
+            : "chatOptions__show_receiver"
         }
       >
         {message?.sender === sender && (
@@ -159,19 +168,19 @@ const Options = ({ dispatch, reactTabIsOpen, message, sender }) => {
             variant="contained"
             size="small"
             onClick={() => deleteChat(message)}
-            className="icon mx-1"
+            className="icon"
           >
             <DeleteIcon className="icon__button text-light" />
           </IconButton>
         )}
-        <IconButton variant="contained" size="small" className="icon mx-1">
+        <IconButton variant="contained" size="small" className="icon">
           <ReplayIcon className="icon__button text-light" />
         </IconButton>
         <IconButton
           variant="contained"
           size="small"
           onClick={() => toggleReactTab(dispatch, !reactTabIsOpen)}
-          className="icon mx-1"
+          className="icon"
         >
           <AddReactionIcon className="icon__button text-light" />
         </IconButton>
@@ -184,25 +193,25 @@ const Options = ({ dispatch, reactTabIsOpen, message, sender }) => {
         >
           <p
             onClick={() => handleReactions(dispatch, message, sender, "🧡")}
-            className="mx-1 p-1 chose"
+            className=" p-1 chose"
           >
             🧡
           </p>
           <p
             onClick={() => handleReactions(dispatch, message, sender, "😢")}
-            className="mx-1 p-1 chose"
+            className=" p-1 chose"
           >
             😢
           </p>
           <p
             onClick={() => handleReactions(dispatch, message, sender, "😠")}
-            className="mx-1 p-1 chose"
+            className="p-1 chose"
           >
             😠
           </p>
           <p
             onClick={() => handleReactions(dispatch, message, sender, "🙄")}
-            className="mx-1 p-1 chose"
+            className="p-1 chose"
           >
             🙄
           </p>
@@ -210,13 +219,13 @@ const Options = ({ dispatch, reactTabIsOpen, message, sender }) => {
             onClick={() =>
               handleReactions(dispatch, message?._id, sender, "😦")
             }
-            className="mx-1 p-1 chose"
+            className="p-1 chose"
           >
             😦
           </p>
           <p
             onClick={() => handleReactions(dispatch, message, sender, "👍")}
-            className="mx-1 p-1 chose"
+            className="p-1 chose"
           >
             👍
           </p>
@@ -584,7 +593,7 @@ export const ChatFooter = ({
           onClick={() => dispatch(isClickUploadOption(!clickUploadOption))}
           className="icon"
         >
-          <AddCircleIcon className="icon__button text-light" />
+          <AddCircleIcon className="icon__button text-light add__button" />
         </IconButton>
       )}
       {largeScreen ? (
@@ -623,7 +632,7 @@ export const ChatFooter = ({
             />
           </div>
           {(inputText.trim() || chosenFiles) && (
-            <IconButton onClick={handleOnEnter} className="icon">
+            <IconButton onClick={handleOnEnter} className="icon send__icon">
               <SendIcon className="text-light" />
             </IconButton>
           )}

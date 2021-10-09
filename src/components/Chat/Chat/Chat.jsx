@@ -58,7 +58,7 @@ const Chat = ({
   useEffect(() => {
     const refetchData = () => {
       id && JSON.parse(sessionStorage.getItem("barta/groupName"))?.groupName
-        ? getGroupInfo(dispatch, id?.split("(*Φ皿Φ*)")?.join(" "))
+        ? getGroupInfo(dispatch, id)
         : getUsersData(dispatch, id);
     };
     const reloadWebpage = () => {
@@ -138,7 +138,7 @@ const Chat = ({
   const roomId = useMemo(() => {
     if (id) {
       if (JSON.parse(sessionStorage.getItem("barta/groupName"))?.groupName) {
-        const ID = id?.split("(*Φ皿Φ*)")?.join(" ");
+        const ID = id;
         dispatch(setRoomId(ID));
         return ID;
       } else {

@@ -30,12 +30,21 @@ import {
   SET_LOGIN_SPINNER,
   SET_VERIFY_JWT_TOKEN_SPINNER,
   REMOVE_USER_INFO,
+  SET_ACCESS_TOKEN,
+  SET_PROFILE_UPDATE_SPINNER,
+  SET_ADD_MEMBER_SPINNER,
+  SET_ADD_MEMBER_COMPLETE_ICON,
+  SET_ADD_MEMBER_ERROR_ICON,
 } from "../types";
 import jwt_decode from "jwt-decode";
 
-const getUserInfoFromDB = (id) => {
+let accessToken = "";
+
+const getUserInfoFromDB = (id, token) => {
   return (dispatch) => {
-    axios(`http://localhost:5000/user/account/userInfo/${id}`)
+    axios(`http://localhost:5000/user/account/userInfo/${id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
       .then(({ data }) => {
         dispatch({
           type: GET_USER_INFO,
@@ -48,22 +57,27 @@ const getUserInfoFromDB = (id) => {
   };
 };
 
-const getJWTFromServer = (_id, displayName, email, status) => {
+export const getJWTFromServer = (token) => {
   return (dispatch) => {
+    const { _id, displayName, email, status } = jwt_decode(token);
+    localStorage.removeItem("accessToken");
     axios
-      .post("http://localhost:5000/jwt/get-new-jwt", {
-        _id,
-        displayName,
-        email,
-        status,
-      })
+      .post(
+        "http://localhost:5000/jwt/get-new-jwt",
+        {
+          _id,
+          displayName,
+          email,
+          status,
+        },
+        { headers: { Authorization: "Bearer " + token } }
+      )
       .then(({ data }) => {
+        accessToken = data;
         localStorage.setItem("accessToken", JSON.stringify(data));
-        const { _id, displayName, email, status } = jwt_decode(data);
-        const tokenData = { _id, displayName, email, status };
         dispatch({
-          type: GET_USER_INFO,
-          payload: tokenData,
+          type: SET_ACCESS_TOKEN,
+          payload: data,
         });
         dispatch({
           type: SET_VERIFY_JWT_TOKEN_SPINNER,
@@ -81,21 +95,32 @@ const getJWTFromServer = (_id, displayName, email, status) => {
   };
 };
 
-export const getUserInfo = () => {
+export const getUserInfo = (firstTime = "") => {
   return (dispatch) => {
+    dispatch({
+      type: SET_VERIFY_JWT_TOKEN_SPINNER,
+      payload: true,
+    });
     const token = JSON.parse(localStorage.getItem("accessToken"));
-    if (!token) return;
-    const { _id, displayName, email, status, exp } = jwt_decode(token);
-    dispatch(getUserInfoFromDB(_id));
-
-    if (exp * 1000 < new Date().getTime()) {
+    if (!token) {
       dispatch({
         type: SET_VERIFY_JWT_TOKEN_SPINNER,
-        payload: true,
+        payload: false,
       });
+      return;
+    }
+    const { _id, displayName, email, status, exp } = jwt_decode(token);
+
+    if (exp * 1000 <= new Date().getTime()) {
       localStorage.removeItem("accessToken");
-      dispatch(getJWTFromServer(_id, displayName, email, status));
     } else {
+      accessToken = token;
+      dispatch({
+        type: SET_ACCESS_TOKEN,
+        payload: token,
+      });
+      dispatch(getJWTFromServer(token));
+      firstTime && dispatch(getUserInfoFromDB(_id, token));
       const userData = { _id, displayName, email, status };
       dispatch({
         type: GET_USER_INFO,
@@ -113,12 +138,14 @@ export const removeUserInfo = () => {
 };
 
 export const getFriendInfo = (userEmail) => {
-  return (dispatch) => {
+  return async (dispatch) => {
     dispatch({
       type: SET_SPINNER_FOR_CHAT_LIST,
       payload: true,
     });
-    axios(`http://localhost:5000/user/account/${userEmail}`)
+    axios(`http://localhost:5000/user/account/${userEmail}`, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    })
       .then((data) => {
         dispatch({
           type: SET_SPINNER_FOR_CHAT_LIST,
@@ -131,6 +158,12 @@ export const getFriendInfo = (userEmail) => {
       })
       .catch((error) => {
         if (error.response?.status === 400) {
+          dispatch({
+            type: SET_FIND_FRIEND_ERROR,
+            payload: error.response?.data,
+          });
+        }
+        if (error.response?.status === 401) {
           dispatch({
             type: SET_FIND_FRIEND_ERROR,
             payload: error.response?.data,
@@ -158,7 +191,10 @@ export const updateFriendStatus = (friendList) => {
 export const getFriendInfoFromSocket = (friendEmail) => {
   return (dispatch) => {
     axios(
-      `http://localhost:5000/user/account/getFriendDetailsByEmail/${friendEmail}`
+      `http://localhost:5000/user/account/getFriendDetailsByEmail/${friendEmail}`,
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      }
     ).then((data) => {
       dispatch({
         type: GET_FRIEND_INFO_FROM_SOCKET,
@@ -190,7 +226,10 @@ export const postFriendInfo = (roomId, friendData) => {
           axios
             .put(
               `http://localhost:5000/user/account/updateChatList/${email}`,
-              friendInfo
+              friendInfo,
+              {
+                headers: { Authorization: `Bearer ${accessToken}` },
+              }
             )
             .then((data) => {
               dispatch({
@@ -217,7 +256,9 @@ export const getAllUserInfo = (searchString) => {
         type: LOADING_USER_INFO,
         payload: true,
       });
-      axios(`http://localhost:5000/user/account/allAccount/${searchString}`)
+      axios(`http://localhost:5000/user/account/allAccount/${searchString}`, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      })
         .then((data) => {
           dispatch({
             type: GET_ALL_USER_INFO,
@@ -266,10 +307,15 @@ export const sendSignInRequest = (user, history, from) => {
           type: SET_LOGIN_SPINNER,
           payload: false,
         });
+        accessToken = data.token;
         localStorage.setItem("accessToken", JSON.stringify(data.token));
         dispatch({
           type: GET_USER_INFO,
           payload: data.accountInfo,
+        });
+        dispatch({
+          type: SET_ACCESS_TOKEN,
+          payload: data.token,
         });
         history.replace(from);
       })
@@ -296,10 +342,15 @@ export const sendLoginRequest = (user, history, from) => {
           type: SET_LOGIN_SPINNER,
           payload: false,
         });
+        accessToken = data.token;
         localStorage.setItem("accessToken", JSON.stringify(data.token));
         dispatch({
           type: GET_USER_INFO,
           payload: data.accountInfo,
+        });
+        dispatch({
+          type: SET_ACCESS_TOKEN,
+          payload: data.token,
         });
         history.replace(from);
       })
@@ -319,11 +370,31 @@ export const profileUpdate = (pic, info) => {
     // for (var pair of data.entries()) {
     //   console.log(pair[0] + ", " + pair[1]);
     // }
+    dispatch({
+      type: SET_PROFILE_UPDATE_SPINNER,
+      payload: true,
+    });
+
+    let destination = "";
+    const updateGroupProfile = JSON.parse(
+      sessionStorage.getItem("barta/groupName")
+    )?.groupName;
+    if (updateGroupProfile) {
+      destination = "groupAccount";
+    } else {
+      destination = "user/account";
+    }
+
     if (pic) {
       axios
-        .put("http://localhost:5000/user/account/update-profile-pic", pic)
+        .put(`http://localhost:5000/${destination}/update-profile-pic`, pic, {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        })
         .then(() => {
-          dispatch(getUserInfoFromDB(info._id));
+          dispatch({
+            type: SET_PROFILE_UPDATE_SPINNER,
+            payload: false,
+          });
         })
         .catch((err) => {
           if (err.response?.status === 404) {
@@ -335,16 +406,45 @@ export const profileUpdate = (pic, info) => {
 
     info &&
       axios
-        .put("http://localhost:5000/user/account/update-profile-info", info)
+        .put(`http://localhost:5000/${destination}/update-profile-info`, info, {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        })
         .then(() => {
-          dispatch(getUserInfoFromDB(info._id));
+          !pic &&
+            dispatch({
+              type: SET_PROFILE_UPDATE_SPINNER,
+              payload: false,
+            });
         })
         .catch((err) => {
           if (err.response?.status === 404) {
             alert(err.response?.data);
           }
+          dispatch({
+            type: SET_PROFILE_UPDATE_SPINNER,
+            payload: false,
+          });
           console.log(err.response);
         });
+  };
+};
+
+export const updateProfileDataFromSocket = (data, userInfo, chatList) => {
+  return (dispatch) => {
+    if (userInfo?._id === data._id) {
+      const updatedProfileData = { ...userInfo, ...data.updateFiled };
+      dispatch({
+        type: GET_USER_INFO,
+        payload: updatedProfileData,
+      });
+    } else {
+      const isFriend = chatList?.find((f) => f?._id === data._id);
+      if (isFriend) {
+        const index = chatList?.findIndex((f) => f?._id === data._id);
+        const updatedData = { ...isFriend, ...data.updateFiled };
+        chatList.splice(index, 1, updatedData);
+      }
+    }
   };
 };
 
@@ -352,7 +452,9 @@ export const postMyInfo = (user) => {
   return (dispatch) => {
     getUserInfo();
     axios
-      .post("http://localhost:5000/user/account", user)
+      .post("http://localhost:5000/user/account", user, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      })
       .then((data) => {
         localStorage.setItem(
           "barta/user",
@@ -391,7 +493,9 @@ export const getReceiverInfo = (id) => {
       type: GET_GROUP_INFO,
       payload: {},
     });
-    axios(`http://localhost:5000/user/account/receiverInfo/${id}`)
+    axios(`http://localhost:5000/user/account/receiverInfo/${id}`, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    })
       .then((data) => {
         dispatch({
           type: GET_RECEIVER_INFO,
@@ -428,7 +532,9 @@ export const setGroupsInfoFromDatabase = (userEmail) => {
       type: SET_SPINNER_FOR_GROUP_LIST,
       payload: true,
     });
-    axios(`http://localhost:5000/user/account/groupList/${userEmail}`)
+    axios(`http://localhost:5000/user/account/groupList/${userEmail}`, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    })
       .then((data) => {
         dispatch({
           type: SET_SPINNER_FOR_GROUP_LIST,
@@ -501,14 +607,20 @@ export const clearGroupCreateSuccessfullyStatus = () => {
   };
 };
 
-const addGroupNameInGroupMemberProfile = (selectedUserEmail, groupName) => {
+const addGroupNameInGroupMemberProfile = (selectedUserEmail, groupId) => {
   for (let i = 0; i < selectedUserEmail.length; i++) {
     const email = selectedUserEmail[i];
     axios
-      .put(`http://localhost:5000/user/account/updateGroupList/${email}`, {
-        member: email?.split("@")[0],
-        groupName,
-      })
+      .put(
+        `http://localhost:5000/user/account/updateGroupList/${email}`,
+        {
+          member: email?.split("@")[0],
+          groupId,
+        },
+        {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        }
+      )
       .then(() => console.log("updated group list"))
       .catch(() => console.log("group list not updated"));
   }
@@ -528,12 +640,11 @@ export const createGroup = (selectedUserEmail, groupName) => {
       timeStamp: new Date().toUTCString(),
     };
     axios
-      .post("http://localhost:5000/groupAccount/newGroup", groupInfo)
+      .post("http://localhost:5000/groupAccount/newGroup", groupInfo, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      })
       .then((res) => {
-        addGroupNameInGroupMemberProfile(
-          selectedUserEmail,
-          res?.data?.groupName
-        );
+        addGroupNameInGroupMemberProfile(selectedUserEmail, res?.data?._id);
         dispatch({
           type: GROUP_CREATING_SPINNER,
           payload: false,
@@ -557,7 +668,7 @@ export const createGroup = (selectedUserEmail, groupName) => {
   };
 };
 
-export const getGroupIdForChatBar = (groupName, reason) => {
+export const getGroupIdForChatBar = (id, reason = "") => {
   return (dispatch) => {
     if (!reason) {
       dispatch({
@@ -566,20 +677,102 @@ export const getGroupIdForChatBar = (groupName, reason) => {
       });
     }
 
-    axios(`http://localhost:5000/groupAccount/groupInfo/${groupName}`).then(
-      (data) => {
-        if (reason === "chatBar") {
-          dispatch({
-            type: GET_GROUP_INFO_FROM_SOCKET,
-            payload: data.data,
-          });
-        } else {
-          dispatch({
-            type: GET_GROUP_INFO,
-            payload: data.data,
-          });
-        }
+    axios(`http://localhost:5000/groupAccount/groupInfo/${id}`, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    }).then((data) => {
+      if (reason === "chatBar") {
+        dispatch({
+          type: GET_GROUP_INFO_FROM_SOCKET,
+          payload: data.data,
+        });
+      } else {
+        dispatch({
+          type: GET_GROUP_INFO,
+          payload: data.data,
+        });
       }
-    );
+    });
+  };
+};
+
+export const leaveFromGroup = (info) => {
+  axios
+    .put("http://localhost:5000/groupAccount/remove-group-member", info, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    })
+    .catch(() => alert("Something is wrong. Please try again"));
+};
+
+export const addMemberInGroup = (data = {}) => {
+  if (!data?._id) return;
+  return (dispatch) => {
+    dispatch({
+      type: SET_ADD_MEMBER_ERROR_ICON,
+      payload: false,
+    });
+    dispatch({
+      type: SET_ADD_MEMBER_SPINNER,
+      payload: true,
+    });
+    axios
+      .put("http://localhost:5000/groupAccount/add-new-member", data, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      })
+      .then(() => {
+        dispatch({
+          type: SET_ADD_MEMBER_SPINNER,
+          payload: false,
+        });
+
+        dispatch({
+          type: SET_ADD_MEMBER_COMPLETE_ICON,
+          payload: true,
+        });
+
+        setTimeout(() => {
+          dispatch({
+            type: SET_ADD_MEMBER_COMPLETE_ICON,
+            payload: false,
+          });
+        }, 100);
+      })
+      .catch(() => {
+        dispatch({
+          type: SET_ADD_MEMBER_SPINNER,
+          payload: false,
+        });
+        dispatch({
+          type: SET_ADD_MEMBER_ERROR_ICON,
+          payload: true,
+        });
+        setTimeout(() => {
+          dispatch({
+            type: SET_ADD_MEMBER_ERROR_ICON,
+            payload: false,
+          });
+        }, 150);
+        alert("Something is wrong. Please try again");
+      });
+  };
+};
+
+export const updateGroupListData = (data, groups, groupData, groupInfo) => {
+  return (dispatch) => {
+    const updatedGroup = { ...groupData, ...data.updatedData };
+    const index = groups.findIndex((g) => g._id === data._id);
+    groups.splice(index, 1, updatedGroup);
+
+    dispatch({
+      type: SET_GROUP_LIST_FROM_DATABASE,
+      payload: groups,
+    });
+
+    if (!groupInfo?._id) return;
+    if (groupInfo?._id !== data._id) return;
+    const newData = { ...groupInfo, ...data.updatedData };
+    dispatch({
+      type: GET_GROUP_INFO,
+      payload: newData,
+    });
   };
 };

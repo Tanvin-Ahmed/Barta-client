@@ -1,6 +1,7 @@
 // login
 export const SET_LOGIN_SPINNER = "set_login_spinner";
 export const SET_VERIFY_JWT_TOKEN_SPINNER = "set_verify_jwt_token_spinner";
+export const SET_ACCESS_TOKEN = "set_access_token";
 
 // user
 export const SET_SPINNER_FOR_CHAT_LIST = "set_spinner_for_chat_list";
@@ -17,6 +18,7 @@ export const GET_RECEIVER_INFO = "get_receiver_info";
 export const UPDATE_FRIEND_STATUS = "update_friend_status";
 export const UPDATE_CHAT_STATUS = "update_chat_status";
 export const SET_FIND_FRIEND_ERROR = "set_find_friend_error";
+export const SET_PROFILE_UPDATE_SPINNER = "set_profile_update_spinner";
 // message
 export const GET_MESSAGES_FROM_DB = "get_message_from_db";
 export const GET_OLD_MESSAGES_FROM_DB = "get_old_message_from_db";
@@ -95,3 +97,6 @@ export const CLEAR_GROUP_CREATED_SUCCESSFULLY_STATUS =
 // group info
 export const GET_GROUP_INFO = "get_group_info";
 export const SET_SPINNER_FOR_GROUP_LIST = "set_spinner_for_group_list";
+export const SET_ADD_MEMBER_SPINNER = "set_add_member_spinner";
+export const SET_ADD_MEMBER_COMPLETE_ICON = "set_add_member_complete_icon";
+export const SET_ADD_MEMBER_ERROR_ICON = "set_add_member_error_icon";

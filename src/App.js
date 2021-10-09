@@ -21,7 +21,7 @@ const App = () => {
   useEffect(() => {
     const getData = () => {
       if (navigator.onLine) {
-        dispatch(getUserInfo());
+        dispatch(getUserInfo("firstTime"));
       }
     };
     const conditionOfNetwork = () => {
@@ -41,12 +41,20 @@ const App = () => {
     };
   }, [dispatch]);
 
+  // socket
   useEffect(() => {
     const s = io("http://localhost:5000/");
     setSocket(s);
 
     return () => s.close();
   }, []);
+
+  // refresh jwt
+  useEffect(() => {
+    setInterval(() => {
+      dispatch(getUserInfo());
+    }, 60 * 60000);
+  }, [dispatch]);
 
   // PREVENT RELOAD PAGE //
   useEffect(() => {

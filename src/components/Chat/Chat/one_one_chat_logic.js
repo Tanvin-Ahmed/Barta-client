@@ -29,8 +29,8 @@ export const getUsersData = async (dispatch, id) => {
   await dispatch(getReceiverInfo(id));
 };
 
-export const getGroupInfo = (dispatch, groupName) => {
-  dispatch(getGroupIdForChatBar(groupName, ""));
+export const getGroupInfo = (dispatch, id) => {
+  dispatch(getGroupIdForChatBar(id, ""));
 };
 
 export const getRoomId = (email) => {
