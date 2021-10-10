@@ -85,7 +85,6 @@ const Chat = ({
     uploadPercentage,
     largeScreen,
     typing,
-    clickUploadOption,
     chosenFiles,
     isOpenOptions,
     reactTabIsOpen,
@@ -111,7 +110,6 @@ const Chat = ({
     uploadPercentage: state.messageReducer.uploadPercentage,
     largeScreen: state.messageReducer.largeScreen,
     typing: state.messageReducer.typing,
-    clickUploadOption: state.messageReducer.clickUploadOption,
     chosenFiles: state.messageReducer.chosenFiles,
     isOpenOptions: state.messageReducer.isOpenOptions,
     reactTabIsOpen: state.messageReducer.reactTabIsOpen,
@@ -133,6 +131,22 @@ const Chat = ({
     showCallButtons: state.groupCallReducer.showCallButtons,
   }));
   const [inputText, setInputText] = useState("");
+  const text = useRef(null);
+  const [cursorPosition, setCursorPosition] = useState(null);
+
+  const onEmojiClick = (event, { emoji }) => {
+    const ref = text.current;
+    ref.focus();
+    const start = inputText.substring(0, ref.selectionStart);
+    const end = inputText.substring(ref.selectionStart);
+    const msg = start + emoji + end;
+    setInputText(msg);
+    setCursorPosition(start.length + emoji.length);
+  };
+
+  useEffect(() => {
+    text.current.selectionEnd = cursorPosition;
+  }, [cursorPosition]);
 
   ////////// GET ROOM ID //////////
   const roomId = useMemo(() => {
@@ -407,7 +421,6 @@ const Chat = ({
               dispatch={dispatch}
             />
           )}
-          {clickUploadOption && <UploadFile dispatch={dispatch} />}
 
           <ChatFooter
             largeScreen={largeScreen}
@@ -415,10 +428,11 @@ const Chat = ({
             senderEmail={senderInfo?.email}
             inputText={inputText}
             setInputText={setInputText}
+            text={text}
+            onEmojiClick={onEmojiClick}
             handleOnEnter={handleOnEnter}
-            dispatch={dispatch}
-            clickUploadOption={clickUploadOption}
             chosenFiles={chosenFiles[0]}
+            dispatch={dispatch}
           />
         </>
       )}

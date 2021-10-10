@@ -21,7 +21,7 @@ import AdapterDateFns from "@material-ui/lab/AdapterDateFns";
 const Login = () => {
   const [passwordShow, setPasswordShow] = useState("password");
   const [login, setLogin] = useState(true);
-  const [birthday, setBirthday] = useState(null);
+  const [birthday, setBirthday] = useState(new Date().toUTCString());
   initializationLoginFramework();
 
   const dispatch = useDispatch();
@@ -99,7 +99,7 @@ const Login = () => {
               email: data.email,
               password: data.password,
               confirm: data.confirm,
-              birthday: new Date(birthday).toUTCString(),
+              birthday: birthday,
             };
             dispatch(sendSignInRequest(userInfo, history, from));
           } else alert("Birthday required");
@@ -168,7 +168,7 @@ const Login = () => {
                 {...register("confirm", { required: true })}
                 placeholder="Confirm Password"
               />
-              {errors.confirm && <span>This field is required</span>}
+              {errors.confirm && <span>Confirm password is required</span>}
             </>
           )}
 
@@ -180,7 +180,9 @@ const Login = () => {
                   label="Birth Day"
                   inputFormat="MM/dd/yyyy"
                   value={new Date().toUTCString()}
-                  onChange={(value) => setBirthday(value)}
+                  onChange={(value) =>
+                    setBirthday(new Date(value).toUTCString())
+                  }
                   renderInput={(params) => <TextField {...params} />}
                 />
               </LocalizationProvider>
@@ -189,15 +191,15 @@ const Login = () => {
 
           <div className="button__container">
             <button className="submit__button" type="submit">
-              {login ? "Log In" : "Sign In"}
+              {login ? "Log In" : "Sign In"} {"  "}
+              {loginSpinner && (
+                <CircularProgress
+                  style={{ color: "white", height: "0.7rem", width: "0.7rem" }}
+                />
+              )}
             </button>
           </div>
         </form>
-        {loginSpinner && (
-          <div className="mt-3 mb-2 d-flex justify-content-center align-items-center">
-            <CircularProgress size="small" />
-          </div>
-        )}
         <div className="signIn_btn">
           {login ? (
             <>
@@ -211,9 +213,9 @@ const Login = () => {
           )}
         </div>
 
-        <button onClick={signIn} className="google__btn">
+        {/* <button onClick={signIn} className="google__btn">
           SignIn with Google
-        </button>
+        </button> */}
       </div>
     </section>
   );

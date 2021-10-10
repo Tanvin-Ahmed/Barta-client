@@ -5,7 +5,6 @@ import {
   GET_NEW_MESSAGE_FROM_SOCKET,
   SCREEN_SIZE,
   IS_TYPE,
-  CLICK_UPLOAD_OPTION,
   SELECTED_FILES,
   OPEN_OPTIONS_FOR_CHAT,
   REACT_TAB_TOGGLE,
@@ -24,7 +23,6 @@ const initialState = {
   getMessageSpinner: false,
   largeScreen: true,
   typing: false,
-  clickUploadOption: false,
   chosenFiles: [],
   isOpenOptions: {},
   reactTabIsOpen: false,
@@ -94,12 +92,6 @@ const messageReducer = (state = initialState, action) => {
       return {
         ...state,
         typing: action.payload,
-      };
-
-    case CLICK_UPLOAD_OPTION:
-      return {
-        ...state,
-        clickUploadOption: action.payload,
       };
 
     case SELECTED_FILES:

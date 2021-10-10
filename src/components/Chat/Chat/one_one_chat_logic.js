@@ -113,7 +113,6 @@ export const handleSendMessage = (
 
 export const fileUpload = (e, dispatch) => {
   const newFiles = e.target.files;
-
   const files = [];
   for (let i = 0; i < newFiles.length; i++) {
     const element = newFiles[i];

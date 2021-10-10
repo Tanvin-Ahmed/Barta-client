@@ -45,7 +45,7 @@ export const ChatBarHeader = ({
               src={
                 userPhotoURL
                   ? userPhotoURL
-                  : `https://barta-the-real-time-chat-app.herokuapp.com/user/account/get-profile-img/${photoId}`
+                  : `http://localhost:5000/user/account/get-profile-img/${photoId}`
               }
             />
             <div className="onLine" />
@@ -128,7 +128,7 @@ export const ChatList = ({
                     src={
                       friend?.photoURL
                         ? friend?.photoURL
-                        : `https://barta-the-real-time-chat-app.herokuapp.com/user/account/get-profile-img/${friend?.photoId}`
+                        : `http://localhost:5000/user/account/get-profile-img/${friend?.photoId}`
                     }
                   />
                   <div
@@ -203,7 +203,7 @@ export const GroupList = ({ groups, history, spinnerForGroupList }) => {
               >
                 <div style={{ position: "relative" }} className="mr-3">
                   <Avatar
-                    src={`https://barta-the-real-time-chat-app.herokuapp.com/groupAccount/get-profile-img/${group?.photoId}`}
+                    src={`http://localhost:5000/groupAccount/get-profile-img/${group?.photoId}`}
                   />
                   <div
                     className={group?.status === "active" ? "onLine" : "d-none"}
@@ -279,7 +279,7 @@ export const SearchFriend = ({
                   src={
                     selectedId?.photoURL
                       ? selectedId?.photoURL
-                      : `https://barta-the-real-time-chat-app.herokuapp.com/user/account/get-profile-img/${selectedId?.photoId}`
+                      : `http://localhost:5000/user/account/get-profile-img/${selectedId?.photoId}`
                   }
                 />
               </div>
@@ -336,7 +336,7 @@ export const SearchFriend = ({
                       src={
                         otherUser?.photoURL
                           ? otherUser?.photoURL
-                          : `https://barta-the-real-time-chat-app.herokuapp.com/user/account/get-profile-img/${otherUser?.photoId}`
+                          : `http://localhost:5000/user/account/get-profile-img/${otherUser?.photoId}`
                       }
                     />
                   </div>

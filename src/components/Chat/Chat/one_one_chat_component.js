@@ -6,10 +6,11 @@ import VideoCallIcon from "@material-ui/icons/VideoCall";
 import { Avatar, CardActionArea, IconButton } from "@material-ui/core";
 import ScrollToBottom from "react-scroll-to-bottom";
 import { css } from "@emotion/css";
-import InputEmoji from "react-input-emoji";
+import InsertEmoticonIcon from "@mui/icons-material/InsertEmoticon";
 import AttachFileIcon from "@material-ui/icons/AttachFile";
 import SendIcon from "@material-ui/icons/Send";
 import CircularProgress from "@material-ui/core/CircularProgress";
+import Picker from "emoji-picker-react";
 import {
   deleteChosenFiles,
   fileUpload,
@@ -21,11 +22,7 @@ import {
 import AddCircleIcon from "@material-ui/icons/AddCircle";
 import InsertPhotoIcon from "@material-ui/icons/InsertPhoto";
 import VideoLibraryIcon from "@material-ui/icons/VideoLibrary";
-import {
-  deleteChat,
-  download,
-  isClickUploadOption,
-} from "../../../app/actions/messageAction";
+import { deleteChat, download } from "../../../app/actions/messageAction";
 import HighlightOffIcon from "@material-ui/icons/HighlightOff";
 import DeleteIcon from "@material-ui/icons/Delete";
 import AddReactionIcon from "@material-ui/icons/AddReaction";
@@ -38,6 +35,8 @@ import CallMissedOutgoingIcon from "@material-ui/icons/CallMissedOutgoing";
 import CallMissedIcon from "@material-ui/icons/CallMissed";
 import Timer from "../PrivateCallSystem/Timer.jsx";
 import path from "path";
+import { useState } from "react";
+import { Menu, MenuItem } from "@mui/material";
 
 const CallButtons = ({ callUser }) => {
   return (
@@ -83,9 +82,9 @@ export const ChatHeader = ({
             receiverInfo?.displayName
               ? receiverInfo?.photoURL
                 ? receiverInfo.photoURL
-                : `https://barta-the-real-time-chat-app.herokuapp.com/user/account/get-profile-img/${receiverInfo?.photoId}`
+                : `http://localhost:5000/user/account/get-profile-img/${receiverInfo?.photoId}`
               : groupInfo?.photoId &&
-                `https://barta-the-real-time-chat-app.herokuapp.com/groupAccount/get-profile-img/${groupInfo?.photoId}`
+                `http://localhost:5000/groupAccount/get-profile-img/${groupInfo?.photoId}`
           }
         />
         {addChatList && (
@@ -369,12 +368,12 @@ export const ChatBody = ({
                             return (
                               <a
                                 key={index}
-                                href={`https://barta-the-real-time-chat-app.herokuapp.com/chatMessage/file/${file?.filename}`}
+                                href={`http://localhost:5000/chatMessage/file/${file?.filename}`}
                               >
                                 <img
                                   key={file.fileId}
                                   className="chat__img"
-                                  src={`https://barta-the-real-time-chat-app.herokuapp.com/chatMessage/file/${file?.filename}`}
+                                  src={`http://localhost:5000/chatMessage/file/${file?.filename}`}
                                   alt={`${index + 1}`}
                                 />
                               </a>
@@ -398,7 +397,7 @@ export const ChatBody = ({
                                 <video
                                   key={file.fileId}
                                   className="chat__img"
-                                  src={`https://barta-the-real-time-chat-app.herokuapp.com/chatMessage/file/${file?.filename}`}
+                                  src={`http://localhost:5000/chatMessage/file/${file?.filename}`}
                                   controls
                                   controlsList="nodownload"
                                 ></video>
@@ -544,100 +543,177 @@ export const ShowFileBeforeUpload = ({ chosenFiles, dispatch }) => {
   );
 };
 
-export const UploadFile = ({ dispatch }) => {
-  return (
-    <div className="upload__file">
-      <div>
-        <IconButton onChange={(e) => fileUpload(e, dispatch)} className="icon">
-          <input type="file" name="file" accept="image/*" id="image" multiple />
-          <label htmlFor="image">
-            <InsertPhotoIcon size="small" className="text-light" />
-          </label>
-        </IconButton>
-      </div>
-      <div>
-        <IconButton onChange={(e) => fileUpload(e, dispatch)} className="icon">
-          <input type="file" name="file" accept="video/*" id="video" />
-          <label htmlFor="video">
-            <VideoLibraryIcon size="small" className="text-light" />
-          </label>
-        </IconButton>
-      </div>
-      <div>
-        <IconButton onChange={(e) => fileUpload(e, dispatch)} className="icon">
-          <input type="file" name="file" accept="file/*" id="file" multiple />
-          <label htmlFor="file">
-            <AttachFileIcon size="small" className="text-light" />
-          </label>
-        </IconButton>
-      </div>
-    </div>
-  );
-};
-
 export const ChatFooter = ({
   largeScreen,
   socket,
   senderEmail,
   inputText,
   setInputText,
+  text,
+  onEmojiClick,
   handleOnEnter,
-  dispatch,
-  clickUploadOption,
   chosenFiles,
+  dispatch,
 }) => {
+  const [openEmoji, setOpenEmoji] = useState(false);
   return (
-    <div className="chat__footer">
-      {!inputText.trim() && (
-        <IconButton
-          onClick={() => dispatch(isClickUploadOption(!clickUploadOption))}
-          className="icon"
+    <div
+      className={
+        openEmoji ? "chat__footer_withEmoji" : "chat__footer_withoutEmoji"
+      }
+    >
+      <div className="chat__footer_container">
+        {largeScreen ? (
+          <>
+            <div
+              className="d-flex justify-content-between align-items-center"
+              style={{ flex: 1 }}
+              onFocus={(e) => handleIsType(e, socket, senderEmail)}
+              onBlur={(e) => handleIsType(e, socket, senderEmail)}
+            >
+              {!inputText.trim() && <FilePicker dispatch={dispatch} />}
+              <textarea
+                cols="30"
+                rows="2"
+                ref={text}
+                value={inputText}
+                onChange={(e) => setInputText(e.target.value)}
+                onFocus={() => setOpenEmoji(false)}
+                placeholder="Type a message"
+              ></textarea>
+              <IconButton
+                onClick={() => setOpenEmoji(!openEmoji)}
+                className="icon"
+              >
+                <InsertEmoticonIcon
+                  style={{ color: "white" }}
+                  className="icon__button"
+                />
+              </IconButton>
+              {(inputText.trim() || chosenFiles) && (
+                <IconButton onClick={handleOnEnter} className="icon">
+                  <SendIcon className="icon__button text-light" />
+                </IconButton>
+              )}
+            </div>
+          </>
+        ) : (
+          <>
+            <div
+              className="d-flex justify-content-between align-items-center"
+              style={{ flex: 1 }}
+              onFocus={(e) => handleIsType(e, socket, senderEmail)}
+              onBlur={(e) => handleIsType(e, socket, senderEmail)}
+            >
+              {!inputText.trim() && <FilePicker dispatch={dispatch} />}
+              <textarea
+                cols="30"
+                rows="2"
+                ref={text}
+                value={inputText}
+                onChange={(e) => setInputText(e.target.value)}
+                onFocus={() => setOpenEmoji(false)}
+                placeholder="Type a message"
+              ></textarea>
+              <IconButton
+                onClick={() => setOpenEmoji(!openEmoji)}
+                className="icon"
+              >
+                <InsertEmoticonIcon
+                  style={{ color: "white" }}
+                  className="icon__button"
+                />
+              </IconButton>
+              {(inputText.trim() || chosenFiles) && (
+                <IconButton onClick={handleOnEnter} className="icon send__icon">
+                  <SendIcon className="text-light" />
+                </IconButton>
+              )}
+            </div>
+          </>
+        )}
+      </div>
+      {openEmoji && (
+        <Picker style={{ width: "100%" }} onEmojiClick={onEmojiClick} />
+      )}
+    </div>
+  );
+};
+
+const FilePicker = ({ dispatch }) => {
+  const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  return (
+    <div>
+      <IconButton
+        className="icon"
+        id="basic-button"
+        aria-controls="basic-menu"
+        aria-haspopup="true"
+        aria-expanded={open ? "true" : undefined}
+        onClick={handleClick}
+      >
+        <AddCircleIcon className="icon__button text-light add__button" />
+      </IconButton>
+      <Menu
+        id="basic-menu"
+        anchorEl={anchorEl}
+        open={open}
+        onClose={handleClose}
+        MenuListProps={{
+          "aria-labelledby": "basic-button",
+        }}
+      >
+        <MenuItem
+          onChange={(e) => {
+            fileUpload(e, dispatch);
+            handleClose();
+          }}
         >
-          <AddCircleIcon className="icon__button text-light add__button" />
-        </IconButton>
-      )}
-      {largeScreen ? (
-        <>
-          <div
-            style={{ flex: 1 }}
-            onFocus={(e) => handleIsType(e, socket, senderEmail)}
-            onBlur={(e) => handleIsType(e, socket, senderEmail)}
+          <input type="file" name="file" accept="image/*" id="image" multiple />
+          <label
+            htmlFor="image"
+            style={{ color: "rgb(144, 89, 233)", cursor: "pointer" }}
           >
-            <InputEmoji
-              value={inputText}
-              onChange={setInputText}
-              cleanOnEnter
-              onEnter={handleOnEnter}
-              placeholder="Type a message"
-              style={{ color: "white" }}
-            />
-          </div>
-          {(inputText.trim() || chosenFiles) && (
-            <IconButton onClick={handleOnEnter} className="icon">
-              <SendIcon className="icon__button text-light" />
-            </IconButton>
-          )}
-        </>
-      ) : (
-        <>
-          <div
-            style={{ flex: 1 }}
-            onFocus={(e) => handleIsType(e, socket, senderEmail)}
-            onBlur={(e) => handleIsType(e, socket, senderEmail)}
+            Image <InsertPhotoIcon size="small" />
+          </label>
+        </MenuItem>
+        <MenuItem
+          onChange={(e) => {
+            fileUpload(e, dispatch);
+            handleClose();
+          }}
+        >
+          <input type="file" name="file" accept="video/*" id="video" />
+          <label
+            htmlFor="video"
+            style={{ color: "rgb(144, 89, 233)", cursor: "pointer" }}
           >
-            <InputEmoji
-              value={inputText}
-              onChange={setInputText}
-              placeholder="Type a message"
-            />
-          </div>
-          {(inputText.trim() || chosenFiles) && (
-            <IconButton onClick={handleOnEnter} className="icon send__icon">
-              <SendIcon className="text-light" />
-            </IconButton>
-          )}
-        </>
-      )}
+            Video <VideoLibraryIcon size="small" />
+          </label>
+        </MenuItem>
+        <MenuItem
+          onChange={(e) => {
+            fileUpload(e, dispatch);
+            handleClose();
+          }}
+        >
+          <input type="file" name="file" accept="file/*" id="file" multiple />
+          <label
+            htmlFor="file"
+            style={{ color: "rgb(144, 89, 233)", cursor: "pointer" }}
+          >
+            File <AttachFileIcon size="small" />
+          </label>
+        </MenuItem>
+      </Menu>
     </div>
   );
 };

@@ -28,7 +28,6 @@ export const CHAT_UPLOAD_PERCENTAGE = "chat_upload_percentage";
 export const GET_NEW_MESSAGE_FROM_SOCKET = "get_new_message_from_socket";
 export const SCREEN_SIZE = "screen_size";
 export const IS_TYPE = "is_type";
-export const CLICK_UPLOAD_OPTION = "click_upload_option";
 export const UPDATE_REACT = "update_react";
 export const UPDATE_CHAT_REACT = "update_chat_react";
 export const DELETE_CHAT_MESSAGE = "delete_chat_message";
