@@ -159,7 +159,7 @@ const UpdateAccount = () => {
                 style={{ color: "white" }}
                 label="Birth Day"
                 inputFormat="MM/dd/yyyy"
-                value={new Date(userInfo.birthday)}
+                value={birthday}
                 onChange={(value) => setBirthday(value)}
                 renderInput={(params) => <TextField {...params} />}
               />

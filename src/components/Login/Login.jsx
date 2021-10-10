@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory, useLocation } from "react-router";
 import {
-  accessTokenForGoogle,
   postMyInfo,
   sendLoginRequest,
   sendSignInRequest,
@@ -23,6 +22,8 @@ const Login = () => {
   const [login, setLogin] = useState(true);
   const [birthday, setBirthday] = useState(new Date().toUTCString());
   initializationLoginFramework();
+
+  console.log(birthday);
 
   const dispatch = useDispatch();
   const { loginSpinner } = useSelector((state) => ({
@@ -99,7 +100,7 @@ const Login = () => {
               email: data.email,
               password: data.password,
               confirm: data.confirm,
-              birthday: birthday,
+              birthday: new Date(birthday).toUTCString(),
             };
             dispatch(sendSignInRequest(userInfo, history, from));
           } else alert("Birthday required");
@@ -179,10 +180,8 @@ const Login = () => {
                   style={{ color: "white" }}
                   label="Birth Day"
                   inputFormat="MM/dd/yyyy"
-                  value={new Date().toUTCString()}
-                  onChange={(value) =>
-                    setBirthday(new Date(value).toUTCString())
-                  }
+                  value={birthday}
+                  onChange={(value) => setBirthday(value)}
                   renderInput={(params) => <TextField {...params} />}
                 />
               </LocalizationProvider>
