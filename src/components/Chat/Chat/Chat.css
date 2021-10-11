@@ -234,18 +234,29 @@
   left: 92%;
 }
 
-.react_options {
+.chat__body .react__tab .back__drop {
   position: absolute;
-  background-color: rgb(88, 61, 160);
-  border-radius: 5rem;
-  height: 2rem;
-  z-index: 1200;
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  z-index: 100;
+  background-color: rgba(0, 0, 0, 0.144);
 }
 
-.react_options_receiver {
+.chat__body .react_options {
   position: absolute;
   background-color: rgb(88, 61, 160);
-  left: -200%;
+  border-radius: 5px;
+  /* height: 2rem; */
+  z-index: 1200;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
 }
 
 .chose {
@@ -253,6 +264,7 @@
   border-radius: 50%;
   transition: all 0.5s;
   cursor: pointer;
+  margin: 0.15rem;
 }
 
 .chose:hover {

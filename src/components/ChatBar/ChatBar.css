@@ -13,11 +13,11 @@
   font-family: "Lobster", cursive;
   color: rgb(22, 24, 39);
 }
-.find__friend input,
-.find__users input,
-.find__friend input:focus,
-.find__users input:focus {
-  background-color: transparent;
+.find__friend input[type="text"],
+.find__users input[type="text"],
+.find__friend input[type="text"]:focus,
+.find__users input[type="text"]:focus {
+  background-color: rgb(50, 30, 73);
   color: white !important;
   font-weight: 400;
   letter-spacing: 1px;

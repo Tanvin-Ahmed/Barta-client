@@ -31,13 +31,7 @@ import {
 } from "../../app/actions/userAction";
 import { useState } from "react";
 
-export const ChatBarHeader = ({
-  userPhotoURL,
-  photoId,
-  dispatch,
-  chatList,
-  openGroupList,
-}) => {
+export const ChatBarHeader = ({ userPhotoURL, photoId }) => {
   return (
     <div className="chatBar__header">
       <div className="d-flex align-items-center justify-content-between flex-wrap">
@@ -60,26 +54,6 @@ export const ChatBarHeader = ({
           <Dropdown />
         </div>
       </div>
-      {/* <div className="add__friend mt-2 d-flex justify-content-around align-items-center flex-wrap">
-        <div title="Friend list">
-          <CardActionArea
-            className={chatList && "listTab__open"}
-            style={{ padding: "0.6rem", borderRadius: "50%" }}
-            onClick={() => openFriendListTab(dispatch)}
-          >
-            <PersonOutlineIcon className="text-light" size="small" />
-          </CardActionArea>
-        </div>
-        <div title="Group list">
-          <CardActionArea
-            className={openGroupList && "listTab__open"}
-            style={{ padding: "0.6rem", borderRadius: "50%" }}
-            onClick={() => openGroupListTab(dispatch)}
-          >
-            <PeopleIcon className="text-light" size="small" />
-          </CardActionArea>
-        </div>
-      </div> */}
     </div>
   );
 };
@@ -150,23 +124,6 @@ export const ChatList = ({
   );
 };
 
-// export const MakeNewFriendButton = ({ dispatch }) => {
-//   return (
-//     <div title="Make new friend" className="make__newFriend__button">
-//       <CardActionArea
-//         style={{
-//           padding: "0.6rem",
-//           borderRadius: "50%",
-//           backgroundColor: "rgb(7, 17, 63)",
-//         }}
-//         onClick={() => openSearchToMakeFriendTab(dispatch)}
-//       >
-//         <PersonAddIcon className="text-light" size="small" />
-//       </CardActionArea>
-//     </div>
-//   );
-// };
-
 export const GroupList = ({ groups, history, spinnerForGroupList }) => {
   const [searchTerm, setSearchTerm] = useState("");
   return (
@@ -221,23 +178,6 @@ export const GroupList = ({ groups, history, spinnerForGroupList }) => {
     </div>
   );
 };
-
-// export const MakeNewGroupButton = ({ dispatch }) => {
-//   return (
-//     <div title="Make new Group" className="make__newFriend__button">
-//       <CardActionArea
-//         style={{
-//           padding: "0.6rem",
-//           borderRadius: "50%",
-//           backgroundColor: "rgb(7, 17, 63)",
-//         }}
-//         onClick={() => openGroupMakingTab(dispatch)}
-//       >
-//         <GroupAddIcon className="text-light" size="small" />
-//       </CardActionArea>
-//     </div>
-//   );
-// };
 
 export const SearchFriend = ({
   userEmail,

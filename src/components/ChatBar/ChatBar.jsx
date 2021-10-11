@@ -179,9 +179,6 @@ const ChatBar = ({ socket }) => {
       <ChatBarHeader
         userPhotoURL={userInfo?.photoURL}
         photoId={userInfo?.photoId}
-        dispatch={dispatch}
-        chatList={friendListOpen}
-        openGroupList={openGroupList}
       />
       <div className="list__body">
         {friendListOpen && !makeGroup && !openGroupList && (
@@ -192,7 +189,6 @@ const ChatBar = ({ socket }) => {
               spinnerForChatList={spinnerForChatList}
               friendNotAvailable={friendNotAvailable}
             />
-            {/* <MakeNewFriendButton dispatch={dispatch} /> */}
           </>
         )}
         {!friendListOpen && !makeGroup && openGroupList && (
@@ -202,7 +198,6 @@ const ChatBar = ({ socket }) => {
               history={history}
               spinnerForGroupList={spinnerForGroupList}
             />
-            {/* <MakeNewGroupButton dispatch={dispatch} /> */}
           </>
         )}
         {((!friendListOpen && !makeGroup && !openGroupList) ||

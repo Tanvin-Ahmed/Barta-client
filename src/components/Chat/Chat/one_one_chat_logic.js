@@ -76,6 +76,7 @@ export const handleSendMessage = (
       const element = chosenFiles[i]?.file;
       data.append("file", element);
     }
+    data.append("status", "unseen");
     data.append("timeStamp", new Date().toUTCString());
 
     // console.log(data);
@@ -87,6 +88,7 @@ export const handleSendMessage = (
       sender: senderEmail,
       message: inputText,
       react: [],
+      status: "unseen",
       timeStamp: new Date().toUTCString(),
     };
     dispatch(sendMessageInDatabase(chat));

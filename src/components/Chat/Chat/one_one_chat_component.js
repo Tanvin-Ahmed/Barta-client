@@ -154,7 +154,7 @@ export const UploadProgressBar = ({ uploadPercentage }) => {
 
 const Options = ({ dispatch, reactTabIsOpen, message, sender }) => {
   return (
-    <div className="position-relative">
+    <div>
       <div
         className={
           message?.sender === sender
@@ -185,49 +185,129 @@ const Options = ({ dispatch, reactTabIsOpen, message, sender }) => {
         </IconButton>
       </div>
       {reactTabIsOpen && (
-        <div
-          className={`${
-            message?.sender === sender ? "" : "react_options_receiver"
-          } react_options d-flex justify-content-center align-items-center`}
-        >
-          <p
-            onClick={() => handleReactions(dispatch, message, sender, "🧡")}
-            className=" p-1 chose"
-          >
-            🧡
-          </p>
-          <p
-            onClick={() => handleReactions(dispatch, message, sender, "😢")}
-            className=" p-1 chose"
-          >
-            😢
-          </p>
-          <p
-            onClick={() => handleReactions(dispatch, message, sender, "😠")}
-            className="p-1 chose"
-          >
-            😠
-          </p>
-          <p
-            onClick={() => handleReactions(dispatch, message, sender, "🙄")}
-            className="p-1 chose"
-          >
-            🙄
-          </p>
-          <p
-            onClick={() =>
-              handleReactions(dispatch, message?._id, sender, "😦")
-            }
-            className="p-1 chose"
-          >
-            😦
-          </p>
-          <p
-            onClick={() => handleReactions(dispatch, message, sender, "👍")}
-            className="p-1 chose"
-          >
-            👍
-          </p>
+        <div className="react__tab">
+          <div
+            onClick={() => toggleReactTab(dispatch, !reactTabIsOpen)}
+            className="back__drop"
+          />
+          <div className="react_options">
+            <p
+              onClick={() => handleReactions(dispatch, message, sender, "🧡")}
+              className="chose"
+            >
+              🧡
+            </p>
+            <p
+              onClick={() => handleReactions(dispatch, message, sender, "😍")}
+              className="chose"
+            >
+              😍
+            </p>
+            <p
+              onClick={() => handleReactions(dispatch, message, sender, "😘")}
+              className="chose"
+            >
+              😘
+            </p>
+            <p
+              onClick={() => handleReactions(dispatch, message, sender, "🥰")}
+              className="chose"
+            >
+              🥰
+            </p>
+            <p
+              onClick={() => handleReactions(dispatch, message, sender, "🤗")}
+              className="chose"
+            >
+              🤗
+            </p>
+            <p
+              onClick={() => handleReactions(dispatch, message, sender, "😢")}
+              className="chose"
+            >
+              😢
+            </p>
+            <p
+              onClick={() => handleReactions(dispatch, message, sender, "🤣")}
+              className="chose"
+            >
+              🤣
+            </p>
+            <p
+              onClick={() => handleReactions(dispatch, message, sender, "😍")}
+              className="chose"
+            >
+              😅
+            </p>
+            <p
+              onClick={() => handleReactions(dispatch, message, sender, "🥰")}
+              className="chose"
+            >
+              🙂
+            </p>
+            <p
+              onClick={() => handleReactions(dispatch, message, sender, "😠")}
+              className="chose"
+            >
+              😠
+            </p>
+            <p
+              onClick={() => handleReactions(dispatch, message, sender, "😭")}
+              className="chose"
+            >
+              😭
+            </p>
+            <p
+              onClick={() => handleReactions(dispatch, message, sender, "🙄")}
+              className="chose"
+            >
+              🙄
+            </p>
+            <p
+              onClick={() =>
+                handleReactions(dispatch, message?._id, sender, "😦")
+              }
+              className="chose"
+            >
+              😦
+            </p>
+            <p
+              onClick={() => handleReactions(dispatch, message, sender, "😋")}
+              className="chose"
+            >
+              😋
+            </p>
+            <p
+              onClick={() => handleReactions(dispatch, message, sender, "😪")}
+              className="chose"
+            >
+              😪
+            </p>
+            <p
+              onClick={() => handleReactions(dispatch, message, sender, "🥰")}
+              className="chose"
+            >
+              🤪
+            </p>
+            <p
+              onClick={() => handleReactions(dispatch, message, sender, "😴")}
+              className="chose"
+            >
+              😴
+            </p>
+            <p
+              onClick={() => handleReactions(dispatch, message, sender, "🤔")}
+              className="chose"
+            >
+              🤔
+            </p>
+            <p
+              onClick={() => handleReactions(dispatch, message, sender, "👍")}
+              className="chose"
+            >
+              👍
+            </p>
+          </div>
         </div>
       )}
     </div>
