@@ -11,6 +11,7 @@ import {
   SearchFriend,
   MakeNewFriendButton,
   MakeNewGroupButton,
+  BottomNavigationBar,
 } from "./chatBar_component";
 import {
   clearGroupCreateSuccessfullyStatus,
@@ -33,7 +34,7 @@ const ChatBar = ({ socket }) => {
     error,
     loading,
     spinnerForChatList,
-    chatList,
+    friendListOpen,
     userInfo,
     accessToken,
     userStatusToReceiveOtherCall,
@@ -53,7 +54,7 @@ const ChatBar = ({ socket }) => {
     error: state.userReducer.error,
     loading: state.userReducer.loading,
     spinnerForChatList: state.userReducer.spinnerForChatList,
-    chatList: state.userReducer.addChatList,
+    friendListOpen: state.userReducer.friendListOpen,
     userInfo: state.userReducer.userInfo,
     accessToken: state.userReducer.accessToken,
     // private call
@@ -77,14 +78,14 @@ const ChatBar = ({ socket }) => {
   useEffect(() => {
     const getData = () => {
       if (navigator.onLine) {
-        chatList &&
+        friendListOpen &&
           fetchFriendList.current &&
           dispatch(getFriendInfo(userInfo?.email));
         openGroupList &&
           fetchGroupList.current &&
           dispatch(setGroupsInfoFromDatabase(userInfo?.email));
 
-        if (chatList) fetchFriendList.current = false;
+        if (friendListOpen) fetchFriendList.current = false;
         if (openGroupList) fetchGroupList.current = false;
       }
     };
@@ -105,7 +106,7 @@ const ChatBar = ({ socket }) => {
       window.removeEventListener("online", conditionOfNetwork);
       window.removeEventListener("offline", conditionOfNetwork);
     };
-  }, [userInfo?.email, dispatch, chatList, openGroupList, accessToken]);
+  }, [userInfo?.email, dispatch, friendListOpen, openGroupList, accessToken]);
 
   //////////////// Friend List Update ///////////////
   useEffect(() => {
@@ -179,11 +180,11 @@ const ChatBar = ({ socket }) => {
         userPhotoURL={userInfo?.photoURL}
         photoId={userInfo?.photoId}
         dispatch={dispatch}
-        chatList={chatList}
+        chatList={friendListOpen}
         openGroupList={openGroupList}
       />
       <div className="list__body">
-        {chatList && !makeGroup && !openGroupList && (
+        {friendListOpen && !makeGroup && !openGroupList && (
           <>
             <ChatList
               friendList={friendList}
@@ -191,21 +192,21 @@ const ChatBar = ({ socket }) => {
               spinnerForChatList={spinnerForChatList}
               friendNotAvailable={friendNotAvailable}
             />
-            <MakeNewFriendButton dispatch={dispatch} />
+            {/* <MakeNewFriendButton dispatch={dispatch} /> */}
           </>
         )}
-        {!chatList && !makeGroup && openGroupList && (
+        {!friendListOpen && !makeGroup && openGroupList && (
           <>
             <GroupList
               groups={groups}
               history={history}
               spinnerForGroupList={spinnerForGroupList}
             />
-            <MakeNewGroupButton dispatch={dispatch} />
+            {/* <MakeNewGroupButton dispatch={dispatch} /> */}
           </>
         )}
-        {((!chatList && !makeGroup && !openGroupList) ||
-          (!chatList && makeGroup && !finalStepToCreateGroup)) && (
+        {((!friendListOpen && !makeGroup && !openGroupList) ||
+          (!friendListOpen && makeGroup && !finalStepToCreateGroup)) && (
           <SearchFriend
             userEmail={userInfo?.email}
             users={users}
@@ -218,7 +219,7 @@ const ChatBar = ({ socket }) => {
             groupCreatingSpinner={groupCreatingSpinner}
           />
         )}
-        {!chatList && makeGroup && finalStepToCreateGroup && (
+        {!friendListOpen && makeGroup && finalStepToCreateGroup && (
           <FinalProcessToCreateGroup
             dispatch={dispatch}
             selectedIdsForGroup={selectedIdsForGroup}
@@ -227,6 +228,7 @@ const ChatBar = ({ socket }) => {
           />
         )}
       </div>
+      <BottomNavigationBar dispatch={dispatch} />
     </section>
   );
 };

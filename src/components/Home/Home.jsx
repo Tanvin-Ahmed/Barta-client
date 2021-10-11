@@ -131,44 +131,37 @@ const Home = ({ socket }) => {
                 setRemoveGroupCallModal={setRemoveGroupCallModal}
               />
             )}
-          {/* {(openPrivateCall || receivingCall || userStream.current) && (
-            <PrivateCall
-              socket={socket}
-              userStream={userStream}
-              myStream={myStream}
-              connectionRef={connectionRef}
-              Peer={Peer}
-            />
-          )} */}
-          {!openGroupCall && !acceptedGroupCall && (
-            <Router>
-              <Switch>
-                <Route path="/login">
-                  <Login />
-                </Route>
-                <PrivateRoute exact path="/">
+          <Router>
+            <Switch>
+              <Route path="/login">
+                <Login />
+              </Route>
+              <PrivateRoute exact path="/">
+                {!openGroupCall && !acceptedGroupCall && (
                   <ChatBar socket={socket} />
-                </PrivateRoute>
-                <PrivateRoute path="/view-profile/:identity">
-                  <Profile />
-                </PrivateRoute>
-                <PrivateRoute path="/update-account/:identity">
-                  <UpdateAccount />
-                </PrivateRoute>
-                <PrivateRoute path="/chat/:id">
+                )}
+              </PrivateRoute>
+              <PrivateRoute path="/view-profile/:identity">
+                {!openGroupCall && !acceptedGroupCall && <Profile />}
+              </PrivateRoute>
+              <PrivateRoute path="/update-account/:identity">
+                {!openGroupCall && !acceptedGroupCall && <UpdateAccount />}
+              </PrivateRoute>
+              <PrivateRoute path="/chat/:id">
+                {!openGroupCall && !acceptedGroupCall && (
                   <Chat
                     socket={socket}
                     myStream={myStream}
                     groupPeersRef={groupPeersRef}
                     roomIdOfReceivingGroupCall={roomIdOfReceivingGroupCall}
                   />
-                </PrivateRoute>
-                <PrivateRoute path="/chat-settings">
-                  <ChatSettings />
-                </PrivateRoute>
-              </Switch>
-            </Router>
-          )}
+                )}
+              </PrivateRoute>
+              <PrivateRoute path="/chat-settings">
+                {!openGroupCall && !acceptedGroupCall && <ChatSettings />}
+              </PrivateRoute>
+            </Switch>
+          </Router>
         </>
       )}
     </section>

@@ -10,6 +10,8 @@ import CircularProgress from "@material-ui/core/CircularProgress";
 import CheckCircleOutlineIcon from "@material-ui/icons/CheckCircleOutline";
 import PersonOutlineIcon from "@material-ui/icons/PersonOutline";
 import Dropdown from "../DropdownMenu/Dropdown";
+import BottomNavigation from "@mui/material/BottomNavigation";
+import BottomNavigationAction from "@mui/material/BottomNavigationAction";
 import {
   addIdToCreateGroup,
   createGroupForFirst,
@@ -58,7 +60,7 @@ export const ChatBarHeader = ({
           <Dropdown />
         </div>
       </div>
-      <div className="add__friend mt-2 d-flex justify-content-around align-items-center flex-wrap">
+      {/* <div className="add__friend mt-2 d-flex justify-content-around align-items-center flex-wrap">
         <div title="Friend list">
           <CardActionArea
             className={chatList && "listTab__open"}
@@ -77,7 +79,7 @@ export const ChatBarHeader = ({
             <PeopleIcon className="text-light" size="small" />
           </CardActionArea>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };
@@ -148,22 +150,22 @@ export const ChatList = ({
   );
 };
 
-export const MakeNewFriendButton = ({ dispatch }) => {
-  return (
-    <div title="Make new friend" className="make__newFriend__button">
-      <CardActionArea
-        style={{
-          padding: "0.6rem",
-          borderRadius: "50%",
-          backgroundColor: "rgb(7, 17, 63)",
-        }}
-        onClick={() => openSearchToMakeFriendTab(dispatch)}
-      >
-        <PersonAddIcon className="text-light" size="small" />
-      </CardActionArea>
-    </div>
-  );
-};
+// export const MakeNewFriendButton = ({ dispatch }) => {
+//   return (
+//     <div title="Make new friend" className="make__newFriend__button">
+//       <CardActionArea
+//         style={{
+//           padding: "0.6rem",
+//           borderRadius: "50%",
+//           backgroundColor: "rgb(7, 17, 63)",
+//         }}
+//         onClick={() => openSearchToMakeFriendTab(dispatch)}
+//       >
+//         <PersonAddIcon className="text-light" size="small" />
+//       </CardActionArea>
+//     </div>
+//   );
+// };
 
 export const GroupList = ({ groups, history, spinnerForGroupList }) => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -220,22 +222,22 @@ export const GroupList = ({ groups, history, spinnerForGroupList }) => {
   );
 };
 
-export const MakeNewGroupButton = ({ dispatch }) => {
-  return (
-    <div title="Make new Group" className="make__newFriend__button">
-      <CardActionArea
-        style={{
-          padding: "0.6rem",
-          borderRadius: "50%",
-          backgroundColor: "rgb(7, 17, 63)",
-        }}
-        onClick={() => openGroupMakingTab(dispatch)}
-      >
-        <GroupAddIcon className="text-light" size="small" />
-      </CardActionArea>
-    </div>
-  );
-};
+// export const MakeNewGroupButton = ({ dispatch }) => {
+//   return (
+//     <div title="Make new Group" className="make__newFriend__button">
+//       <CardActionArea
+//         style={{
+//           padding: "0.6rem",
+//           borderRadius: "50%",
+//           backgroundColor: "rgb(7, 17, 63)",
+//         }}
+//         onClick={() => openGroupMakingTab(dispatch)}
+//       >
+//         <GroupAddIcon className="text-light" size="small" />
+//       </CardActionArea>
+//     </div>
+//   );
+// };
 
 export const SearchFriend = ({
   userEmail,
@@ -255,7 +257,9 @@ export const SearchFriend = ({
           onChange={(e) => handleSearchForFriend(e, userEmail, dispatch)}
           type="text"
           className="form-control"
-          placeholder="Add new Friend"
+          placeholder={
+            makeGroup ? "Search people to make group" : "Add new Friend"
+          }
         />
       </div>
       <div className="my-1" />
@@ -423,5 +427,59 @@ export const FinalProcessToCreateGroup = ({
         </div>
       </div>
     </div>
+  );
+};
+
+export const BottomNavigationBar = ({ dispatch }) => {
+  const [value, setValue] = useState("friendList");
+  const handleChange = (event, newValue) => {
+    setValue(newValue);
+    if (newValue === "friendList") {
+      openFriendListTab(dispatch);
+    } else if (newValue === "addNewFriend") {
+      openSearchToMakeFriendTab(dispatch);
+    } else if (newValue === "groups") {
+      openGroupListTab(dispatch);
+    } else if (newValue === "makeNewGroup") {
+      openGroupMakingTab(dispatch);
+    }
+  };
+  return (
+    <BottomNavigation
+      sx={{
+        position: "absolute",
+        bottom: 0,
+        left: 0,
+        right: 0,
+        background: "rgba(68, 27, 121, 0.445)",
+      }}
+      value={value}
+      onChange={handleChange}
+    >
+      <BottomNavigationAction
+        color="warning"
+        label="Friends"
+        value="friendList"
+        icon={<PersonOutlineIcon sx={{ color: "#fff" }} />}
+      />
+      <BottomNavigationAction
+        sx={{ color: "#fff" }}
+        label="Add"
+        value="addNewFriend"
+        icon={<PersonAddIcon sx={{ color: "#fff" }} />}
+      />
+      <BottomNavigationAction
+        sx={{ color: "#fff" }}
+        label="Groups"
+        value="groups"
+        icon={<PeopleIcon sx={{ color: "#fff" }} />}
+      />
+      <BottomNavigationAction
+        sx={{ color: "#fff" }}
+        label="Create"
+        value="makeNewGroup"
+        icon={<GroupAddIcon sx={{ color: "#fff" }} />}
+      />
+    </BottomNavigation>
   );
 };

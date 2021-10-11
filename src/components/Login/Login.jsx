@@ -23,8 +23,6 @@ const Login = () => {
   const [birthday, setBirthday] = useState(new Date().toUTCString());
   initializationLoginFramework();
 
-  console.log(birthday);
-
   const dispatch = useDispatch();
   const { loginSpinner } = useSelector((state) => ({
     loginSpinner: state.userReducer.loginSpinner,

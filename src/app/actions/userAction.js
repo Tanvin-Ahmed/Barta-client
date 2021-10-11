@@ -1,6 +1,6 @@
 import axios from "axios";
 import {
-  ADD_CHAT_LIST,
+  OPEN_FRIEND_LIST_TAB,
   ERROR_USER_INFO,
   GET_ALL_USER_INFO,
   GET_FRIEND_INFO,
@@ -487,9 +487,9 @@ export const postMyInfo = (user) => {
   };
 };
 
-export const updateChatList = (bool) => {
+export const setFriendListTapOpen = (bool) => {
   return {
-    type: ADD_CHAT_LIST,
+    type: OPEN_FRIEND_LIST_TAB,
     payload: bool,
   };
 };

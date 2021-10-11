@@ -5,30 +5,30 @@ import {
   setOpenGroupList,
   setOpenGroupMakingTab,
   setSelectedIdInfo,
-  updateChatList,
+  setFriendListTapOpen,
   updatedSelectedIdList,
   updateFriendStatus,
 } from "../../app/actions/userAction";
 
 export const openFriendListTab = (dispatch) => {
-  dispatch(updateChatList(true));
+  dispatch(setFriendListTapOpen(true));
   dispatch(setOpenGroupMakingTab(false));
   dispatch(setOpenGroupList(false));
 };
 
 export const openSearchToMakeFriendTab = (dispatch) => {
-  dispatch(updateChatList(false));
+  dispatch(setFriendListTapOpen(false));
   dispatch(setOpenGroupMakingTab(false));
 };
 
 export const openGroupMakingTab = (dispatch) => {
-  dispatch(updateChatList(false));
+  dispatch(setFriendListTapOpen(false));
   dispatch(setOpenGroupMakingTab(true));
   dispatch(setOpenGroupList(false));
 };
 
 export const openGroupListTab = (dispatch) => {
-  dispatch(updateChatList(false));
+  dispatch(setFriendListTapOpen(false));
   dispatch(setOpenGroupMakingTab(false));
   dispatch(setOpenGroupList(true));
 };

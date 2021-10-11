@@ -13,7 +13,7 @@ import {
   getGroupIdForChatBar,
   getReceiverInfo,
   postFriendInfo,
-  updateChatList,
+  setFriendListTapOpen,
 } from "../../../app/actions/userAction";
 
 export const screen = (dispatch) => {
@@ -108,7 +108,7 @@ export const handleSendMessage = (
         ],
       })
     ) &&
-    dispatch(updateChatList(true));
+    dispatch(setFriendListTapOpen(true));
 };
 
 export const fileUpload = (e, dispatch) => {

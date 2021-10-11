@@ -1,5 +1,5 @@
 import {
-  ADD_CHAT_LIST,
+  OPEN_FRIEND_LIST_TAB,
   ERROR_USER_INFO,
   GET_ALL_USER_INFO,
   GET_FRIEND_INFO,
@@ -49,7 +49,7 @@ const initialState = {
   error: "",
   success: "",
   loading: false,
-  addChatList: true,
+  friendListOpen: true,
   profileUpdateSpinner: false,
   // for group
   openGroupList: false,
@@ -144,10 +144,10 @@ const userReducer = (state = initialState, action) => {
         ...state,
         error: action.payload,
       };
-    case ADD_CHAT_LIST:
+    case OPEN_FRIEND_LIST_TAB:
       return {
         ...state,
-        addChatList: action.payload,
+        friendListOpen: action.payload,
       };
     case GET_RECEIVER_INFO:
       return {

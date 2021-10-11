@@ -143,3 +143,21 @@
   background-color: rgba(248, 248, 248, 0.863);
   border-radius: 50%;
 }
+
+.chat__bar
+  .css-1ee5err-MuiButtonBase-root-MuiBottomNavigationAction-root.Mui-selected {
+  color: #fff !important;
+  background: #6f31ff !important;
+}
+.chat__bar
+  .css-1uawn05-MuiButtonBase-root-MuiBottomNavigationAction-root.Mui-selected {
+  color: #fff !important;
+  background: #6f31ff !important;
+}
+
+.chat__bar .css-1ee5err-MuiButtonBase-root-MuiBottomNavigationAction-root {
+  min-width: 60px !important;
+}
+.chat__bar .css-1bhme17-MuiButtonBase-root-MuiBottomNavigationAction-root {
+  min-width: 60px !important;
+}

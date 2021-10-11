@@ -194,24 +194,6 @@ const Chat = ({
       page.current++;
     }
   };
-  // useEffect(() => {
-  //   const onScroll = (e) => {
-  //     const scroll = e.target.document.querySelector(
-  //       ".react-scroll-to-bottom--css-rcops-1n7m0yu"
-  //     ).scrollTop;
-  //     console.log(scroll);
-  //     if (scroll === 0 && reFetchMessage) {
-  //       dispatch(
-  //         getMessagesFromDatabase({ pageNum: page.current, roomId }, true)
-  //       );
-  //       dispatch(stopReFetchMessage());
-  //       page.current++;
-  //     }
-  //   };
-  //   document.addEventListener("scroll", onScroll);
-
-  //   return () => document.removeEventListener("scroll", onScroll);
-  // }, [dispatch, roomId, reFetchMessage]);
 
   ////////////// GET MESSAGE FROM SOCKET //////////////////
   useEffect(() => {
