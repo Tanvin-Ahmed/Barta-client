@@ -179,6 +179,7 @@ const ChatBar = ({ socket }) => {
       <ChatBarHeader
         userPhotoURL={userInfo?.photoURL}
         photoId={userInfo?.photoId}
+        name={userInfo?.displayName}
       />
       <div className="list__body">
         {friendListOpen && !makeGroup && !openGroupList && (

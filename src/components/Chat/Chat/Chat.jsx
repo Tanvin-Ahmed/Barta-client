@@ -32,8 +32,10 @@ import {
   getMessagesFromDatabase,
   getNewMessageFromSocket,
   isTyping,
+  messageWithUpdatedStatus,
   setRoomId,
   stopReFetchMessage,
+  updateMessageStatus,
   updateReactInChat,
 } from "../../../app/actions/messageAction";
 import { updateChatStatus } from "../../../app/actions/userAction";
@@ -199,13 +201,25 @@ const Chat = ({
   useEffect(() => {
     socket.on("new-message", (message) => {
       dispatch(getNewMessageFromSocket(message));
+      if (senderInfo?.email !== message?.sender) {
+        updateMessageStatus([message?._id]);
+      }
     });
     return () => socket.off("new-message");
-  }, [socket, dispatch]);
+  }, [socket, dispatch, senderInfo?.email]);
 
   useEffect(() => {
     socket.emit("join", { roomId });
   }, [socket, roomId]);
+
+  ///// update status of a message //////
+  useEffect(() => {
+    socket.on("updated-message-status", (data) => {
+      dispatch(messageWithUpdatedStatus(data, chatMessage));
+    });
+
+    return () => socket.off("updated-message-status");
+  }, [socket, chatMessage, dispatch]);
 
   //////////////// TYPING CONDITION //////////////
   useEffect(() => {

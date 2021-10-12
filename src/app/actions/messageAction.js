@@ -18,6 +18,7 @@ import {
 } from "../types";
 import FileServer from "file-saver";
 import path from "path";
+import jwt_decode from "jwt-decode";
 
 export const sendMessageInDatabase = (chat) => {
   return (dispatch) => {
@@ -197,6 +198,19 @@ export const getMessagesFromDatabase = (data, oldMessage = false) => {
             type: REFETCH_MESSAGE,
             payload: false,
           });
+        }
+        const { email } = jwt_decode(
+          JSON.parse(localStorage.getItem("accessToken"))
+        );
+        let needUpdateStatus = data.data.map(({ _id, status, sender }) => {
+          if (status === "unseen" && sender !== email) {
+            return _id;
+          }
+          return null;
+        });
+        needUpdateStatus = needUpdateStatus.filter((id) => id);
+        if (needUpdateStatus.length > 0) {
+          updateMessageStatus(needUpdateStatus);
         }
       })
       .catch((err) => {
@@ -436,5 +450,38 @@ export const setRoomId = (id) => {
   return {
     type: SET_ROOM_ID,
     payload: id,
+  };
+};
+
+export const updateMessageStatus = (ids) => {
+  let destination;
+  if (JSON.parse(sessionStorage.getItem("barta/groupName"))?.groupName) {
+    destination = "groupChat";
+  } else {
+    destination = "chatMessage";
+  }
+  axios
+    .post(`http://localhost:5000/${destination}/unseen-message-to-seen`, ids, {
+      headers: {
+        Authorization: `Bearer ${JSON.parse(
+          localStorage.getItem("accessToken")
+        )}`,
+      },
+    })
+    .catch((err) => console.log(err.response));
+};
+
+export const messageWithUpdatedStatus = (data, chatMessage) => {
+  return (dispatch) => {
+    const index = chatMessage.findIndex(({ _id }) => _id === data?._id);
+    if (index !== -1) {
+      const msg = chatMessage.find(({ _id }) => _id === data?._id);
+      const newMessage = { ...msg, status: data?.status };
+      chatMessage.splice(index, 1, newMessage);
+      dispatch({
+        type: GET_MESSAGES_FROM_DB,
+        payload: chatMessage,
+      });
+    }
   };
 };

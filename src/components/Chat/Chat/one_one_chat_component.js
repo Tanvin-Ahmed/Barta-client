@@ -525,23 +525,25 @@ export const ChatBody = ({
                     </div>
                     <p className="time d-flex justify-content-between align-items-center">
                       {new Date(message?.timeStamp).toLocaleString()}
-                      {message?.status === "unseen" ? (
-                        <CheckIcon
-                          sx={{
-                            color: "#ccc",
-                            height: "1rem",
-                            width: "1rem",
-                          }}
-                        />
-                      ) : (
-                        <DoneAllIcon
-                          sx={{
-                            color: "#ccc",
-                            height: "1rem",
-                            width: "1rem",
-                          }}
-                        />
-                      )}
+                      {message?.sender === senderInfo?.email ? (
+                        message?.status === "unseen" ? (
+                          <CheckIcon
+                            sx={{
+                              color: "#ccc",
+                              height: "1rem",
+                              width: "1rem",
+                            }}
+                          />
+                        ) : (
+                          <DoneAllIcon
+                            sx={{
+                              color: "#ccc",
+                              height: "1rem",
+                              width: "1rem",
+                            }}
+                          />
+                        )
+                      ) : null}
                     </p>
                   </div>
                   <div className="tooltip__hover">

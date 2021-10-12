@@ -31,13 +31,14 @@ import {
 } from "../../app/actions/userAction";
 import { useState } from "react";
 
-export const ChatBarHeader = ({ userPhotoURL, photoId }) => {
+export const ChatBarHeader = ({ userPhotoURL, photoId, name }) => {
   return (
     <div className="chatBar__header">
       <div className="d-flex align-items-center justify-content-between flex-wrap">
         <div className="avatar">
           <IconButton style={{ position: "relative" }}>
             <Avatar
+              title={name}
               src={
                 userPhotoURL
                   ? userPhotoURL
