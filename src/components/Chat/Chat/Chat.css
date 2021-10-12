@@ -163,8 +163,8 @@
 }
 
 .chat .chat__img {
-  max-width: 10rem;
   min-width: 5rem;
+  max-width: 10rem;
   border-radius: 10px;
   margin: 0.5rem;
 }
@@ -299,43 +299,6 @@
   margin-bottom: 0.1rem;
 }
 
-/* .chat__footer .add__button {
-  margin-top: 2rem;
-}
-
-.chat__footer .send__icon {
-  margin-top: 2rem;
-} */
-
-/* .react-input-emoji--container {
-  background-color: transparent !important;
-  border: 1px solid rgb(255, 160, 83) !important;
-  width: 10rem !important;
-}
-
-.react-emoji {
-  margin-top: 2rem !important;
-}
-
-.react-input-emoji--input {
-  overflow: scroll !important;
-  overflow: -moz-scrollbars-none;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  color: white !important;
-}
-
-.react-input-emoji--input::-webkit-scrollbar {
-  width: 0 !important;
-  display: none;
-  width: 100% !important;
-}
-
-.react-input-emoji--button svg {
-  fill: white !important;
-  width: 1.4rem;
-} */
-
 .chat__footer_withoutEmoji textarea,
 .chat__footer_withEmoji textarea {
   width: 100%;
@@ -433,9 +396,6 @@
 }
 
 @media screen and (max-width: 444px) {
-  /* .react-input-emoji--input {
-    max-height: 80px !important;
-  } */
   .icon__button {
     font-size: 1.3rem !important;
   }
@@ -446,18 +406,6 @@
   .chat__footer_withEmoji {
     padding-bottom: 4rem;
   }
-  /* .react-emoji {
-    margin-top: 3rem !important;
-  }
-  .react-emoji-picker--wrapper {
-    overflow-x: auto !important;
-  } */
-  /* .chat__footer .add__button {
-    margin-top: 3rem;
-  }
-  .chat__footer .send__icon {
-    margin-top: 3rem;
-  } */
 }
 
 @media screen and (max-width: 366px) {
@@ -469,5 +417,8 @@
 @media screen and (max-width: 334px) {
   .chat__header {
     flex-wrap: wrap !important;
+  }
+  .chat .chat__img {
+    width: 97%;
   }
 }

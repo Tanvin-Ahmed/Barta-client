@@ -11,6 +11,8 @@ import AttachFileIcon from "@material-ui/icons/AttachFile";
 import SendIcon from "@material-ui/icons/Send";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import Picker from "emoji-picker-react";
+import CheckIcon from "@mui/icons-material/Check";
+import DoneAllIcon from "@mui/icons-material/DoneAll";
 import {
   deleteChosenFiles,
   fileUpload,
@@ -35,7 +37,7 @@ import CallMissedOutgoingIcon from "@material-ui/icons/CallMissedOutgoing";
 import CallMissedIcon from "@material-ui/icons/CallMissed";
 import Timer from "../PrivateCallSystem/Timer.jsx";
 import path from "path";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Menu, MenuItem } from "@mui/material";
 
 const CallButtons = ({ callUser }) => {
@@ -397,7 +399,10 @@ export const ChatBody = ({
                       : `${receiverInfo?.displayName?.split(" ")[0]}`}
                   </p>
                   <div>
-                    {message?.message}
+                    <div
+                      dangerouslySetInnerHTML={{ __html: message?.message }}
+                    ></div>
+
                     {message.receiver && (
                       <>
                         <div className="d-flex justify-content-center align-items-center">
@@ -441,83 +446,102 @@ export const ChatBody = ({
                         )}
                       </>
                     )}
-                    {message?.files?.length > 0 ? (
-                      <SRLWrapper options={option}>
-                        {message.files?.map((file, index) => {
-                          if (file.contentType.split("/")[0] === "image") {
-                            return (
-                              <a
-                                key={index}
-                                href={`http://localhost:5000/chatMessage/file/${file?.filename}`}
-                              >
-                                <img
-                                  key={file.fileId}
-                                  className="chat__img"
-                                  src={`http://localhost:5000/chatMessage/file/${file?.filename}`}
-                                  alt={`${index + 1}`}
-                                />
-                              </a>
-                            );
-                          } else if (
-                            file.contentType.split("/")[0] === "video"
-                          ) {
-                            return (
-                              <div
-                                key={index}
-                                className="d-flex justify-content-center align-items-center"
-                              >
-                                <IconButton
-                                  variant="contained"
-                                  size="small"
-                                  onClick={() => download(file.filename)}
-                                  className="icon download__icon text-light"
+                    <div className="d-flex justify-content-center align-items-center flex-wrap">
+                      {message?.files?.length > 0 ? (
+                        <SRLWrapper options={option}>
+                          {message.files?.map((file, index) => {
+                            if (file.contentType.split("/")[0] === "image") {
+                              return (
+                                <a
+                                  key={index}
+                                  href={`http://localhost:5000/chatMessage/file/${file?.filename}`}
                                 >
-                                  <ArrowDownwardIcon />
-                                </IconButton>
-                                <video
-                                  key={file.fileId}
-                                  className="chat__img"
-                                  src={`http://localhost:5000/chatMessage/file/${file?.filename}`}
-                                  controls
-                                  controlsList="nodownload"
-                                ></video>
-                              </div>
-                            );
-                          } else if (
-                            file.contentType.split("/")[0] === "application"
-                          ) {
-                            return (
-                              <div
-                                key={index}
-                                className={`d-flex align-items-center show__document ${
-                                  message?.sender === senderInfo.email &&
-                                  "show_user_document"
-                                }`}
-                              >
-                                <IconButton
-                                  variant="contained"
-                                  size="small"
-                                  onClick={() => download(file.filename)}
-                                  className="icon download__icon text-light mr-3"
+                                  <img
+                                    key={file.fileId}
+                                    className="chat__img"
+                                    src={`http://localhost:5000/chatMessage/file/${file?.filename}`}
+                                    alt={`${index + 1}`}
+                                  />
+                                </a>
+                              );
+                            } else if (
+                              file.contentType.split("/")[0] === "video"
+                            ) {
+                              return (
+                                <div
+                                  key={index}
+                                  className="d-flex justify-content-center align-items-center"
                                 >
-                                  <ArrowDownwardIcon />
-                                </IconButton>
-                                <div className="document__title">
-                                  {file.filename
-                                    ?.split("_")
-                                    ?.join(" ")
-                                    ?.split("◉ ◉")[0] +
-                                    path.extname(file.filename)}
+                                  <IconButton
+                                    variant="contained"
+                                    size="small"
+                                    onClick={() => download(file.filename)}
+                                    className="icon download__icon text-light"
+                                  >
+                                    <ArrowDownwardIcon />
+                                  </IconButton>
+                                  <video
+                                    key={file.fileId}
+                                    className="chat__img"
+                                    src={`http://localhost:5000/chatMessage/file/${file?.filename}`}
+                                    controls
+                                    controlsList="nodownload"
+                                  ></video>
                                 </div>
-                              </div>
-                            );
-                          }
-                          return null;
-                        })}
-                      </SRLWrapper>
-                    ) : null}
-                    <p className="time">
+                              );
+                            } else if (
+                              file.contentType.split("/")[0] === "application"
+                            ) {
+                              return (
+                                <div
+                                  key={index}
+                                  className={`d-flex align-items-center show__document ${
+                                    message?.sender === senderInfo.email &&
+                                    "show_user_document"
+                                  }`}
+                                >
+                                  <IconButton
+                                    variant="contained"
+                                    size="small"
+                                    onClick={() => download(file.filename)}
+                                    className="icon download__icon text-light mr-3"
+                                  >
+                                    <ArrowDownwardIcon />
+                                  </IconButton>
+                                  <div className="document__title">
+                                    {file.filename
+                                      ?.split("_")
+                                      ?.join(" ")
+                                      ?.split("◉_◉")[0] +
+                                      path.extname(file.filename)}
+                                  </div>
+                                </div>
+                              );
+                            }
+                            return null;
+                          })}
+                        </SRLWrapper>
+                      ) : null}
+                    </div>
+                    <p className="time d-flex justify-content-between align-items-center">
                       {new Date(message?.timeStamp).toLocaleString()}
+                      {message?.status === "unseen" ? (
+                        <CheckIcon
+                          sx={{
+                            color: "#ccc",
+                            height: "1rem",
+                            width: "1rem",
+                          }}
+                        />
+                      ) : (
+                        <DoneAllIcon
+                          sx={{
+                            color: "#ccc",
+                            height: "1rem",
+                            width: "1rem",
+                          }}
+                        />
+                      )}
                     </p>
                   </div>
                   <div className="tooltip__hover">
@@ -636,6 +660,13 @@ export const ChatFooter = ({
   dispatch,
 }) => {
   const [openEmoji, setOpenEmoji] = useState(false);
+  const [message, setMessage] = useState("");
+
+  useEffect(() => {
+    const value = message.split(" ").join("&nbsp;").split("\n").join("<br/>");
+    setInputText(value);
+  }, [message, setInputText]);
+
   return (
     <div
       className={
@@ -656,8 +687,10 @@ export const ChatFooter = ({
                 cols="30"
                 rows="2"
                 ref={text}
-                value={inputText}
-                onChange={(e) => setInputText(e.target.value)}
+                value={message}
+                onChange={(e) => {
+                  setMessage(e.target.value);
+                }}
                 onFocus={() => setOpenEmoji(false)}
                 placeholder="Type a message"
               ></textarea>
@@ -671,7 +704,19 @@ export const ChatFooter = ({
                 />
               </IconButton>
               {(inputText.trim() || chosenFiles) && (
-                <IconButton onClick={handleOnEnter} className="icon">
+                <IconButton
+                  onClick={() => {
+                    handleOnEnter();
+                    setMessage("");
+                  }}
+                  onKeyUp={(e) => {
+                    if (e.code === "Enter") {
+                      handleOnEnter();
+                      setMessage("");
+                    }
+                  }}
+                  className="icon"
+                >
                   <SendIcon className="icon__button text-light" />
                 </IconButton>
               )}
@@ -691,7 +736,10 @@ export const ChatFooter = ({
                 rows="2"
                 ref={text}
                 value={inputText}
-                onChange={(e) => setInputText(e.target.value)}
+                onChange={(e) => {
+                  setInputText(e.target.value);
+                  setMessage(e.target.value);
+                }}
                 onFocus={() => setOpenEmoji(false)}
                 placeholder="Type a message"
               ></textarea>
@@ -705,7 +753,13 @@ export const ChatFooter = ({
                 />
               </IconButton>
               {(inputText.trim() || chosenFiles) && (
-                <IconButton onClick={handleOnEnter} className="icon send__icon">
+                <IconButton
+                  onClick={() => {
+                    handleOnEnter();
+                    setMessage("");
+                  }}
+                  className="icon send__icon"
+                >
                   <SendIcon className="text-light" />
                 </IconButton>
               )}
