@@ -485,3 +485,23 @@ export const messageWithUpdatedStatus = (data, chatMessage) => {
     }
   };
 };
+
+export const setMessage = (message) => {
+  return {
+    type: GET_NEW_MESSAGE_FROM_SOCKET,
+    payload: message,
+  };
+};
+
+export const setSendedMessage = (chatMessage, sendedMessage) => {
+  return (dispatch) => {
+    const index = chatMessage.findIndex(
+      ({ timeStamp }) => timeStamp === sendedMessage.timeStamp
+    );
+    chatMessage.splice(index, 1, sendedMessage);
+    dispatch({
+      type: GET_MESSAGES_FROM_DB,
+      payload: chatMessage,
+    });
+  };
+};

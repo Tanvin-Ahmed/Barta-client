@@ -339,6 +339,15 @@ export const ChatBody = ({
   getOldMessage,
   reFetchMessage,
 }) => {
+  const [destination, setDestination] = useState("");
+
+  useEffect(() => {
+    if (JSON.parse(sessionStorage.getItem("barta/groupName"))?.groupName) {
+      setDestination("groupChat");
+    } else {
+      setDestination("chatMessage");
+    }
+  }, []);
   return (
     <>
       <ScrollToBottom className={`${ROOT_CSS} chat__body`}>
@@ -454,12 +463,20 @@ export const ChatBody = ({
                               return (
                                 <a
                                   key={index}
-                                  href={`http://localhost:5000/chatMessage/file/${file?.filename}`}
+                                  href={
+                                    file.fileId
+                                      ? `http://localhost:5000/${destination}/file/${file?.filename}`
+                                      : file?.url
+                                  }
                                 >
                                   <img
-                                    key={file.fileId}
+                                    key={file.fileId || index}
                                     className="chat__img"
-                                    src={`http://localhost:5000/chatMessage/file/${file?.filename}`}
+                                    src={
+                                      file.fileId
+                                        ? `http://localhost:5000/${destination}/file/${file?.filename}`
+                                        : file?.url
+                                    }
                                     alt={`${index + 1}`}
                                   />
                                 </a>
@@ -481,9 +498,13 @@ export const ChatBody = ({
                                     <ArrowDownwardIcon />
                                   </IconButton>
                                   <video
-                                    key={file.fileId}
+                                    key={file.fileId || index}
                                     className="chat__img"
-                                    src={`http://localhost:5000/chatMessage/file/${file?.filename}`}
+                                    src={
+                                      file.fileId
+                                        ? `http://localhost:5000/${destination}/file/${file?.filename}`
+                                        : file?.url
+                                    }
                                     controls
                                     controlsList="nodownload"
                                   ></video>
@@ -526,7 +547,15 @@ export const ChatBody = ({
                     <p className="time d-flex justify-content-between align-items-center">
                       {new Date(message?.timeStamp).toLocaleString()}
                       {message?.sender === senderInfo?.email ? (
-                        message?.status === "unseen" ? (
+                        message?.status === "sending" ? (
+                          <CircularProgress
+                            style={{
+                              color: "#ccc",
+                              height: "0.7rem",
+                              width: "0.7rem",
+                            }}
+                          />
+                        ) : message?.status === "unseen" ? (
                           <CheckIcon
                             sx={{
                               color: "#ccc",

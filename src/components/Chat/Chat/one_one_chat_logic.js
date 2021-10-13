@@ -8,6 +8,7 @@ import {
   updateChatMessage,
   updatePreReact,
   uploadFiles,
+  setMessage,
 } from "../../../app/actions/messageAction";
 import {
   getGroupIdForChatBar,
@@ -67,6 +68,7 @@ export const handleSendMessage = (
   dispatch,
   chosenFiles
 ) => {
+  const timeStamp = new Date().toUTCString();
   if (chosenFiles[0]) {
     const data = new FormData();
     data.append("id", roomId);
@@ -77,10 +79,20 @@ export const handleSendMessage = (
       data.append("file", element);
     }
     data.append("status", "unseen");
-    data.append("timeStamp", new Date().toUTCString());
+    data.append("timeStamp", timeStamp);
 
     // console.log(data);
     dispatch(uploadFiles(data));
+
+    const chat = {
+      id: roomId,
+      sender: senderEmail,
+      files: chosenFiles,
+      react: [],
+      status: "sending",
+      timeStamp,
+    };
+    dispatch(setMessage(chat));
     dispatch(getChosenFiles([]));
   } else {
     const chat = {
@@ -89,9 +101,10 @@ export const handleSendMessage = (
       message: inputText,
       react: [],
       status: "unseen",
-      timeStamp: new Date().toUTCString(),
+      timeStamp,
     };
     dispatch(sendMessageInDatabase(chat));
+    dispatch(setMessage({ ...chat, status: "sending" }));
 
     setInputText("");
   }
@@ -122,6 +135,7 @@ export const fileUpload = (e, dispatch) => {
       name: element.name,
       url: URL.createObjectURL(element),
       file: element,
+      contentType: element.type,
     });
   }
   dispatch(getChosenFiles(files));

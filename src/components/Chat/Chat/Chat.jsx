@@ -37,6 +37,7 @@ import {
   stopReFetchMessage,
   updateMessageStatus,
   updateReactInChat,
+  setSendedMessage,
 } from "../../../app/actions/messageAction";
 import { updateChatStatus } from "../../../app/actions/userAction";
 import {
@@ -200,13 +201,16 @@ const Chat = ({
   ////////////// GET MESSAGE FROM SOCKET //////////////////
   useEffect(() => {
     socket.on("new-message", (message) => {
-      dispatch(getNewMessageFromSocket(message));
-      if (senderInfo?.email !== message?.sender) {
+      if (message.id === roomId && message.sender === senderInfo?.email) {
+        dispatch(setSendedMessage(chatMessage, message));
+      }
+      if (message.id === roomId && message.sender !== senderInfo?.email) {
+        dispatch(getNewMessageFromSocket(message));
         updateMessageStatus([message?._id]);
       }
     });
     return () => socket.off("new-message");
-  }, [socket, dispatch, senderInfo?.email]);
+  }, [socket, dispatch, senderInfo?.email, chatMessage, roomId]);
 
   useEffect(() => {
     socket.emit("join", { roomId });

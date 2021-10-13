@@ -165,8 +165,11 @@
 .chat .chat__img {
   min-width: 5rem;
   max-width: 10rem;
+  min-height: 5rem;
+  max-height: 10rem;
   border-radius: 10px;
   margin: 0.5rem;
+  object-fit: cover;
 }
 
 .show__file {
@@ -187,7 +190,9 @@
 
 .show__file .show__img {
   width: 5rem;
+  height: 5rem;
   margin: 0.5rem;
+  object-fit: cover;
 }
 
 .show__file .show__files {
@@ -302,6 +307,7 @@
 .chat__footer_withoutEmoji textarea,
 .chat__footer_withEmoji textarea {
   width: 100%;
+  height: 95%;
   outline: none;
   border: 2px solid rgb(144, 89, 233);
   border-radius: 5px;
@@ -420,5 +426,6 @@
   }
   .chat .chat__img {
     width: 97%;
+    height: 97%;
   }
 }
