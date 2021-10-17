@@ -60,7 +60,7 @@ export const handleIsType = (e, socket, senderEmail) => {
 
 export const handleSendMessage = (
   roomId,
-  addChatList,
+  friendListOpen,
   setInputText,
   inputText,
   senderEmail,
@@ -81,7 +81,6 @@ export const handleSendMessage = (
     data.append("status", "unseen");
     data.append("timeStamp", timeStamp);
 
-    // console.log(data);
     dispatch(uploadFiles(data));
 
     const chat = {
@@ -108,7 +107,7 @@ export const handleSendMessage = (
 
     setInputText("");
   }
-  !addChatList &&
+  !friendListOpen &&
     dispatch(
       postFriendInfo(roomId, {
         friendInfo: [
@@ -170,4 +169,18 @@ export const handleReactions = (dispatch, message, sender, react) => {
     updateChatMessage({ id: message._id, reactInfo: { sender, react } });
   }
   toggleReactTab(dispatch, false);
+};
+
+export const handleText = (str, largeScreen) => {
+  if (largeScreen) {
+    return str.length > 15
+      ? str.split("\n").join(" ").split("&nbsp;").join(" ").substring(0, 14) +
+          "...."
+      : str;
+  } else {
+    return str.length > 7
+      ? str.split("\n").join(" ").split("&nbsp;").join(" ").substring(0, 6) +
+          "...."
+      : str;
+  }
 };

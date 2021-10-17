@@ -1,0 +1,65 @@
+@import url("https://fonts.googleapis.com/css2?family=Lobster&display=swap");
+
+.reset__modal .container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 50vh;
+  padding: 0.5rem;
+  width: 95%;
+  background-color: rgb(72, 30, 150);
+  border-radius: 5px;
+  position: absolute;
+  top: 20%;
+  z-index: 200;
+}
+
+.reset__modal .back__drop {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.123);
+  z-index: 100;
+}
+
+.reset__modal h4 {
+  font-family: "Lobster", cursive;
+  font-size: 2rem;
+  color: #fff;
+  letter-spacing: 2px;
+}
+
+.reset__modal input[type="email"] {
+  background: transparent;
+  border: none;
+  border-bottom: solid 2px var(--input-border-color);
+  color: #fff;
+  outline: none;
+  width: 100%;
+  padding: 0.5rem;
+  margin-bottom: 0.8rem;
+}
+
+.reset__modal input[type="email"]::placeholder {
+  color: var(--placeholder-color);
+  font-size: 12px;
+}
+
+.reset__modal .submit__button {
+  background-color: var(--submit-button-background);
+  color: rgb(231, 231, 231);
+  border-radius: 5px;
+  padding: 0.4rem 2rem;
+  letter-spacing: 1px;
+  font-weight: 500;
+  border: none;
+  font-size: 15px;
+  transition: all 0.5s;
+}
+
+.reset__modal .submit__button:hover {
+  color: #fff;
+  background-color: rgb(88, 48, 177);
+}

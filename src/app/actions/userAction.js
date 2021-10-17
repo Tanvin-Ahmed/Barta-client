@@ -40,6 +40,21 @@ import jwt_decode from "jwt-decode";
 
 let accessToken = "";
 
+export const resetPasswordRequest = (email, setLoading, setMessage) => {
+  setLoading(true);
+  axios(`http://localhost:5000/user/account/reset-password-request/${email}`)
+    .then(({ data }) => {
+      console.log(data);
+      setMessage(data);
+      setLoading(false);
+    })
+    .catch((err) => {
+      console.log(err.message);
+      setMessage(err.message);
+      setLoading(false);
+    });
+};
+
 const getUserInfoFromDB = (id, token) => {
   return (dispatch) => {
     axios(`http://localhost:5000/user/account/userInfo/${id}`, {

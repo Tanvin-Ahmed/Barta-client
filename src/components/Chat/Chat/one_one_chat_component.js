@@ -65,7 +65,7 @@ const CallButtons = ({ callUser }) => {
 
 export const ChatHeader = ({
   receiverInfo,
-  addChatList,
+  friendListOpen,
   largeScreen,
   // private video call
   callUser,
@@ -89,7 +89,8 @@ export const ChatHeader = ({
                 `http://localhost:5000/groupAccount/get-profile-img/${groupInfo?.photoId}`
           }
         />
-        {addChatList && (
+
+        {friendListOpen && (
           <div
             className={
               receiverInfo?.status
@@ -102,6 +103,7 @@ export const ChatHeader = ({
             }
           />
         )}
+
         <div className="p-2">
           <h6
             style={{ fontWeight: "bold", letterSpacing: "1px", color: "white" }}
@@ -113,7 +115,7 @@ export const ChatHeader = ({
               : receiverInfo?.displayName?.split(" ")[0] ||
                 groupInfo?.groupName?.split("◉_◉")[0]?.split(" ")[0]}
           </h6>
-          {addChatList && receiverInfo?.status === "inactive" && (
+          {friendListOpen && receiverInfo?.status === "inactive" && (
             <small style={{ color: "rgb(231, 231, 231)" }} className="p-0 m-0">
               active <TimeAgo datetime={receiverInfo?.goOffLine} />
             </small>

@@ -9,7 +9,6 @@ import {
   getRoomId,
   getUsersData,
   handleSendMessage,
-  screen,
 } from "./one_one_chat_logic";
 import {
   ChatBody,
@@ -83,7 +82,7 @@ const Chat = ({
     senderInfo,
     receiverInfo,
     groupInfo,
-    addChatList,
+    friendListOpen,
     chatMessage,
     uploadPercentage,
     largeScreen,
@@ -108,7 +107,7 @@ const Chat = ({
     senderInfo: state.userReducer.userInfo,
     receiverInfo: state.userReducer.receiverInfo,
     groupInfo: state.userReducer.groupInfo,
-    addChatList: state.userReducer.addChatList,
+    friendListOpen: state.userReducer.friendListOpen,
     chatMessage: state.messageReducer.chatMessages,
     uploadPercentage: state.messageReducer.uploadPercentage,
     largeScreen: state.messageReducer.largeScreen,
@@ -198,20 +197,6 @@ const Chat = ({
     }
   };
 
-  ////////////// GET MESSAGE FROM SOCKET //////////////////
-  useEffect(() => {
-    socket.on("new-message", (message) => {
-      if (message.id === roomId && message.sender === senderInfo?.email) {
-        dispatch(setSendedMessage(chatMessage, message));
-      }
-      if (message.id === roomId && message.sender !== senderInfo?.email) {
-        dispatch(getNewMessageFromSocket(message));
-        updateMessageStatus([message?._id]);
-      }
-    });
-    return () => socket.off("new-message");
-  }, [socket, dispatch, senderInfo?.email, chatMessage, roomId]);
-
   useEffect(() => {
     socket.emit("join", { roomId });
   }, [socket, roomId]);
@@ -261,27 +246,12 @@ const Chat = ({
     return () => socket.off("update-react");
   }, [socket, dispatch, chatMessage]);
 
-  ////////////// DELETE MESSAGE //////////////
-  useEffect(() => {
-    socket.on("delete-chatMessage", (deletedItem) => {
-      if (chatMessage.length > 0 || chatMessage[0])
-        dispatch(deleteMessage(chatMessage, deletedItem._id));
-    });
-    return () => socket.off("delete-chatMessage");
-  }, [socket, dispatch, chatMessage]);
-
-  ////////////// SCREEN_SIZE //////////////
-  useEffect(() => {
-    window.addEventListener("resize", screen(dispatch));
-    return () => window.removeEventListener("resize", screen(dispatch));
-  }, [dispatch]);
-
   ////////////// SEND MESSAGE //////////////
   const handleOnEnter = () => {
     if (inputText.trim() || chosenFiles[0]) {
       handleSendMessage(
         roomId,
-        addChatList,
+        friendListOpen,
         setInputText,
         inputText,
         senderInfo?.email,
@@ -388,7 +358,7 @@ const Chat = ({
         <>
           <ChatHeader
             receiverInfo={receiverInfo}
-            addChatList={addChatList}
+            friendListOpen={friendListOpen}
             largeScreen={largeScreen}
             callUser={callUser}
             // for group

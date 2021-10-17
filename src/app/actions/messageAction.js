@@ -15,6 +15,8 @@ import {
   SET_ROOM_ID,
   UPDATE_CHAT_REACT,
   GET_OLD_MESSAGES_FROM_DB,
+  GET_FRIEND_INFO,
+  SET_GROUP_LIST_FROM_DATABASE,
 } from "../types";
 import FileServer from "file-saver";
 import path from "path";
@@ -502,6 +504,75 @@ export const setSendedMessage = (chatMessage, sendedMessage) => {
     dispatch({
       type: GET_MESSAGES_FROM_DB,
       payload: chatMessage,
+    });
+  };
+};
+
+export const updateChatBarMessage = (
+  newMessage,
+  chatList,
+  userEmail,
+  groups
+) => {
+  return (dispatch) => {
+    groups.forEach((group) => {
+      if (group?._id === newMessage?.id) {
+        group.lastMessage = newMessage;
+        return dispatch({
+          type: SET_GROUP_LIST_FROM_DATABASE,
+          payload: groups,
+        });
+      }
+    });
+    // friend list
+    chatList.forEach((friend) => {
+      const arr = [
+        userEmail?.split("@")[0],
+        friend?.email?.split("@")[0],
+      ].sort();
+      const roomId = `${arr[0]}_${arr[1]}`;
+
+      if (newMessage?.id === roomId) {
+        friend.lastMessage = newMessage;
+        return dispatch({
+          type: GET_FRIEND_INFO,
+          payload: chatList,
+        });
+      }
+    });
+  };
+};
+
+export const deleteMessageFromChatBar = (id, chatList, groups) => {
+  return (dispatch) => {
+    groups.forEach((group) => {
+      if (group?.lastMessage?._id === id) {
+        axios(
+          `http://localhost:5000/groupChat/get-lastMessage-for-chatBar/${group?._id}`
+        ).then(({ data }) => {
+          group.lastMessage = data;
+          dispatch({
+            type: SET_GROUP_LIST_FROM_DATABASE,
+            payload: groups,
+          });
+        });
+        return;
+      }
+    });
+
+    chatList.forEach((friend) => {
+      if (friend.lastMessage?._id === id) {
+        axios(
+          `http://localhost:5000/chatMessage/get-lastMessage-for-chatBar/${friend?.lastMessage?.id}`
+        ).then(({ data }) => {
+          friend.lastMessage = data;
+          dispatch({
+            type: GET_FRIEND_INFO,
+            payload: chatList,
+          });
+        });
+        return;
+      }
     });
   };
 };

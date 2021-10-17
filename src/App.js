@@ -8,6 +8,7 @@ import io from "socket.io-client";
 import PopupMessage from "./components/PopupMessage/PopupMessage";
 import { useSelector } from "react-redux";
 import CircularProgress from "@mui/material/CircularProgress";
+import { screen } from "./components/Chat/Chat/one_one_chat_logic";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -17,6 +18,12 @@ const App = () => {
 
   const [showPopup, setShowPopup] = useState(true);
   const [socket, setSocket] = useState(null);
+
+  ////////////// SCREEN_SIZE //////////////
+  useEffect(() => {
+    window.addEventListener("resize", screen(dispatch));
+    return () => window.removeEventListener("resize", screen(dispatch));
+  }, [dispatch]);
 
   useEffect(() => {
     const getData = () => {

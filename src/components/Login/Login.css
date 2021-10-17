@@ -6,6 +6,7 @@
   justify-content: center;
   height: 95vh;
   padding: 1rem;
+  position: relative;
 }
 
 .login__container > h4 {
@@ -99,7 +100,8 @@
   letter-spacing: 2px;
 }
 
-.signIn_btn {
+.signIn_btn,
+.forget {
   font-size: 12px;
   font-weight: bold;
   letter-spacing: 2px;
@@ -113,6 +115,19 @@
   letter-spacing: 2px;
   text-decoration: underline;
   cursor: pointer;
+}
+
+.forget span {
+  color: rgb(253, 135, 80);
+  font-size: 12px;
+  font-weight: bold;
+  letter-spacing: 2px;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.forget span:focus {
+  color: rgb(255, 34, 34);
 }
 
 .google__btn {

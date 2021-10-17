@@ -16,12 +16,14 @@ import LocalizationProvider from "@material-ui/lab/LocalizationProvider";
 import DesktopDatePicker from "@material-ui/lab/DesktopDatePicker";
 import { TextField } from "@material-ui/core";
 import AdapterDateFns from "@material-ui/lab/AdapterDateFns";
+import ResetModal from "./ResetModal/ResetModal";
 
 const Login = () => {
   const [passwordShow, setPasswordShow] = useState("password");
   const [login, setLogin] = useState(true);
   const [birthday, setBirthday] = useState(new Date().toUTCString());
-  initializationLoginFramework();
+  const [openModal, setOpenModal] = useState(false);
+  // initializationLoginFramework();
 
   const dispatch = useDispatch();
   const { loginSpinner } = useSelector((state) => ({
@@ -32,37 +34,37 @@ const Login = () => {
   const location = useLocation();
   const { from } = location.state || { from: { pathname: "/" } };
 
-  const signIn = () => {
-    SignInWithGoogle()
-      .then((result) => {
-        const user = {
-          email: result.email,
-          displayName: result.displayName,
-          photoURL: result.photoURL,
-          chatList: [],
-          groups: [],
-          status: "active",
-          goOffLine: new Date().toUTCString(),
-          timeStamp: new Date().toUTCString(),
-        };
+  // const signIn = () => {
+  //   SignInWithGoogle()
+  //     .then((result) => {
+  //       const user = {
+  //         email: result.email,
+  //         displayName: result.displayName,
+  //         photoURL: result.photoURL,
+  //         chatList: [],
+  //         groups: [],
+  //         status: "active",
+  //         goOffLine: new Date().toUTCString(),
+  //         timeStamp: new Date().toUTCString(),
+  //       };
 
-        localStorage.setItem(
-          "barta/user",
-          JSON.stringify({
-            email: result.email,
-            displayName: result.displayName,
-            photoURL: result.photoURL,
-            status: "active",
-          })
-        );
-        dispatch(postMyInfo(user));
+  //       localStorage.setItem(
+  //         "barta/user",
+  //         JSON.stringify({
+  //           email: result.email,
+  //           displayName: result.displayName,
+  //           photoURL: result.photoURL,
+  //           status: "active",
+  //         })
+  //       );
+  //       dispatch(postMyInfo(user));
 
-        history.replace(from);
-      })
-      .catch((error) => {
-        alert(error.message);
-      });
-  };
+  //       history.replace(from);
+  //     })
+  //     .catch((error) => {
+  //       alert(error.message);
+  //     });
+  // };
 
   const handlePasswordShow = () => {
     if (passwordShow === "password") {
@@ -158,6 +160,11 @@ const Login = () => {
             )}
           </div>
           {errors.password && <span>Password is required</span>}
+          {login && (
+            <div className="forget">
+              <span onClick={() => setOpenModal(true)}>Forget password?</span>
+            </div>
+          )}
 
           {!login && (
             <>
@@ -213,6 +220,7 @@ const Login = () => {
         {/* <button onClick={signIn} className="google__btn">
           SignIn with Google
         </button> */}
+        {openModal && <ResetModal setOpenModal={setOpenModal} />}
       </div>
     </section>
   );

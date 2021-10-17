@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect } from "react";
 import "./ChatBar.css";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router";
@@ -9,17 +9,11 @@ import {
   FinalProcessToCreateGroup,
   GroupList,
   SearchFriend,
-  MakeNewFriendButton,
-  MakeNewGroupButton,
   BottomNavigationBar,
 } from "./chatBar_component";
 import {
   clearGroupCreateSuccessfullyStatus,
   clearSelectedIdsForGroup,
-  getFriendInfo,
-  getFriendInfoFromSocket,
-  getGroupIdForChatBar,
-  setGroupsInfoFromDatabase,
 } from "../../app/actions/userAction";
 import { callReached } from "../Chat/PrivateCallSystem/callLogic";
 
@@ -36,7 +30,7 @@ const ChatBar = ({ socket }) => {
     spinnerForChatList,
     friendListOpen,
     userInfo,
-    accessToken,
+    largeScreen,
     userStatusToReceiveOtherCall,
     openGroupList,
     spinnerForGroupList,
@@ -56,7 +50,7 @@ const ChatBar = ({ socket }) => {
     spinnerForChatList: state.userReducer.spinnerForChatList,
     friendListOpen: state.userReducer.friendListOpen,
     userInfo: state.userReducer.userInfo,
-    accessToken: state.userReducer.accessToken,
+    largeScreen: state.messageReducer.largeScreen,
     // private call
     userStatusToReceiveOtherCall:
       state.privateCall.userStatusToReceiveOtherCall,
@@ -71,62 +65,6 @@ const ChatBar = ({ socket }) => {
     groupCreated: state.userReducer.groupCreated,
     groupCreatingSpinner: state.userReducer.groupCreatingSpinner,
   }));
-
-  //////////////// Show Friend List or Group List /////////////
-  const fetchGroupList = useRef(true);
-  const fetchFriendList = useRef(true);
-  useEffect(() => {
-    const getData = () => {
-      if (navigator.onLine) {
-        friendListOpen &&
-          fetchFriendList.current &&
-          dispatch(getFriendInfo(userInfo?.email));
-        openGroupList &&
-          fetchGroupList.current &&
-          dispatch(setGroupsInfoFromDatabase(userInfo?.email));
-
-        if (friendListOpen) fetchFriendList.current = false;
-        if (openGroupList) fetchGroupList.current = false;
-      }
-    };
-    const conditionOfNetwork = () => {
-      fetchFriendList.current = true;
-      fetchGroupList.current = true;
-      accessToken && getData();
-    };
-    const webpageLoad = () => {
-      window.addEventListener("online", conditionOfNetwork);
-      window.addEventListener("offline", conditionOfNetwork);
-    };
-    window.addEventListener("load", webpageLoad);
-    accessToken && getData();
-
-    return () => {
-      window.removeEventListener("load", webpageLoad);
-      window.removeEventListener("online", conditionOfNetwork);
-      window.removeEventListener("offline", conditionOfNetwork);
-    };
-  }, [userInfo?.email, dispatch, friendListOpen, openGroupList, accessToken]);
-
-  //////////////// Friend List Update ///////////////
-  useEffect(() => {
-    if (socket === null) return;
-    socket.on("add-friend-list", (friendEmail) => {
-      dispatch(getFriendInfoFromSocket(friendEmail));
-    });
-    return () => socket.off("add-friend-list");
-  }, [socket, dispatch]);
-
-  //////////////// Group List Update ///////////////
-  useEffect(() => {
-    if (socket === null) return;
-    socket.on("add-group-list", (groupInfo) => {
-      if (groupInfo.member === userInfo?.email?.split("@")[0]) {
-        dispatch(getGroupIdForChatBar(groupInfo.groupId, "chatBar"));
-      }
-    });
-    return () => socket.off("add-group-list");
-  }, [socket, dispatch, userInfo]);
 
   //////////////// Update friend Status ///////////////////
   useEffect(() => {
@@ -175,57 +113,63 @@ const ChatBar = ({ socket }) => {
   }, [groupCreated, dispatch]);
 
   return (
-    <section className="chat__bar">
-      <ChatBarHeader
-        userPhotoURL={userInfo?.photoURL}
-        photoId={userInfo?.photoId}
-        name={userInfo?.displayName}
-      />
-      <div className="list__body">
-        {friendListOpen && !makeGroup && !openGroupList && (
-          <>
-            <ChatList
-              friendList={friendList}
+    <>
+      <section className="chat__bar">
+        <ChatBarHeader
+          userPhotoURL={userInfo?.photoURL}
+          photoId={userInfo?.photoId}
+          name={userInfo?.displayName}
+        />
+        <div className="list__body">
+          {friendListOpen && !makeGroup && !openGroupList && (
+            <>
+              <ChatList
+                friendList={friendList}
+                history={history}
+                spinnerForChatList={spinnerForChatList}
+                friendNotAvailable={friendNotAvailable}
+                largeScreen={largeScreen}
+                userInfo={userInfo}
+              />
+            </>
+          )}
+          {!friendListOpen && !makeGroup && openGroupList && (
+            <>
+              <GroupList
+                groups={groups}
+                history={history}
+                spinnerForGroupList={spinnerForGroupList}
+                largeScreen={largeScreen}
+                userInfo={userInfo}
+              />
+            </>
+          )}
+          {((!friendListOpen && !makeGroup && !openGroupList) ||
+            (!friendListOpen && makeGroup && !finalStepToCreateGroup)) && (
+            <SearchFriend
+              userEmail={userInfo?.email}
+              users={users}
+              loading={loading}
               history={history}
-              spinnerForChatList={spinnerForChatList}
-              friendNotAvailable={friendNotAvailable}
+              dispatch={dispatch}
+              makeGroup={makeGroup}
+              selectedIdsForGroup={selectedIdsForGroup}
+              groupCreated={groupCreated}
+              groupCreatingSpinner={groupCreatingSpinner}
             />
-          </>
-        )}
-        {!friendListOpen && !makeGroup && openGroupList && (
-          <>
-            <GroupList
-              groups={groups}
-              history={history}
-              spinnerForGroupList={spinnerForGroupList}
+          )}
+          {!friendListOpen && makeGroup && finalStepToCreateGroup && (
+            <FinalProcessToCreateGroup
+              dispatch={dispatch}
+              selectedIdsForGroup={selectedIdsForGroup}
+              userInfo={userInfo}
+              groupName={groupName}
             />
-          </>
-        )}
-        {((!friendListOpen && !makeGroup && !openGroupList) ||
-          (!friendListOpen && makeGroup && !finalStepToCreateGroup)) && (
-          <SearchFriend
-            userEmail={userInfo?.email}
-            users={users}
-            loading={loading}
-            history={history}
-            dispatch={dispatch}
-            makeGroup={makeGroup}
-            selectedIdsForGroup={selectedIdsForGroup}
-            groupCreated={groupCreated}
-            groupCreatingSpinner={groupCreatingSpinner}
-          />
-        )}
-        {!friendListOpen && makeGroup && finalStepToCreateGroup && (
-          <FinalProcessToCreateGroup
-            dispatch={dispatch}
-            selectedIdsForGroup={selectedIdsForGroup}
-            userInfo={userInfo}
-            groupName={groupName}
-          />
-        )}
-      </div>
-      <BottomNavigationBar dispatch={dispatch} />
-    </section>
+          )}
+        </div>
+        <BottomNavigationBar dispatch={dispatch} />
+      </section>
+    </>
   );
 };
 

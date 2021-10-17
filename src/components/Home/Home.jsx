@@ -5,7 +5,7 @@ import ChatBar from "../ChatBar/ChatBar";
 import Chat from "../Chat/Chat/Chat";
 import Login from "../Login/Login";
 import PrivateRoute from "../PrivateRoute/PrivateRoute";
-
+import ResetPassword from "../Login/ResetPassword/ResetPassword";
 import { useDispatch, useSelector } from "react-redux";
 import ChatSettings from "../Chat/ChatSettings/ChatSettings";
 import { isVideoChat } from "../../app/actions/privateCallAction";
@@ -17,7 +17,19 @@ import Profile from "../Profile/Profile";
 import {
   updateGroupListData,
   updateProfileDataFromSocket,
+  getFriendInfoFromSocket,
+  getFriendInfo,
+  getGroupIdForChatBar,
+  setGroupsInfoFromDatabase,
 } from "../../app/actions/userAction";
+import {
+  deleteMessage,
+  deleteMessageFromChatBar,
+  getNewMessageFromSocket,
+  setSendedMessage,
+  updateChatBarMessage,
+  updateMessageStatus,
+} from "../../app/actions/messageAction";
 
 const Home = ({ socket }) => {
   const myStream = useRef(null);
@@ -31,6 +43,11 @@ const Home = ({ socket }) => {
     groups,
     groupInfo,
     chatList,
+    accessToken,
+    friendListOpen,
+    openGroupList,
+    chatMessage,
+    roomId,
   } = useSelector((state) => ({
     userInfo: state.userReducer.userInfo,
     openGroupCall: state.groupCallReducer.openGroupCall,
@@ -39,6 +56,11 @@ const Home = ({ socket }) => {
     groups: state.userReducer.groups,
     groupInfo: state.userReducer.groupInfo,
     chatList: state.userReducer.chatList,
+    accessToken: state.userReducer.accessToken,
+    friendListOpen: state.userReducer.friendListOpen,
+    openGroupList: state.userReducer.openGroupList,
+    chatMessage: state.messageReducer.chatMessages,
+    roomId: state.messageReducer.roomId,
   }));
 
   const [roomIdOfReceivingGroupCall, setRoomIdOfReceivingGroupCall] =
@@ -50,6 +72,101 @@ const Home = ({ socket }) => {
   useEffect(() => {
     userInfo?.email && socket.emit("user-info", { email: userInfo?.email });
   }, [dispatch, socket, userInfo]);
+
+  //////////////// Show Friend List or Group List /////////////
+  const fetchGroupList = useRef(true);
+  const fetchFriendList = useRef(true);
+  useEffect(() => {
+    const getData = () => {
+      if (navigator.onLine) {
+        friendListOpen &&
+          fetchFriendList.current &&
+          dispatch(getFriendInfo(userInfo?.email));
+        openGroupList &&
+          fetchGroupList.current &&
+          dispatch(setGroupsInfoFromDatabase(userInfo?.email));
+
+        if (friendListOpen) fetchFriendList.current = false;
+        if (openGroupList) fetchGroupList.current = false;
+      }
+    };
+    const conditionOfNetwork = () => {
+      fetchFriendList.current = true;
+      fetchGroupList.current = true;
+      accessToken && getData();
+    };
+    const webpageLoad = () => {
+      window.addEventListener("online", conditionOfNetwork);
+      window.addEventListener("offline", conditionOfNetwork);
+    };
+    window.addEventListener("load", webpageLoad);
+    accessToken && getData();
+
+    return () => {
+      window.removeEventListener("load", webpageLoad);
+      window.removeEventListener("online", conditionOfNetwork);
+      window.removeEventListener("offline", conditionOfNetwork);
+    };
+  }, [userInfo?.email, dispatch, friendListOpen, openGroupList, accessToken]);
+
+  //////////////// Friend List Update ///////////////
+  useEffect(() => {
+    if (socket === null) return;
+    socket.on("add-friend-list", (friendEmail) => {
+      dispatch(getFriendInfoFromSocket(friendEmail));
+    });
+    return () => socket.off("add-friend-list");
+  }, [socket, dispatch]);
+
+  //////////////// Group List Update ///////////////
+  useEffect(() => {
+    if (socket === null) return;
+    socket.on("add-group-list", (groupInfo) => {
+      if (groupInfo.member === userInfo?.email?.split("@")[0]) {
+        dispatch(getGroupIdForChatBar(groupInfo.groupId, "chatBar"));
+      }
+    });
+    return () => socket.off("add-group-list");
+  }, [socket, dispatch, userInfo]);
+
+  ///// update chat bar last message ////////
+  // get new message from socket
+  useEffect(() => {
+    socket.on("new-message", (message) => {
+      if (message.id === roomId && message.sender === userInfo?.email) {
+        dispatch(setSendedMessage(chatMessage, message));
+      }
+      if (message.id === roomId && message.sender !== userInfo?.email) {
+        dispatch(getNewMessageFromSocket(message));
+        updateMessageStatus([message?._id]);
+      }
+      dispatch(
+        updateChatBarMessage(message, chatList, userInfo?.email, groups)
+      );
+    });
+
+    return () => socket.off("new-message");
+  }, [
+    socket,
+    dispatch,
+    chatList,
+    userInfo?.email,
+    groups,
+    roomId,
+    chatMessage,
+  ]);
+
+  // delete message
+  useEffect(() => {
+    socket.on("delete-chatMessage", ({ _id }) => {
+      console.log("deleted message", _id);
+      if (chatMessage.length > 0 || chatMessage[0]) {
+        dispatch(deleteMessage(chatMessage, _id));
+      }
+      dispatch(deleteMessageFromChatBar(_id, chatList, groups));
+    });
+    return () => socket.off("delete-chatMessage");
+  }, [socket, dispatch, chatList, groups, chatMessage]);
 
   // update group info
   useEffect(() => {
@@ -131,37 +248,43 @@ const Home = ({ socket }) => {
                 setRemoveGroupCallModal={setRemoveGroupCallModal}
               />
             )}
-          <Router>
-            <Switch>
-              <Route path="/login">
-                <Login />
-              </Route>
-              <PrivateRoute exact path="/">
-                {!openGroupCall && !acceptedGroupCall && (
-                  <ChatBar socket={socket} />
-                )}
-              </PrivateRoute>
-              <PrivateRoute path="/view-profile/:identity">
-                {!openGroupCall && !acceptedGroupCall && <Profile />}
-              </PrivateRoute>
-              <PrivateRoute path="/update-account/:identity">
-                {!openGroupCall && !acceptedGroupCall && <UpdateAccount />}
-              </PrivateRoute>
-              <PrivateRoute path="/chat/:id">
-                {!openGroupCall && !acceptedGroupCall && (
+          {!openGroupCall && !acceptedGroupCall && (
+            <Router>
+              <Switch>
+                <Route path="/login">
+                  <Login />
+                </Route>
+                <Route path="/reset-password/:token">
+                  <ResetPassword />
+                </Route>
+                <PrivateRoute exact path="/">
+                  <ChatBar
+                    socket={socket}
+                    myStream={myStream}
+                    groupPeersRef={groupPeersRef}
+                    roomIdOfReceivingGroupCall={roomIdOfReceivingGroupCall}
+                  />
+                </PrivateRoute>
+                <PrivateRoute path="/view-profile/:identity">
+                  <Profile />
+                </PrivateRoute>
+                <PrivateRoute path="/update-account/:identity">
+                  <UpdateAccount />
+                </PrivateRoute>
+                <PrivateRoute path="/chat/:id">
                   <Chat
                     socket={socket}
                     myStream={myStream}
                     groupPeersRef={groupPeersRef}
                     roomIdOfReceivingGroupCall={roomIdOfReceivingGroupCall}
                   />
-                )}
-              </PrivateRoute>
-              <PrivateRoute path="/chat-settings">
-                {!openGroupCall && !acceptedGroupCall && <ChatSettings />}
-              </PrivateRoute>
-            </Switch>
-          </Router>
+                </PrivateRoute>
+                <PrivateRoute path="/chat-settings">
+                  <ChatSettings />
+                </PrivateRoute>
+              </Switch>
+            </Router>
+          )}
         </>
       )}
     </section>

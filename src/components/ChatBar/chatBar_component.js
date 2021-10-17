@@ -12,6 +12,7 @@ import PersonOutlineIcon from "@material-ui/icons/PersonOutline";
 import Dropdown from "../DropdownMenu/Dropdown";
 import BottomNavigation from "@mui/material/BottomNavigation";
 import BottomNavigationAction from "@mui/material/BottomNavigationAction";
+import path from "path";
 import {
   addIdToCreateGroup,
   createGroupForFirst,
@@ -30,6 +31,7 @@ import {
   setGroupName,
 } from "../../app/actions/userAction";
 import { useState } from "react";
+import { handleText } from "../Chat/Chat/one_one_chat_logic";
 
 export const ChatBarHeader = ({ userPhotoURL, photoId, name }) => {
   return (
@@ -64,6 +66,8 @@ export const ChatList = ({
   history,
   spinnerForChatList,
   friendNotAvailable,
+  largeScreen,
+  userInfo,
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
   return (
@@ -96,6 +100,7 @@ export const ChatList = ({
             })
             ?.map((friend) => (
               <CardActionArea
+                sx={{ height: "4.5rem" }}
                 key={friend?._id}
                 onClick={() => handleReceiverInfo(friend, history)}
                 className="px-3 d-flex justify-content-start align-items-center text-light"
@@ -114,9 +119,108 @@ export const ChatList = ({
                     }
                   />
                 </div>
-                <h6 style={{ letterSpacing: "1px" }} className="m-4">
-                  {friend?.displayName}
-                </h6>
+                <div>
+                  <h6 style={{ letterSpacing: "1px" }} className="mx-4 mb-0">
+                    {friend?.displayName}
+                  </h6>
+                  {friend?.lastMessage?.status ? (
+                    friend?.lastMessage?.files?.length > 0 ? (
+                      friend?.lastMessage?.files[0]?.contentType?.split(
+                        "/"
+                      )[0] === "image" ? (
+                        <div
+                          className={
+                            friend?.lastMessage?.sender !== userInfo?.email
+                              ? friend?.lastMessage?.status === "unseen"
+                                ? "unseenMessage mx-4"
+                                : "seenMessage mx-4"
+                              : "seenMessage mx-4"
+                          }
+                        >
+                          <small>Photo</small>
+                          <small className="ml-1">
+                            {new Date(
+                              friend?.lastMessage?.timeStamp
+                            ).toLocaleString()}
+                          </small>
+                        </div>
+                      ) : friend?.lastMessage?.files[0]?.contentType?.split(
+                          "/"
+                        )[0] === "video" ? (
+                        <div
+                          className={
+                            friend?.lastMessage?.sender !== userInfo?.email
+                              ? friend?.lastMessage?.status === "unseen"
+                                ? "unseenMessage mx-4"
+                                : "seenMessage mx-4"
+                              : "seenMessage mx-4"
+                          }
+                        >
+                          <small>Video</small>
+                          <small className="ml-1">
+                            {new Date(
+                              friend?.lastMessage?.timeStamp
+                            ).toLocaleString()}
+                          </small>
+                        </div>
+                      ) : (
+                        friend?.lastMessage?.files[0]?.contentType?.split(
+                          "/"
+                        )[0] === "application" && (
+                          <div
+                            className={
+                              friend?.lastMessage?.sender !== userInfo?.email
+                                ? friend?.lastMessage?.status === "unseen"
+                                  ? "unseenMessage mx-4"
+                                  : "seenMessage mx-4"
+                                : "seenMessage mx-4"
+                            }
+                          >
+                            <small>
+                              {handleText(
+                                friend?.lastMessage?.files[0]?.filename
+                                  ?.split("_")
+                                  ?.join(" ")
+                                  ?.split("◉_◉")[0],
+                                largeScreen
+                              ) +
+                                path.extname(
+                                  friend?.lastMessage?.files[0]?.filename
+                                )}
+                            </small>
+                            <small className="ml-1">
+                              {new Date(
+                                friend?.lastMessage?.timeStamp
+                              ).toLocaleString()}
+                            </small>
+                          </div>
+                        )
+                      )
+                    ) : (
+                      <div
+                        className={
+                          friend?.lastMessage?.sender !== userInfo?.email
+                            ? friend?.lastMessage?.status === "unseen"
+                              ? "unseenMessage mx-4"
+                              : "seenMessage mx-4"
+                            : "seenMessage mx-4"
+                        }
+                      >
+                        <small>
+                          {handleText(
+                            friend?.lastMessage?.message,
+                            largeScreen
+                          )}
+                        </small>
+                        <small className="ml-1">
+                          {new Date(
+                            friend?.lastMessage?.timeStamp
+                          ).toLocaleString()}
+                        </small>
+                      </div>
+                    )
+                  ) : null}
+                </div>
               </CardActionArea>
             ))
         )}
@@ -125,7 +229,13 @@ export const ChatList = ({
   );
 };
 
-export const GroupList = ({ groups, history, spinnerForGroupList }) => {
+export const GroupList = ({
+  groups,
+  history,
+  spinnerForGroupList,
+  largeScreen,
+  userInfo,
+}) => {
   const [searchTerm, setSearchTerm] = useState("");
   return (
     <div className="friendList__container">
@@ -157,6 +267,7 @@ export const GroupList = ({ groups, history, spinnerForGroupList }) => {
             })
             ?.map((group) => (
               <CardActionArea
+                sx={{ height: "4.5rem" }}
                 key={group?._id}
                 onClick={() => handleGroupInfo(group, history)}
                 className="px-3 d-flex justify-content-start align-items-center text-light"
@@ -169,9 +280,109 @@ export const GroupList = ({ groups, history, spinnerForGroupList }) => {
                     className={group?.status === "active" ? "onLine" : "d-none"}
                   />
                 </div>
-                <h6 style={{ letterSpacing: "1px" }} className="m-4">
-                  {group?.groupName?.split("◉_◉")[0]}
-                </h6>
+                <div>
+                  <h6 style={{ letterSpacing: "1px" }} className="mx-4 mb-0">
+                    {group?.groupName?.split("◉_◉")[0]}
+                  </h6>
+                  {group?.lastMessage?.status ? (
+                    group?.lastMessage?.files?.length > 0 ? (
+                      group?.lastMessage?.files[0]?.contentType?.split(
+                        "/"
+                      )[0] === "image" ? (
+                        <div
+                          className={
+                            group?.lastMessage?.sender !== userInfo?.email
+                              ? group?.lastMessage?.status === "unseen"
+                                ? "unseenMessage mx-4"
+                                : "seenMessage mx-4"
+                              : "seenMessage mx-4"
+                          }
+                        >
+                          <small>Photo</small>
+                          <small className="ml-1">
+                            {new Date(
+                              group?.lastMessage?.timeStamp
+                            ).toLocaleString()}
+                          </small>
+                        </div>
+                      ) : group?.lastMessage?.files[0]?.contentType?.split(
+                          "/"
+                        )[0] === "video" ? (
+                        <div
+                          className={
+                            group?.lastMessage?.sender !== userInfo?.email
+                              ? group?.lastMessage?.status === "unseen"
+                                ? "unseenMessage mx-4"
+                                : "seenMessage mx-4"
+                              : "seenMessage mx-4"
+                          }
+                        >
+                          <small>Video</small>
+                          <small className="ml-1">
+                            {new Date(
+                              group?.lastMessage?.timeStamp
+                            ).toLocaleString()}
+                          </small>
+                        </div>
+                      ) : (
+                        group?.lastMessage?.files[0]?.contentType?.split(
+                          "/"
+                        )[0] === "application" && (
+                          <div
+                            className={
+                              group?.lastMessage?.sender !== userInfo?.email
+                                ? group?.lastMessage?.status === "unseen"
+                                  ? "unseenMessage mx-4"
+                                  : "seenMessage mx-4"
+                                : "seenMessage mx-4"
+                            }
+                          >
+                            <small>
+                              {handleText(
+                                group?.lastMessage?.files[0]?.filename
+                                  ?.split("_")
+                                  ?.join(" ")
+                                  ?.split("◉_◉")[0],
+                                largeScreen
+                              ) +
+                                path.extname(
+                                  group?.lastMessage?.files[0]?.filename
+                                )}
+                            </small>
+                            <small className="ml-1">
+                              {new Date(
+                                group?.lastMessage?.timeStamp
+                              ).toLocaleString()}
+                            </small>
+                          </div>
+                        )
+                      )
+                    ) : (
+                      <div
+                        className={
+                          group?.lastMessage?.sender !== userInfo?.email
+                            ? group?.lastMessage?.status === "unseen"
+                              ? "unseenMessage mx-4"
+                              : "seenMessage mx-4"
+                            : "seenMessage mx-4"
+                        }
+                      >
+                        <small>
+                          {handleText(group?.lastMessage?.message, largeScreen)}
+                        </small>
+                        <small className="ml-1">
+                          {new Date(
+                            group?.lastMessage?.timeStamp
+                          ).toLocaleString()}
+                        </small>
+                      </div>
+                    )
+                  ) : (
+                    <small className="seenMessage mx-4">
+                      {group?.lastMessage?.message}
+                    </small>
+                  )}
+                </div>
               </CardActionArea>
             ))
         )}

@@ -143,7 +143,19 @@
   background-color: rgba(248, 248, 248, 0.863);
   border-radius: 50%;
 }
+/* after deploy */
+.css-fcyteq.Mui-selected,
+.css-11g9m8p.Mui-selected {
+  color: #fff !important;
+  background: #6f31ff !important;
+}
 
+.css-qpufms,
+.css-11g9m8p {
+  min-width: 60px !important;
+}
+
+/* in development */
 .chat__bar
   .css-1ee5err-MuiButtonBase-root-MuiBottomNavigationAction-root.Mui-selected {
   color: #fff !important;
@@ -160,4 +172,25 @@
 }
 .chat__bar .css-1bhme17-MuiButtonBase-root-MuiBottomNavigationAction-root {
   min-width: 60px !important;
+}
+
+.friendList__container .unseenMessage {
+  color: rgb(72, 182, 255);
+  size: 12px;
+  letter-spacing: 1px;
+  font-weight: 600;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+.friendList__container .seenMessage {
+  color: rgb(149, 149, 149);
+  size: 12px;
+  letter-spacing: 1px;
+  font-weight: 600;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
 }
