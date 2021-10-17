@@ -84,9 +84,9 @@ export const ChatHeader = ({
             receiverInfo?.displayName
               ? receiverInfo?.photoURL
                 ? receiverInfo.photoURL
-                : `http://localhost:5000/user/account/get-profile-img/${receiverInfo?.photoId}`
+                : `https://barta-the-real-time-chat-app.herokuapp.com/user/account/get-profile-img/${receiverInfo?.photoId}`
               : groupInfo?.photoId &&
-                `http://localhost:5000/groupAccount/get-profile-img/${groupInfo?.photoId}`
+                `https://barta-the-real-time-chat-app.herokuapp.com/groupAccount/get-profile-img/${groupInfo?.photoId}`
           }
         />
 
@@ -467,7 +467,7 @@ export const ChatBody = ({
                                   key={index}
                                   href={
                                     file.fileId
-                                      ? `http://localhost:5000/${destination}/file/${file?.filename}`
+                                      ? `https://barta-the-real-time-chat-app.herokuapp.com/${destination}/file/${file?.filename}`
                                       : file?.url
                                   }
                                 >
@@ -476,7 +476,7 @@ export const ChatBody = ({
                                     className="chat__img"
                                     src={
                                       file.fileId
-                                        ? `http://localhost:5000/${destination}/file/${file?.filename}`
+                                        ? `https://barta-the-real-time-chat-app.herokuapp.com/${destination}/file/${file?.filename}`
                                         : file?.url
                                     }
                                     alt={`${index + 1}`}
@@ -504,7 +504,7 @@ export const ChatBody = ({
                                     className="chat__img"
                                     src={
                                       file.fileId
-                                        ? `http://localhost:5000/${destination}/file/${file?.filename}`
+                                        ? `https://barta-the-real-time-chat-app.herokuapp.com/${destination}/file/${file?.filename}`
                                         : file?.url
                                     }
                                     controls

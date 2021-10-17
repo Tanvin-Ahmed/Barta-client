@@ -13,6 +13,7 @@ import Dropdown from "../DropdownMenu/Dropdown";
 import BottomNavigation from "@mui/material/BottomNavigation";
 import BottomNavigationAction from "@mui/material/BottomNavigationAction";
 import path from "path";
+import { handleText } from "./chatBar_logic";
 import {
   addIdToCreateGroup,
   createGroupForFirst,
@@ -31,7 +32,6 @@ import {
   setGroupName,
 } from "../../app/actions/userAction";
 import { useState } from "react";
-import { handleText } from "../Chat/Chat/one_one_chat_logic";
 
 export const ChatBarHeader = ({ userPhotoURL, photoId, name }) => {
   return (
@@ -44,7 +44,7 @@ export const ChatBarHeader = ({ userPhotoURL, photoId, name }) => {
               src={
                 userPhotoURL
                   ? userPhotoURL
-                  : `http://localhost:5000/user/account/get-profile-img/${photoId}`
+                  : `https://barta-the-real-time-chat-app.herokuapp.com/user/account/get-profile-img/${photoId}`
               }
             />
             <div className="onLine" />
@@ -110,7 +110,7 @@ export const ChatList = ({
                     src={
                       friend?.photoURL
                         ? friend?.photoURL
-                        : `http://localhost:5000/user/account/get-profile-img/${friend?.photoId}`
+                        : `https://barta-the-real-time-chat-app.herokuapp.com/user/account/get-profile-img/${friend?.photoId}`
                     }
                   />
                   <div
@@ -274,7 +274,7 @@ export const GroupList = ({
               >
                 <div style={{ position: "relative" }} className="mr-3">
                   <Avatar
-                    src={`http://localhost:5000/groupAccount/get-profile-img/${group?.photoId}`}
+                    src={`https://barta-the-real-time-chat-app.herokuapp.com/groupAccount/get-profile-img/${group?.photoId}`}
                   />
                   <div
                     className={group?.status === "active" ? "onLine" : "d-none"}
@@ -435,7 +435,7 @@ export const SearchFriend = ({
                   src={
                     selectedId?.photoURL
                       ? selectedId?.photoURL
-                      : `http://localhost:5000/user/account/get-profile-img/${selectedId?.photoId}`
+                      : `https://barta-the-real-time-chat-app.herokuapp.com/user/account/get-profile-img/${selectedId?.photoId}`
                   }
                 />
               </div>
@@ -492,7 +492,7 @@ export const SearchFriend = ({
                       src={
                         otherUser?.photoURL
                           ? otherUser?.photoURL
-                          : `http://localhost:5000/user/account/get-profile-img/${otherUser?.photoId}`
+                          : `https://barta-the-real-time-chat-app.herokuapp.com/user/account/get-profile-img/${otherUser?.photoId}`
                       }
                     />
                   </div>

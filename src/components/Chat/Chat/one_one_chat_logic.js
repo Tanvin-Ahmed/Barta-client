@@ -170,17 +170,3 @@ export const handleReactions = (dispatch, message, sender, react) => {
   }
   toggleReactTab(dispatch, false);
 };
-
-export const handleText = (str, largeScreen) => {
-  if (largeScreen) {
-    return str.length > 15
-      ? str.split("\n").join(" ").split("&nbsp;").join(" ").substring(0, 14) +
-          "...."
-      : str;
-  } else {
-    return str.length > 7
-      ? str.split("\n").join(" ").split("&nbsp;").join(" ").substring(0, 6) +
-          "...."
-      : str;
-  }
-};

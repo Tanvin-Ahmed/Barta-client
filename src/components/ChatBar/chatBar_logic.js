@@ -119,3 +119,21 @@ export const createGroupForFirst = (
   dispatch(createGroup(selectedUsersEmail, groupName));
   dispatch(setFinalStepToCreateGroup(false));
 };
+
+export const handleText = (str, largeScreen) => {
+  if (largeScreen) {
+    return str.length > 15
+      ? str
+          .split("<br/>")
+          .join(" ")
+          .split("&nbsp;")
+          .join(" ")
+          .substring(0, 14) + "..."
+      : str;
+  } else {
+    return str.length > 7
+      ? str.split("<br/>").join(" ").split("&nbsp;").join(" ").substring(0, 6) +
+          "..."
+      : str;
+  }
+};

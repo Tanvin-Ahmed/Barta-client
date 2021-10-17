@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { resetPasswordRequest } from "../../../app/actions/userAction";
 import "./ResetModal.css";
 import CircularProgress from "@mui/material/CircularProgress";
 
 const ResetModal = ({ setOpenModal }) => {
   const [email, setEmail] = useState("");
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState({});
   const [loading, setLoading] = useState(false);
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -14,6 +14,16 @@ const ResetModal = ({ setOpenModal }) => {
       resetPasswordRequest(email, setLoading, setMessage);
     } else alert("Please enter your email");
   };
+
+  useEffect(() => {
+    if (message?.status === "ok") {
+      setTimeout(() => {
+        setOpenModal(false);
+        setMessage({});
+      }, 5000);
+    }
+  }, [message, setOpenModal]);
+
   return (
     <section className="reset__modal">
       <div className="back__drop" onClick={() => setOpenModal(false)} />
@@ -38,7 +48,9 @@ const ResetModal = ({ setOpenModal }) => {
             </button>
           </div>
         </form>
-        <small className="text-center text-light mt-2">{message}</small>
+        <div className="mt-2 text-center">
+          <small className="text-light">{message?.message}</small>
+        </div>
       </div>
     </section>
   );
