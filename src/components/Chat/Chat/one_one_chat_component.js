@@ -711,7 +711,7 @@ export const ChatFooter = ({
   }, [cursorPosition, text]);
 
   useEffect(() => {
-    const value = message.split(" ").join("&nbsp;").split("\n").join("<br/>");
+    const value = message.split("  ").join(" &nbsp;").split("\n").join("<br/>");
     setInputText(value);
   }, [message, setInputText]);
 
