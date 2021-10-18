@@ -157,10 +157,7 @@ export const setReceiver = (bol) => {
 
 export const setCallInfoInDatabase = (callInfo) => {
   axios
-    .post(
-      "https://barta-the-real-time-chat-app.herokuapp.com/chatMessage/postCallInfo",
-      callInfo
-    )
+    .post("http://localhost:5000/chatMessage/postCallInfo", callInfo)
     .then((res) => res)
     .catch((err) => err.message);
 };

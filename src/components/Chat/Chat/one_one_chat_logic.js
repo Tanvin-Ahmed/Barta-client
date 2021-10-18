@@ -107,7 +107,7 @@ export const handleSendMessage = (
 
     setInputText("");
   }
-  !friendListOpen &&
+  if (!friendListOpen) {
     dispatch(
       postFriendInfo(roomId, {
         friendInfo: [
@@ -121,8 +121,9 @@ export const handleSendMessage = (
           },
         ],
       })
-    ) &&
+    );
     dispatch(setFriendListTapOpen(true));
+  }
 };
 
 export const fileUpload = (e, dispatch) => {

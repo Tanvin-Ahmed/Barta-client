@@ -115,7 +115,7 @@ const AddMemberModal = ({ setIsOpen, groupMembers }) => {
                       src={
                         member?.photoURL
                           ? member.photoURL
-                          : `https://barta-the-real-time-chat-app.herokuapp.com/user/account/get-profile-img/${member?.photoId}`
+                          : `http://localhost:5000/user/account/get-profile-img/${member?.photoId}`
                       }
                     />
                   </Badge>
@@ -175,7 +175,7 @@ const AddMemberModal = ({ setIsOpen, groupMembers }) => {
                         src={
                           user?.PhotoURL
                             ? user.PhotoURL
-                            : `https://barta-the-real-time-chat-app.herokuapp.com/user/account/get-profile-img/${user?.photoId}`
+                            : `http://localhost:5000/user/account/get-profile-img/${user?.photoId}`
                         }
                       />
                       <p className="ml-2">{user?.displayName}</p>

@@ -84,9 +84,9 @@ export const ChatHeader = ({
             receiverInfo?.displayName
               ? receiverInfo?.photoURL
                 ? receiverInfo.photoURL
-                : `https://barta-the-real-time-chat-app.herokuapp.com/user/account/get-profile-img/${receiverInfo?.photoId}`
+                : `http://localhost:5000/user/account/get-profile-img/${receiverInfo?.photoId}`
               : groupInfo?.photoId &&
-                `https://barta-the-real-time-chat-app.herokuapp.com/groupAccount/get-profile-img/${groupInfo?.photoId}`
+                `http://localhost:5000/groupAccount/get-profile-img/${groupInfo?.photoId}`
           }
         />
 
@@ -467,7 +467,7 @@ export const ChatBody = ({
                                   key={index}
                                   href={
                                     file.fileId
-                                      ? `https://barta-the-real-time-chat-app.herokuapp.com/${destination}/file/${file?.filename}`
+                                      ? `http://localhost:5000/${destination}/file/${file?.filename}`
                                       : file?.url
                                   }
                                 >
@@ -476,7 +476,7 @@ export const ChatBody = ({
                                     className="chat__img"
                                     src={
                                       file.fileId
-                                        ? `https://barta-the-real-time-chat-app.herokuapp.com/${destination}/file/${file?.filename}`
+                                        ? `http://localhost:5000/${destination}/file/${file?.filename}`
                                         : file?.url
                                     }
                                     alt={`${index + 1}`}
@@ -504,7 +504,7 @@ export const ChatBody = ({
                                     className="chat__img"
                                     src={
                                       file.fileId
-                                        ? `https://barta-the-real-time-chat-app.herokuapp.com/${destination}/file/${file?.filename}`
+                                        ? `http://localhost:5000/${destination}/file/${file?.filename}`
                                         : file?.url
                                     }
                                     controls
@@ -694,6 +694,21 @@ export const ChatFooter = ({
 }) => {
   const [openEmoji, setOpenEmoji] = useState(false);
   const [message, setMessage] = useState("");
+  const [cursorPosition, setCursorPosition] = useState(null);
+
+  const onEmojiClickForMessage = (event, { emoji }) => {
+    const ref = text.current;
+    ref.focus();
+    const start = message.substring(0, ref.selectionStart);
+    const end = message.substring(ref.selectionStart);
+    const msg = start + emoji + end;
+    setMessage(msg);
+    setCursorPosition(start.length + emoji.length);
+  };
+
+  useEffect(() => {
+    text.current.selectionEnd = cursorPosition;
+  }, [cursorPosition, text]);
 
   useEffect(() => {
     const value = message.split(" ").join("&nbsp;").split("\n").join("<br/>");
@@ -712,8 +727,6 @@ export const ChatFooter = ({
             <div
               className="d-flex justify-content-between align-items-center"
               style={{ flex: 1 }}
-              onFocus={(e) => handleIsType(e, socket, senderEmail)}
-              onBlur={(e) => handleIsType(e, socket, senderEmail)}
             >
               {!inputText.trim() && <FilePicker dispatch={dispatch} />}
               <textarea
@@ -724,7 +737,9 @@ export const ChatFooter = ({
                 onChange={(e) => {
                   setMessage(e.target.value);
                 }}
-                onFocus={() => setOpenEmoji(false)}
+                onFocus={(e) => handleIsType(e, socket, senderEmail)}
+                onBlur={(e) => handleIsType(e, socket, senderEmail)}
+                onClick={() => setOpenEmoji(false)}
                 placeholder="Type a message"
               ></textarea>
               <IconButton
@@ -760,20 +775,20 @@ export const ChatFooter = ({
             <div
               className="d-flex justify-content-between align-items-center"
               style={{ flex: 1 }}
-              onFocus={(e) => handleIsType(e, socket, senderEmail)}
-              onBlur={(e) => handleIsType(e, socket, senderEmail)}
             >
               {!inputText.trim() && <FilePicker dispatch={dispatch} />}
               <textarea
                 cols="30"
                 rows="2"
                 ref={text}
-                value={inputText}
+                value={message}
                 onChange={(e) => {
                   setInputText(e.target.value);
                   setMessage(e.target.value);
                 }}
-                onFocus={() => setOpenEmoji(false)}
+                onClick={() => setOpenEmoji(false)}
+                onFocus={(e) => handleIsType(e, socket, senderEmail)}
+                onBlur={(e) => handleIsType(e, socket, senderEmail)}
                 placeholder="Type a message"
               ></textarea>
               <IconButton
@@ -801,7 +816,13 @@ export const ChatFooter = ({
         )}
       </div>
       {openEmoji && (
-        <Picker style={{ width: "100%" }} onEmojiClick={onEmojiClick} />
+        <Picker
+          style={{ width: "100%" }}
+          onEmojiClick={(event, e) => {
+            onEmojiClick(event, e);
+            onEmojiClickForMessage(event, e);
+          }}
+        />
       )}
     </div>
   );
