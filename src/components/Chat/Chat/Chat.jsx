@@ -326,7 +326,8 @@ const Chat = ({
         myName,
         senderInfo,
         video,
-        timer
+        timer,
+        receiverInfo
       );
     }
   };

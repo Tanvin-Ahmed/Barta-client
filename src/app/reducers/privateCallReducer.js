@@ -13,12 +13,14 @@ import {
   RECEIVING_CALL,
   SET_INTERVAL,
   SET_RECEIVER,
+  SET_RECEIVER_IS_BUSY,
   SET_USER_STATUS_TO_RECEIVE_OTHER_CALL,
   START_TIMER,
   USER_ID,
   VIDEO_CHAT,
   VIDEO_OPEN,
   VOICE_OPEN,
+  SET_RECEIVER_OFFLINE_STATUS,
 } from "../types";
 
 const initialState = {
@@ -42,6 +44,8 @@ const initialState = {
   interVal: null,
   receiver: false,
   userStatusToReceiveOtherCall: {},
+  receiverIsBusy: "",
+  receiverIsOffline: "",
 };
 
 const privateCall = (state = initialState, action) => {
@@ -145,6 +149,16 @@ const privateCall = (state = initialState, action) => {
       return {
         ...state,
         userStatusToReceiveOtherCall: action.payload,
+      };
+    case SET_RECEIVER_IS_BUSY:
+      return {
+        ...state,
+        receiverIsBusy: action.payload,
+      };
+    case SET_RECEIVER_OFFLINE_STATUS:
+      return {
+        ...state,
+        receiverIsOffline: action.payload,
       };
     default:
       return state;

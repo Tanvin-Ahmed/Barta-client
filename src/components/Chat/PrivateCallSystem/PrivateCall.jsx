@@ -12,6 +12,8 @@ import {
   setReceiver,
   setStartTimer,
   setPrivateCallIsOpen,
+  setReceiverIsBusy,
+  setReceiverOfflineStatus,
 } from "../../../app/actions/privateCallAction";
 import { Buttons } from "./Component";
 import "./PrivateCall.css";
@@ -24,6 +26,8 @@ import {
   callNotReceive,
   stopBothVideoAndAudio,
 } from "./callLogic";
+import busy_call from "../../../audios/busy_call.mp3";
+import receiverOfflineAudio from "../../../audios/call_not_reached_ton.mp3";
 
 const PrivateVideoCall = ({
   socket,
@@ -53,6 +57,8 @@ const PrivateVideoCall = ({
     receiver,
     roomId,
     openPrivateVideoCall,
+    receiverIsBusy,
+    receiverIsOffline,
   } = useSelector((state) => ({
     stream: state.privateCall.stream,
     receivingCall: state.privateCall.receivingCall,
@@ -73,6 +79,8 @@ const PrivateVideoCall = ({
     receiver: state.privateCall.receiver,
     roomId: state.messageReducer.roomId,
     openPrivateVideoCall: state.privateCall.openPrivateVideoCall,
+    receiverIsBusy: state.privateCall.receiverIsBusy,
+    receiverIsOffline: state.privateCall.receiverIsOffline,
   }));
 
   ////////////////// OPEN CAMERA AND MICROPHONE OF RECEIVER //////////////////
@@ -223,9 +231,11 @@ const PrivateVideoCall = ({
         ? { ...timer, duration: true }
         : { duration: false },
       callDescription: videoChat ? "Video Call" : "Audio Call",
+      status: "unseen",
       timeStamp: new Date().toUTCString(),
     });
     dispatch(setCallTimer({ s: 0, m: 0, h: 0 }));
+    dispatch(getStream(null));
     dispatch(isCallEnded(true));
     dispatch(setStartTimer(false));
     dispatch(setPrivateCallIsOpen(false));
@@ -236,16 +246,62 @@ const PrivateVideoCall = ({
     socket.emit("cutCall", {
       to: receiverInfo.email,
     });
-    !receiver &&
+    if (!receiver && receiverIsBusy === "free") {
       setTimeout(() => {
         window.location.reload();
-      }, 10);
+      }, 20);
+    }
+
     dispatch(setReceiver(false));
+    dispatch(setReceiverIsBusy(""));
+    dispatch(setReceiverOfflineStatus(""));
   };
+
+  // handle call conditions /////
+  const audioRef = useRef(null);
+  useEffect(() => {
+    audioRef.current = document.getElementById("call_info_audio");
+    audioRef.current.volume = 0.3;
+    let t;
+    if (receiverIsBusy === "busy") {
+      audioRef.current.src = busy_call;
+      const playPromise = audioRef.current.play();
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {})
+          .catch(() => {
+            audioRef.current.pause();
+          });
+      }
+      audioRef.current.play();
+      t = setTimeout(() => {
+        audioRef.current.src = null;
+        leaveCall();
+      }, 5000);
+      return () => clearTimeout(t);
+    }
+    if (receiverIsOffline === "offline") {
+      audioRef.current.src = receiverOfflineAudio;
+      const playPromise = audioRef.current.play();
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {})
+          .catch(() => {
+            audioRef.current.pause();
+          });
+      }
+      t = setTimeout(() => {
+        audioRef.current.src = null;
+        leaveCall();
+      }, 6000);
+      return () => clearTimeout(t);
+    }
+  }, [receiverIsBusy, receiverIsOffline, myStream, dispatch, stream]);
 
   return (
     <div style={{ position: "relative" }}>
       <div style={{ position: "relative", width: "100%", height: "95vh" }}>
+        <audio id="call_info_audio"></audio>
         {videoChat ? (
           <>
             {callAccepted && !callEnded ? (

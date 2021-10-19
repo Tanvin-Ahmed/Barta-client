@@ -16,6 +16,8 @@ import {
   getCallerSignal,
   isVideoChat,
   setUserStatusToReceiveOtherCall,
+  setReceiverIsBusy,
+  setReceiverOfflineStatus,
 } from "../../../app/actions/privateCallAction";
 import { end, start } from "./timer.js";
 import Peer from "simple-peer";
@@ -58,7 +60,8 @@ export const makeCall = (
   myName,
   senderInfo,
   video,
-  timer
+  timer,
+  receiverInfo
 ) => {
   dispatch(
     setUserStatusToReceiveOtherCall({
@@ -75,37 +78,55 @@ export const makeCall = (
       dispatch(getStream(stream));
       myStream.current.srcObject = stream;
 
-      const peer = new Peer({
-        initiator: true,
-        trickle: false,
-        stream,
-      });
+      if (receiverInfo?.status === "inactive") {
+        return dispatch(setReceiverOfflineStatus("offline"));
+      }
+      dispatch(setReceiverOfflineStatus("online"));
 
-      peer.on("signal", (signal) => {
-        socket.emit("callUser", {
-          userToCall: idToCall,
-          signal: signal,
-          from: myId,
-          name: myName,
-          callerDataBaseId: senderInfo._id,
-          callType: video ? "video" : "audio",
-        });
+      socket.emit("is-receiver-free", {
+        from: senderInfo?.email,
+        to: receiverInfo?.email,
       });
+      socket.on("receiver-status-for-call", ({ to, status }) => {
+        if (to === senderInfo?.email) {
+          if (status === "free") {
+            dispatch(setReceiverIsBusy("free"));
+            const peer = new Peer({
+              initiator: true,
+              trickle: false,
+              stream,
+            });
 
-      socket.on("callAccepted", (data) => {
-        if (data.to === senderInfo.email) {
-          dispatch(isCallAccepted(true));
-          dispatch(setStartTimer(true));
-          start(timer, dispatch);
-          dispatch(isReceivingCall(false));
-          peer.signal(data.signal);
+            peer.on("signal", (signal) => {
+              socket.emit("callUser", {
+                userToCall: idToCall,
+                signal: signal,
+                from: myId,
+                name: myName,
+                callerDataBaseId: senderInfo._id,
+                callType: video ? "video" : "audio",
+              });
+            });
+
+            socket.on("callAccepted", (data) => {
+              if (data.to === senderInfo.email) {
+                dispatch(isCallAccepted(true));
+                dispatch(setStartTimer(true));
+                start(timer, dispatch);
+                dispatch(isReceivingCall(false));
+                peer.signal(data.signal);
+              }
+            });
+            peer.on("stream", (stream) => {
+              userStream.current.srcObject = stream;
+            });
+
+            connectionRef.current = peer;
+          }
+        } else {
+          dispatch(setReceiverIsBusy("busy"));
         }
       });
-      peer.on("stream", (stream) => {
-        userStream.current.srcObject = stream;
-      });
-
-      connectionRef.current = peer;
     })
     .catch((error) => alert(error.message));
 };

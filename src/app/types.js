@@ -73,6 +73,8 @@ export const SET_INTERVAL = "set_interval";
 export const SET_RECEIVER = "set_receiver";
 export const SET_USER_STATUS_TO_RECEIVE_OTHER_CALL =
   "set_user_status_to_receive_other_call";
+export const SET_RECEIVER_IS_BUSY = "set_receiver_is_busy";
+export const SET_RECEIVER_OFFLINE_STATUS = "set_receiver_offline_status";
 
 // group call
 export const SET_PEERS_FOR_GROUP_CALL = "set_peers_for_group_call";

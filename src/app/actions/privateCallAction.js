@@ -14,6 +14,8 @@ import {
   RECEIVING_CALL,
   SET_INTERVAL,
   SET_RECEIVER,
+  SET_RECEIVER_IS_BUSY,
+  SET_RECEIVER_OFFLINE_STATUS,
   SET_USER_STATUS_TO_RECEIVE_OTHER_CALL,
   START_TIMER,
   USER_ID,
@@ -157,7 +159,12 @@ export const setReceiver = (bol) => {
 
 export const setCallInfoInDatabase = (callInfo) => {
   axios
-    .post("http://localhost:5000/chatMessage/postCallInfo", callInfo)
+    .post("http://localhost:5000/chatMessage/postCallInfo", callInfo, {
+      headers: {
+        Authorization:
+          "Bearer " + JSON.parse(localStorage.getItem("accessToken")),
+      },
+    })
     .then((res) => res)
     .catch((err) => err.message);
 };
@@ -165,6 +172,20 @@ export const setCallInfoInDatabase = (callInfo) => {
 export const setUserStatusToReceiveOtherCall = (status) => {
   return {
     type: SET_USER_STATUS_TO_RECEIVE_OTHER_CALL,
+    payload: status,
+  };
+};
+
+export const setReceiverIsBusy = (status) => {
+  return {
+    type: SET_RECEIVER_IS_BUSY,
+    payload: status,
+  };
+};
+
+export const setReceiverOfflineStatus = (status) => {
+  return {
+    type: SET_RECEIVER_OFFLINE_STATUS,
     payload: status,
   };
 };

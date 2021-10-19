@@ -48,6 +48,8 @@ const Home = ({ socket }) => {
     openGroupList,
     chatMessage,
     roomId,
+    openPrivateCall,
+    callAccepted,
   } = useSelector((state) => ({
     userInfo: state.userReducer.userInfo,
     openGroupCall: state.groupCallReducer.openGroupCall,
@@ -61,6 +63,8 @@ const Home = ({ socket }) => {
     openGroupList: state.userReducer.openGroupList,
     chatMessage: state.messageReducer.chatMessages,
     roomId: state.messageReducer.roomId,
+    openPrivateCall: state.privateCall.openPrivateCall,
+    callAccepted: state.privateCall.callAccepted,
   }));
 
   const [roomIdOfReceivingGroupCall, setRoomIdOfReceivingGroupCall] =
@@ -186,6 +190,37 @@ const Home = ({ socket }) => {
       dispatch(updateProfileDataFromSocket(data, userInfo, chatList));
     });
   }, [socket, userInfo, dispatch, chatList]);
+
+  //////////// PRIVATE CALL /////////
+  useEffect(() => {
+    socket.on("is-me-free", ({ from, to }) => {
+      if (to === userInfo?.email) {
+        if (
+          openGroupCall ||
+          acceptedGroupCall ||
+          openPrivateCall ||
+          receivingCall ||
+          callAccepted ||
+          !removeGroupCallModal
+        ) {
+          socket.emit("my-status-for-call", { to: from, status: "busy" });
+        } else {
+          socket.emit("my-status-for-call", { to: from, status: "free" });
+        }
+      }
+    });
+
+    return () => socket.off("is-receiver-free");
+  }, [
+    socket,
+    userInfo,
+    openGroupCall,
+    acceptedGroupCall,
+    openPrivateCall,
+    receivingCall,
+    callAccepted,
+    removeGroupCallModal,
+  ]);
 
   ////////////////  GROUP CALL ///////////////////
   //************* GROUP CALL RECEIVE OTHER USERS ************//
