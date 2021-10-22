@@ -403,7 +403,7 @@ export const reactTabToggle = (payload) => {
 
 export const updateReactInChat = (chatMessage, update) => {
   return (dispatch) => {
-    const message = chatMessage.find((message) => message?._id === update._id);
+    const message = chatMessage.find((message) => message?._id === update?._id);
     if (message) {
       let updatedMessage = {};
       if (update?.react?.length >= 0) {
@@ -412,9 +412,9 @@ export const updateReactInChat = (chatMessage, update) => {
           ...update,
         };
       } else {
-        const key = Object.keys(update.react)[0];
-        const indexOfReact = parseInt(key.split(".")[1]);
-        message.react[indexOfReact].react = update.react[key];
+        const key = Object.keys(update?.react)[0];
+        const indexOfReact = parseInt(key?.split(".")[1]);
+        message.react[indexOfReact].react = update?.react[key];
         updatedMessage = { ...message };
       }
       const index = chatMessage.findIndex(

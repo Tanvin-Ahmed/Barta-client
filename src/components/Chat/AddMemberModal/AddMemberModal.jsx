@@ -64,7 +64,7 @@ const AddMemberModal = ({ setIsOpen, groupMembers }) => {
       _id: groupInfo?._id,
       members: selectedMembers,
     };
-    dispatch(addMemberInGroup(data));
+    dispatch(addMemberInGroup(data, setIsOpen));
   };
 
   return (

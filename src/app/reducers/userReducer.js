@@ -34,6 +34,8 @@ import {
   SET_ADD_MEMBER_SPINNER,
   SET_ADD_MEMBER_COMPLETE_ICON,
   SET_ADD_MEMBER_ERROR_ICON,
+  SET_DELETE_ACCOUNT_FOREVER,
+  SET_USER_INFO_SPINNER,
 } from "../types";
 
 const initialState = {
@@ -41,9 +43,12 @@ const initialState = {
   tokenVerifySpinner: false,
   loginSpinner: false,
   userInfo: {},
+  userInfoSpinner: false,
   allUserInfo: [],
   friendNotAvailable: "",
-  chatList: [],
+  chatList: []?.filter(
+    (item, index, self) => index === self.findIndex((t) => t._id === item._id)
+  ),
   spinnerForChatList: false,
   receiverInfo: {},
   error: "",
@@ -53,7 +58,9 @@ const initialState = {
   profileUpdateSpinner: false,
   // for group
   openGroupList: false,
-  groups: [],
+  groups: []?.filter(
+    (item, index, self) => index === self.findIndex((t) => t._id === item._id)
+  ),
   spinnerForGroupList: false,
   makeGroup: false,
   finalStepToCreateGroup: false,
@@ -65,6 +72,7 @@ const initialState = {
   addMemberSpinner: false,
   completeAddMemberIcon: false,
   errorToUploadMemberIcon: false,
+  deleteAccountAlert: false,
 };
 
 const userReducer = (state = initialState, action) => {
@@ -93,6 +101,11 @@ const userReducer = (state = initialState, action) => {
       return {
         ...state,
         userInfo: action.payload,
+      };
+    case SET_USER_INFO_SPINNER:
+      return {
+        ...state,
+        userInfoSpinner: action.payload,
       };
     case LOADING_USER_INFO:
       return {
@@ -245,6 +258,11 @@ const userReducer = (state = initialState, action) => {
       return {
         ...state,
         errorToUploadMemberIcon: action.payload,
+      };
+    case SET_DELETE_ACCOUNT_FOREVER:
+      return {
+        ...state,
+        deleteAccountAlert: action.payload,
       };
     default:
       return state;

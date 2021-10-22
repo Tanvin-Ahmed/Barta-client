@@ -35,6 +35,9 @@ import {
   SET_ADD_MEMBER_SPINNER,
   SET_ADD_MEMBER_COMPLETE_ICON,
   SET_ADD_MEMBER_ERROR_ICON,
+  SET_DELETE_ACCOUNT_FOREVER,
+  SET_USER_INFO_SPINNER,
+  DELETE_CHAT_MESSAGE,
 } from "../types";
 import jwt_decode from "jwt-decode";
 
@@ -42,6 +45,7 @@ let accessToken = "";
 
 export const resetPasswordRequest = (email, setLoading, setMessage) => {
   setLoading(true);
+  setMessage({});
   axios(`http://localhost:5000/user/account/reset-password-request/${email}`)
     .then(({ data }) => {
       setMessage({ message: data, status: "ok" });
@@ -75,16 +79,28 @@ export const resetPassword = (data, setLoading, setMessage) => {
 
 const getUserInfoFromDB = (id, token) => {
   return (dispatch) => {
+    dispatch({
+      type: SET_USER_INFO_SPINNER,
+      payload: true,
+    });
     axios(`http://localhost:5000/user/account/userInfo/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then(({ data }) => {
+        dispatch({
+          type: SET_USER_INFO_SPINNER,
+          payload: false,
+        });
         dispatch({
           type: GET_USER_INFO,
           payload: data,
         });
       })
       .catch((err) => {
+        dispatch({
+          type: SET_USER_INFO_SPINNER,
+          payload: false,
+        });
         alert(err?.response?.data);
       });
   };
@@ -404,7 +420,7 @@ export const sendLoginRequest = (user, history, from) => {
   };
 };
 
-export const profileUpdate = (pic, info) => {
+export const profileUpdate = (pic, info, setMessage) => {
   return (dispatch) => {
     if (!pic && !info) return;
     // for (var pair of data.entries()) {
@@ -431,16 +447,14 @@ export const profileUpdate = (pic, info) => {
           headers: { Authorization: `Bearer ${accessToken}` },
         })
         .then(() => {
+          setMessage({ message: "Profile update successfully.", status: "ok" });
           dispatch({
             type: SET_PROFILE_UPDATE_SPINNER,
             payload: false,
           });
         })
         .catch((err) => {
-          if (err.response?.status === 404) {
-            alert(err.response?.data);
-          }
-          console.log(err.response);
+          setMessage({ message: "Profile not update.", status: "error" });
         });
     }
 
@@ -485,6 +499,13 @@ export const updateProfileDataFromSocket = (data, userInfo, chatList) => {
         chatList.splice(index, 1, updatedData);
       }
     }
+  };
+};
+
+export const setDeleteAccountAlert = (bool) => {
+  return {
+    type: SET_DELETE_ACCOUNT_FOREVER,
+    payload: bool,
   };
 };
 
@@ -555,6 +576,105 @@ export const updateChatStatus = (updateStatus) => {
   return {
     type: UPDATE_CHAT_STATUS,
     payload: updateStatus,
+  };
+};
+
+export const removeFriend = (data, setLoading, setError, setRemoved) => {
+  setLoading(true);
+  setError(false);
+  setRemoved(false);
+  axios
+    .put("http://localhost:5000/user/account/remove-friend", data, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    })
+    .then(() => {
+      setLoading(false);
+      setError(false);
+      setRemoved(true);
+
+      setTimeout(() => {
+        setLoading(false);
+        setError(false);
+        setRemoved(false);
+      }, 150);
+    })
+    .catch(() => {
+      setLoading(false);
+      setError(true);
+      setRemoved(false);
+
+      setTimeout(() => {
+        setLoading(false);
+        setError(false);
+        setRemoved(false);
+      }, 250);
+    });
+};
+
+export const deleteAccount = (data, setLoading, setMessage) => {
+  setLoading(true);
+  setMessage({});
+  axios
+    .post("http://localhost:5000/user/account/delete-my-account", data, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    })
+    .then(({ data }) => {
+      setLoading(false);
+      setMessage({ message: data, status: "ok" });
+    })
+    .catch((err) => {
+      setLoading(false);
+      if (err.response.status === 501) {
+        setMessage({ message: err.response.data, status: "error" });
+      } else {
+        setMessage({
+          message: "Something went wrong, please try again",
+          status: "error",
+        });
+      }
+    });
+};
+
+export const removeFriendFromChatList = (
+  chatList,
+  cl,
+  receiverInfo,
+  history
+) => {
+  return (dispatch) => {
+    const newChatList = cl.reverse();
+    const updatedChatList = [];
+    chatList.forEach((friend) => {
+      const updatedFriend = newChatList.find(
+        ({ email }) => email === friend.email
+      );
+      if (updatedFriend) {
+        updatedChatList.push(updatedFriend);
+      } else {
+        if (receiverInfo?.email === friend?.email) {
+          dispatch({
+            type: GET_RECEIVER_INFO,
+            payload: {},
+          });
+          dispatch({
+            type: DELETE_CHAT_MESSAGE,
+            payload: [],
+          });
+          history.push("/");
+        }
+      }
+    });
+    dispatch({
+      type: GET_FRIEND_INFO,
+      payload: updatedChatList,
+    });
+  };
+};
+
+export const removeFriendList = () => {
+  return {
+    type: GET_FRIEND_INFO,
+    payload: [],
   };
 };
 
@@ -735,15 +855,49 @@ export const getGroupIdForChatBar = (id, reason = "") => {
   };
 };
 
-export const leaveFromGroup = (info) => {
+export const removeGroupInfo = (gl, groups) => {
+  return (dispatch) => {
+    const groupList = gl?.reverse();
+    const updatedGroupList = [];
+
+    groups.forEach((group) => {
+      groupList.forEach(({ groupId }) => {
+        if (group?._id === groupId) {
+          updatedGroupList.push(group);
+        }
+      });
+    });
+    dispatch({
+      type: SET_GROUP_LIST_FROM_DATABASE,
+      payload: updatedGroupList,
+    });
+  };
+};
+
+export const removeGroupList = () => {
+  return {
+    type: SET_GROUP_LIST_FROM_DATABASE,
+    payload: [],
+  };
+};
+
+export const leaveFromGroup = (info, setLoading, history) => {
+  setLoading(true);
   axios
     .put("http://localhost:5000/groupAccount/remove-group-member", info, {
       headers: { Authorization: `Bearer ${accessToken}` },
     })
-    .catch(() => alert("Something is wrong. Please try again"));
+    .then(() => {
+      setLoading(false);
+      history.push("/");
+    })
+    .catch(() => {
+      alert("Something is wrong. Please try again");
+      setLoading(false);
+    });
 };
 
-export const addMemberInGroup = (data = {}) => {
+export const addMemberInGroup = (data = {}, setIsOpen) => {
   if (!data?._id) return;
   return (dispatch) => {
     dispatch({
@@ -775,6 +929,8 @@ export const addMemberInGroup = (data = {}) => {
             payload: false,
           });
         }, 100);
+
+        setTimeout(() => setIsOpen(false), 150);
       })
       .catch(() => {
         dispatch({

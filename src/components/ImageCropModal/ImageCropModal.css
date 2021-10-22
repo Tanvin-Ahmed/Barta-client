@@ -13,7 +13,7 @@
   left: 0;
   right: 0;
   bottom: 100px;
-  z-index: 15;
+  z-index: 1200;
   width: 100%;
 }
 
@@ -22,6 +22,7 @@
   bottom: 0;
   width: 100%;
   height: 80px;
+  z-index: 1200;
 }
 .crop .slider {
   width: 47%;

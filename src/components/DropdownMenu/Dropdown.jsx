@@ -11,8 +11,12 @@ import Settings from "@mui/icons-material/Settings";
 import Logout from "@mui/icons-material/Logout";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 import { useDispatch, useSelector } from "react-redux";
-import { removeUserInfo } from "../../app/actions/userAction";
+import {
+  removeUserInfo,
+  setDeleteAccountAlert,
+} from "../../app/actions/userAction";
 import { useHistory } from "react-router";
+import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 
 const Dropdown = () => {
   const history = useHistory();
@@ -89,11 +93,12 @@ const Dropdown = () => {
           Profile
         </MenuItem>
         <MenuItem onClick={() => history.push("/update-account/userAccount")}>
-          <Avatar /> Update profile
+          <Avatar
+            src={`http://localhost:5000/user/account/get-profile-img/${userInfo?.photoId}`}
+          />{" "}
+          Update profile
         </MenuItem>
-        <Divider
-          src={`http://localhost:5000/user/account/get-profile-img/${userInfo?.photoId}`}
-        />
+        <Divider />
         <MenuItem>
           <ListItemIcon>
             <PersonAdd fontSize="small" />
@@ -111,6 +116,12 @@ const Dropdown = () => {
             <Logout fontSize="small" />
           </ListItemIcon>
           Logout
+        </MenuItem>
+        <MenuItem onClick={() => dispatch(setDeleteAccountAlert(true))}>
+          <ListItemIcon>
+            <DeleteForeverIcon fontSize="small" />
+          </ListItemIcon>
+          Delete account
         </MenuItem>
       </Menu>
     </>

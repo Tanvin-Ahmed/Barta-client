@@ -21,6 +21,10 @@ import {
   getFriendInfo,
   getGroupIdForChatBar,
   setGroupsInfoFromDatabase,
+  removeGroupInfo,
+  removeGroupList,
+  removeFriendFromChatList,
+  removeFriendList,
 } from "../../app/actions/userAction";
 import {
   deleteMessage,
@@ -30,8 +34,11 @@ import {
   updateChatBarMessage,
   updateMessageStatus,
 } from "../../app/actions/messageAction";
+import AccountDeleteAlert from "../Alert/AccountDeleteAlert/AccountDeleteAlert";
+import { useHistory } from "react-router-dom";
 
 const Home = ({ socket }) => {
+  const history = useHistory();
   const myStream = useRef(null);
   const groupPeersRef = useRef([]);
   const dispatch = useDispatch();
@@ -50,6 +57,8 @@ const Home = ({ socket }) => {
     roomId,
     openPrivateCall,
     callAccepted,
+    deleteAccountAlert,
+    receiverInfo,
   } = useSelector((state) => ({
     userInfo: state.userReducer.userInfo,
     openGroupCall: state.groupCallReducer.openGroupCall,
@@ -65,6 +74,8 @@ const Home = ({ socket }) => {
     roomId: state.messageReducer.roomId,
     openPrivateCall: state.privateCall.openPrivateCall,
     callAccepted: state.privateCall.callAccepted,
+    deleteAccountAlert: state.userReducer.deleteAccountAlert,
+    receiverInfo: state.userReducer.receiverInfo,
   }));
 
   const [roomIdOfReceivingGroupCall, setRoomIdOfReceivingGroupCall] =
@@ -116,22 +127,48 @@ const Home = ({ socket }) => {
   //////////////// Friend List Update ///////////////
   useEffect(() => {
     if (socket === null) return;
-    socket.on("add-friend-list", (friendEmail) => {
-      dispatch(getFriendInfoFromSocket(friendEmail));
+    socket.on("update-friend-list", (info) => {
+      if (info._id === userInfo?._id) {
+        if (info?.chatList.length) {
+          if (chatList.length < info.chatList.length) {
+            dispatch(getFriendInfoFromSocket(info?.chatList));
+          } else {
+            dispatch(
+              removeFriendFromChatList(
+                chatList,
+                info?.chatList,
+                receiverInfo,
+                history
+              )
+            );
+          }
+        } else {
+          dispatch(removeFriendList());
+        }
+      }
     });
-    return () => socket.off("add-friend-list");
-  }, [socket, dispatch]);
+    return () => socket.off("update-friend-list");
+  }, [socket, dispatch, userInfo, chatList, receiverInfo, history]);
 
   //////////////// Group List Update ///////////////
   useEffect(() => {
     if (socket === null) return;
-    socket.on("add-group-list", (groupInfo) => {
-      if (groupInfo.member === userInfo?.email?.split("@")[0]) {
-        dispatch(getGroupIdForChatBar(groupInfo.groupId, "chatBar"));
+    socket.on("update-group-list", (groupInfo) => {
+      if (groupInfo._id === userInfo?._id) {
+        if (groupInfo.groupList.length) {
+          if (groups?.length < groupInfo.groupList.length) {
+            const info = groupInfo.groupList[groupInfo.groupList.length - 1];
+            dispatch(getGroupIdForChatBar(info.groupId, "chatBar"));
+          } else {
+            dispatch(removeGroupInfo(groupInfo.groupList, groups));
+          }
+        } else {
+          dispatch(removeGroupList());
+        }
       }
     });
-    return () => socket.off("add-group-list");
-  }, [socket, dispatch, userInfo]);
+    return () => socket.off("update-group-list");
+  }, [socket, dispatch, userInfo, groups]);
 
   ///// update chat bar last message ////////
   // get new message from socket
@@ -283,6 +320,7 @@ const Home = ({ socket }) => {
                 setRemoveGroupCallModal={setRemoveGroupCallModal}
               />
             )}
+          {deleteAccountAlert && <AccountDeleteAlert />}
           {!openGroupCall && !acceptedGroupCall && (
             <Router>
               <Switch>

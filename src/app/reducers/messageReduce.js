@@ -17,7 +17,9 @@ import {
 } from "../types";
 
 const initialState = {
-  chatMessages: [],
+  chatMessages: []?.filter(
+    (item, index, self) => index === self.findIndex((t) => t._id === item._id)
+  ),
   error: "",
   uploadPercentage: 0,
   getMessageSpinner: false,

@@ -19,6 +19,8 @@ export const UPDATE_FRIEND_STATUS = "update_friend_status";
 export const UPDATE_CHAT_STATUS = "update_chat_status";
 export const SET_FIND_FRIEND_ERROR = "set_find_friend_error";
 export const SET_PROFILE_UPDATE_SPINNER = "set_profile_update_spinner";
+export const SET_DELETE_ACCOUNT_FOREVER = "set_delete_account_forever";
+export const SET_USER_INFO_SPINNER = "set_user_info_spinner";
 // message
 export const GET_MESSAGES_FROM_DB = "get_message_from_db";
 export const GET_OLD_MESSAGES_FROM_DB = "get_old_message_from_db";

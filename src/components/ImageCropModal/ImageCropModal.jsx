@@ -107,20 +107,20 @@ const ImageCropModal = ({
             size="small"
             style={{ background: "rgba(255, 0, 0, 0.801)", margin: "0 1rem" }}
           >
-            <ClearIcon size="small" />
+            <ClearIcon size="small" sx={{ color: "white" }} />
           </IconButton>
           <IconButton
             size="small"
             style={{ background: "rgb(255, 157, 0)", margin: "0 1rem" }}
           >
-            <ReplayIcon size="small" />
+            <ReplayIcon size="small" sx={{ color: "white" }} />
           </IconButton>
           <IconButton
             onClick={onCrop}
             size="small"
             style={{ background: "rgb(7, 204, 0)", margin: "0 1rem" }}
           >
-            <DoneIcon size="small" />
+            <DoneIcon size="small" sx={{ color: "white" }} />
           </IconButton>
         </div>
       </div>

@@ -1,5 +1,6 @@
 import "./Chat.css";
 import TimeAgo from "timeago-react";
+import time_ago from "time-ago";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 import CallIcon from "@material-ui/icons/Call";
 import VideoCallIcon from "@material-ui/icons/VideoCall";
@@ -117,7 +118,9 @@ export const ChatHeader = ({
           </h6>
           {friendListOpen && receiverInfo?.status === "inactive" && (
             <small style={{ color: "rgb(231, 231, 231)" }} className="p-0 m-0">
-              active <TimeAgo datetime={receiverInfo?.goOffLine} />
+              {largeScreen
+                ? `active ${(<TimeAgo datetime={receiverInfo?.goOffLine} />)}`
+                : `${time_ago.ago(receiverInfo?.goOffLine, true)} ago`}
             </small>
           )}
         </div>
@@ -224,6 +227,12 @@ const Options = ({ dispatch, reactTabIsOpen, message, sender }) => {
               className="chose"
             >
               🤗
+            </p>
+            <p
+              onClick={() => handleReactions(dispatch, message, sender, "😏")}
+              className="chose"
+            >
+              😏
             </p>
             <p
               onClick={() => handleReactions(dispatch, message, sender, "😢")}

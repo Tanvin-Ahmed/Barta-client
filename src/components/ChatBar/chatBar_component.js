@@ -2,7 +2,13 @@ import "./ChatBar.css";
 import PeopleIcon from "@material-ui/icons/People";
 import PersonAddIcon from "@material-ui/icons/PersonAdd";
 import GroupAddIcon from "@material-ui/icons/GroupAdd";
-import { Avatar, Button, CardActionArea, IconButton } from "@material-ui/core";
+import {
+  Avatar,
+  Button,
+  CardActionArea,
+  IconButton,
+  Menu,
+} from "@material-ui/core";
 import HighlightOffIcon from "@material-ui/icons/HighlightOff";
 import AddCircleOutlineIcon from "@material-ui/icons/AddCircleOutline";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
@@ -13,7 +19,10 @@ import Dropdown from "../DropdownMenu/Dropdown";
 import BottomNavigation from "@mui/material/BottomNavigation";
 import BottomNavigationAction from "@mui/material/BottomNavigationAction";
 import path from "path";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
+import BlockIcon from "@mui/icons-material/Block";
 import { handleText } from "./chatBar_logic";
+import time_ago from "time-ago";
 import {
   addIdToCreateGroup,
   createGroupForFirst,
@@ -30,8 +39,11 @@ import { Spinner } from "react-bootstrap";
 import {
   setFinalStepToCreateGroup,
   setGroupName,
+  removeFriend,
 } from "../../app/actions/userAction";
 import { useState } from "react";
+import { MenuItem } from "@mui/material";
+import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
 
 export const ChatBarHeader = ({ userPhotoURL, photoId, name }) => {
   return (
@@ -68,8 +80,22 @@ export const ChatList = ({
   friendNotAvailable,
   largeScreen,
   userInfo,
+  dispatch,
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
+  const [removed, setRemoved] = useState(false);
+  const [friendEmail, setFriendEmail] = useState("");
+
+  const handleRemove = () => {
+    const data = {
+      userEmail: userInfo?.email,
+      friendEmail: friendEmail,
+    };
+    removeFriend(data, setLoading, setError, setRemoved);
+  };
+
   return (
     <div className="friendList__container">
       <div className="find__friend mt-3 sticky-top">
@@ -99,74 +125,36 @@ export const ChatList = ({
               }
             })
             ?.map((friend) => (
-              <CardActionArea
-                sx={{ height: "4.5rem" }}
-                key={friend?._id}
-                onClick={() => handleReceiverInfo(friend, history)}
-                className="px-3 d-flex justify-content-start align-items-center text-light"
-              >
-                <div style={{ position: "relative" }} className="mr-3">
-                  <Avatar
-                    src={
-                      friend?.photoURL
-                        ? friend?.photoURL
-                        : `http://localhost:5000/user/account/get-profile-img/${friend?.photoId}`
-                    }
-                  />
-                  <div
-                    className={
-                      friend?.status === "active" ? "onLine" : "d-none"
-                    }
-                  />
-                </div>
-                <div>
-                  <h6 style={{ letterSpacing: "1px" }} className="mx-4 mb-0">
-                    {friend?.displayName}
-                  </h6>
-                  {friend?.lastMessage?.status ? (
-                    friend?.lastMessage?.files?.length > 0 ? (
-                      friend?.lastMessage?.files[0]?.contentType?.split(
-                        "/"
-                      )[0] === "image" ? (
-                        <div
-                          className={
-                            friend?.lastMessage?.sender !== userInfo?.email
-                              ? friend?.lastMessage?.status === "unseen"
-                                ? "unseenMessage mx-4"
-                                : "seenMessage mx-4"
-                              : "seenMessage mx-4"
-                          }
-                        >
-                          <small>Photo</small>
-                          <small className="ml-1">
-                            {new Date(
-                              friend?.lastMessage?.timeStamp
-                            ).toLocaleString()}
-                          </small>
-                        </div>
-                      ) : friend?.lastMessage?.files[0]?.contentType?.split(
-                          "/"
-                        )[0] === "video" ? (
-                        <div
-                          className={
-                            friend?.lastMessage?.sender !== userInfo?.email
-                              ? friend?.lastMessage?.status === "unseen"
-                                ? "unseenMessage mx-4"
-                                : "seenMessage mx-4"
-                              : "seenMessage mx-4"
-                          }
-                        >
-                          <small>Video</small>
-                          <small className="ml-1">
-                            {new Date(
-                              friend?.lastMessage?.timeStamp
-                            ).toLocaleString()}
-                          </small>
-                        </div>
-                      ) : (
+              <div className="d-flex justify-content-between align-items-center">
+                <CardActionArea
+                  sx={{ padding: "0.5rem", marginBottom: "0.5rem" }}
+                  key={friend?._id}
+                  onClick={() => handleReceiverInfo(friend, history)}
+                  className="px-3 d-flex justify-content-start align-items-center text-light"
+                >
+                  <div style={{ position: "relative" }} className="mr-3">
+                    <Avatar
+                      src={
+                        friend?.photoURL
+                          ? friend?.photoURL
+                          : `http://localhost:5000/user/account/get-profile-img/${friend?.photoId}`
+                      }
+                    />
+                    <div
+                      className={
+                        friend?.status === "active" ? "onLine" : "d-none"
+                      }
+                    />
+                  </div>
+                  <div>
+                    <h6 style={{ letterSpacing: "1px" }} className="mx-4 mb-0">
+                      {friend?.displayName}
+                    </h6>
+                    {friend?.lastMessage?.status ? (
+                      friend?.lastMessage?.files?.length > 0 ? (
                         friend?.lastMessage?.files[0]?.contentType?.split(
                           "/"
-                        )[0] === "application" && (
+                        )[0] === "image" ? (
                           <div
                             className={
                               friend?.lastMessage?.sender !== userInfo?.email
@@ -176,52 +164,117 @@ export const ChatList = ({
                                 : "seenMessage mx-4"
                             }
                           >
-                            <small>
-                              {handleText(
-                                friend?.lastMessage?.files[0]?.filename
-                                  ?.split("_")
-                                  ?.join(" ")
-                                  ?.split("◉_◉")[0],
-                                largeScreen
-                              ) +
-                                path.extname(
-                                  friend?.lastMessage?.files[0]?.filename
-                                )}
-                            </small>
+                            <small>Photo</small>
                             <small className="ml-1">
-                              {new Date(
-                                friend?.lastMessage?.timeStamp
-                              ).toLocaleString()}
+                              {time_ago.ago(
+                                friend?.lastMessage?.timeStamp,
+                                true
+                              )}
                             </small>
                           </div>
+                        ) : friend?.lastMessage?.files[0]?.contentType?.split(
+                            "/"
+                          )[0] === "video" ? (
+                          <div
+                            className={
+                              friend?.lastMessage?.sender !== userInfo?.email
+                                ? friend?.lastMessage?.status === "unseen"
+                                  ? "unseenMessage mx-4"
+                                  : "seenMessage mx-4"
+                                : "seenMessage mx-4"
+                            }
+                          >
+                            <small>Video</small>
+                            <small className="ml-1">
+                              {time_ago.ago(
+                                friend?.lastMessage?.timeStamp,
+                                true
+                              )}
+                            </small>
+                          </div>
+                        ) : (
+                          friend?.lastMessage?.files[0]?.contentType?.split(
+                            "/"
+                          )[0] === "application" && (
+                            <div
+                              className={
+                                friend?.lastMessage?.sender !== userInfo?.email
+                                  ? friend?.lastMessage?.status === "unseen"
+                                    ? "unseenMessage mx-4"
+                                    : "seenMessage mx-4"
+                                  : "seenMessage mx-4"
+                              }
+                            >
+                              <small>
+                                {handleText(
+                                  friend?.lastMessage?.files[0]?.filename
+                                    ?.split("_")
+                                    ?.join(" ")
+                                    ?.split("◉_◉")[0],
+                                  largeScreen
+                                ) +
+                                  path.extname(
+                                    friend?.lastMessage?.files[0]?.filename
+                                  )}
+                              </small>
+                              <small className="ml-1">
+                                {time_ago.ago(
+                                  friend?.lastMessage?.timeStamp,
+                                  true
+                                )}
+                              </small>
+                            </div>
+                          )
                         )
-                      )
-                    ) : (
-                      <div
-                        className={
-                          friend?.lastMessage?.sender !== userInfo?.email
-                            ? friend?.lastMessage?.status === "unseen"
-                              ? "unseenMessage mx-4"
+                      ) : (
+                        <div
+                          className={
+                            friend?.lastMessage?.sender !== userInfo?.email
+                              ? friend?.lastMessage?.status === "unseen"
+                                ? "unseenMessage mx-4"
+                                : "seenMessage mx-4"
                               : "seenMessage mx-4"
-                            : "seenMessage mx-4"
-                        }
-                      >
-                        <small>
-                          {handleText(
-                            friend?.lastMessage?.message,
-                            largeScreen
-                          )}
-                        </small>
-                        <small className="ml-1">
-                          {new Date(
-                            friend?.lastMessage?.timeStamp
-                          ).toLocaleString()}
-                        </small>
-                      </div>
-                    )
-                  ) : null}
-                </div>
-              </CardActionArea>
+                          }
+                        >
+                          <small>
+                            {handleText(
+                              friend?.lastMessage?.message,
+                              largeScreen
+                            )}
+                          </small>
+                          <small className="ml-1">
+                            {time_ago.ago(friend?.lastMessage?.timeStamp, true)}
+                          </small>
+                        </div>
+                      )
+                    ) : null}
+                  </div>
+                </CardActionArea>
+                {loading ? (
+                  <CircularProgress
+                    style={{ color: "white", height: "1rem", width: "1rem" }}
+                  />
+                ) : error ? (
+                  <HighlightOffIcon
+                    style={{
+                      color: "rgb(255, 166, 0)",
+                      height: "1rem",
+                      width: "1rem",
+                    }}
+                  />
+                ) : removed ? (
+                  <CheckCircleOutlineIcon
+                    style={{ color: "red", height: "1rem", width: "1rem" }}
+                  />
+                ) : (
+                  <div onClick={() => setFriendEmail(friend?.email)}>
+                    <FriendMoreButton
+                      dispatch={dispatch}
+                      handleRemove={handleRemove}
+                    />
+                  </div>
+                )}
+              </div>
             ))
         )}
       </div>
@@ -235,6 +288,7 @@ export const GroupList = ({
   spinnerForGroupList,
   largeScreen,
   userInfo,
+  dispatch,
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
   return (
@@ -266,68 +320,32 @@ export const GroupList = ({
               }
             })
             ?.map((group) => (
-              <CardActionArea
-                sx={{ height: "4.5rem" }}
-                key={group?._id}
-                onClick={() => handleGroupInfo(group, history)}
-                className="px-3 d-flex justify-content-start align-items-center text-light"
-              >
-                <div style={{ position: "relative" }} className="mr-3">
-                  <Avatar
-                    src={`http://localhost:5000/groupAccount/get-profile-img/${group?.photoId}`}
-                  />
-                  <div
-                    className={group?.status === "active" ? "onLine" : "d-none"}
-                  />
-                </div>
-                <div>
-                  <h6 style={{ letterSpacing: "1px" }} className="mx-4 mb-0">
-                    {group?.groupName?.split("◉_◉")[0]}
-                  </h6>
-                  {group?.lastMessage?.status ? (
-                    group?.lastMessage?.files?.length > 0 ? (
-                      group?.lastMessage?.files[0]?.contentType?.split(
-                        "/"
-                      )[0] === "image" ? (
-                        <div
-                          className={
-                            group?.lastMessage?.sender !== userInfo?.email
-                              ? group?.lastMessage?.status === "unseen"
-                                ? "unseenMessage mx-4"
-                                : "seenMessage mx-4"
-                              : "seenMessage mx-4"
-                          }
-                        >
-                          <small>Photo</small>
-                          <small className="ml-1">
-                            {new Date(
-                              group?.lastMessage?.timeStamp
-                            ).toLocaleString()}
-                          </small>
-                        </div>
-                      ) : group?.lastMessage?.files[0]?.contentType?.split(
-                          "/"
-                        )[0] === "video" ? (
-                        <div
-                          className={
-                            group?.lastMessage?.sender !== userInfo?.email
-                              ? group?.lastMessage?.status === "unseen"
-                                ? "unseenMessage mx-4"
-                                : "seenMessage mx-4"
-                              : "seenMessage mx-4"
-                          }
-                        >
-                          <small>Video</small>
-                          <small className="ml-1">
-                            {new Date(
-                              group?.lastMessage?.timeStamp
-                            ).toLocaleString()}
-                          </small>
-                        </div>
-                      ) : (
+              <div className="d-flex justify-content-between align-items-center">
+                <CardActionArea
+                  sx={{ padding: "0.5rem", marginBottom: "0.5rem" }}
+                  key={group?._id}
+                  onClick={() => handleGroupInfo(group, history)}
+                  className="px-3 d-flex justify-content-start align-items-center text-light"
+                >
+                  <div style={{ position: "relative" }} className="mr-3">
+                    <Avatar
+                      src={`http://localhost:5000/groupAccount/get-profile-img/${group?.photoId}`}
+                    />
+                    <div
+                      className={
+                        group?.status === "active" ? "onLine" : "d-none"
+                      }
+                    />
+                  </div>
+                  <div>
+                    <h6 style={{ letterSpacing: "1px" }} className="mx-4 mb-0">
+                      {group?.groupName?.split("◉_◉")[0]}
+                    </h6>
+                    {group?.lastMessage?.status ? (
+                      group?.lastMessage?.files?.length > 0 ? (
                         group?.lastMessage?.files[0]?.contentType?.split(
                           "/"
-                        )[0] === "application" && (
+                        )[0] === "image" ? (
                           <div
                             className={
                               group?.lastMessage?.sender !== userInfo?.email
@@ -337,56 +355,151 @@ export const GroupList = ({
                                 : "seenMessage mx-4"
                             }
                           >
-                            <small>
-                              {handleText(
-                                group?.lastMessage?.files[0]?.filename
-                                  ?.split("_")
-                                  ?.join(" ")
-                                  ?.split("◉_◉")[0],
-                                largeScreen
-                              ) +
-                                path.extname(
-                                  group?.lastMessage?.files[0]?.filename
-                                )}
-                            </small>
+                            <small>Photo</small>
                             <small className="ml-1">
-                              {new Date(
-                                group?.lastMessage?.timeStamp
-                              ).toLocaleString()}
+                              {time_ago.ago(
+                                group?.lastMessage?.timeStamp,
+                                true
+                              )}
                             </small>
                           </div>
+                        ) : group?.lastMessage?.files[0]?.contentType?.split(
+                            "/"
+                          )[0] === "video" ? (
+                          <div
+                            className={
+                              group?.lastMessage?.sender !== userInfo?.email
+                                ? group?.lastMessage?.status === "unseen"
+                                  ? "unseenMessage mx-4"
+                                  : "seenMessage mx-4"
+                                : "seenMessage mx-4"
+                            }
+                          >
+                            <small>Video</small>
+                            <small className="ml-1">
+                              {time_ago.ago(
+                                group?.lastMessage?.timeStamp,
+                                true
+                              )}
+                            </small>
+                          </div>
+                        ) : (
+                          group?.lastMessage?.files[0]?.contentType?.split(
+                            "/"
+                          )[0] === "application" && (
+                            <div
+                              className={
+                                group?.lastMessage?.sender !== userInfo?.email
+                                  ? group?.lastMessage?.status === "unseen"
+                                    ? "unseenMessage mx-4"
+                                    : "seenMessage mx-4"
+                                  : "seenMessage mx-4"
+                              }
+                            >
+                              <small>
+                                {handleText(
+                                  group?.lastMessage?.files[0]?.filename
+                                    ?.split("_")
+                                    ?.join(" ")
+                                    ?.split("◉_◉")[0],
+                                  largeScreen
+                                ) +
+                                  path.extname(
+                                    group?.lastMessage?.files[0]?.filename
+                                  )}
+                              </small>
+                              <small className="ml-1">
+                                {time_ago.ago(
+                                  group?.lastMessage?.timeStamp,
+                                  true
+                                )}
+                              </small>
+                            </div>
+                          )
                         )
+                      ) : (
+                        <div
+                          className={
+                            group?.lastMessage?.sender !== userInfo?.email
+                              ? group?.lastMessage?.status === "unseen"
+                                ? "unseenMessage mx-4"
+                                : "seenMessage mx-4"
+                              : "seenMessage mx-4"
+                          }
+                        >
+                          <small>
+                            {handleText(
+                              group?.lastMessage?.message,
+                              largeScreen
+                            )}
+                          </small>
+                          <small className="ml-1">
+                            {time_ago.ago(group?.lastMessage?.timeStamp, true)}
+                          </small>
+                        </div>
                       )
                     ) : (
-                      <div
-                        className={
-                          group?.lastMessage?.sender !== userInfo?.email
-                            ? group?.lastMessage?.status === "unseen"
-                              ? "unseenMessage mx-4"
-                              : "seenMessage mx-4"
-                            : "seenMessage mx-4"
-                        }
-                      >
-                        <small>
-                          {handleText(group?.lastMessage?.message, largeScreen)}
-                        </small>
-                        <small className="ml-1">
-                          {new Date(
-                            group?.lastMessage?.timeStamp
-                          ).toLocaleString()}
-                        </small>
-                      </div>
-                    )
-                  ) : (
-                    <small className="seenMessage mx-4">
-                      {group?.lastMessage?.message}
-                    </small>
-                  )}
-                </div>
-              </CardActionArea>
+                      <small className="seenMessage mx-4">
+                        {group?.lastMessage?.message}
+                      </small>
+                    )}
+                  </div>
+                </CardActionArea>
+              </div>
             ))
         )}
       </div>
+    </div>
+  );
+};
+
+const FriendMoreButton = ({ dispatch, handleRemove }) => {
+  const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  return (
+    <div>
+      <IconButton
+        style={{ width: "1.6rem", height: "1.6rem" }}
+        id="basic-button"
+        aria-controls="basic-menu"
+        aria-haspopup="true"
+        aria-expanded={open ? "true" : undefined}
+        onClick={handleClick}
+      >
+        <MoreVertIcon
+          sx={{ color: "#fff", height: "1.3rem", width: "1.3rem" }}
+        />
+      </IconButton>
+      <Menu
+        id="basic-menu"
+        anchorEl={anchorEl}
+        open={open}
+        onClose={handleClose}
+        MenuListProps={{
+          "aria-labelledby": "basic-button",
+        }}
+      >
+        <MenuItem
+          onClick={() => {
+            handleRemove();
+            handleClose();
+          }}
+        >
+          <RemoveCircleIcon sx={{ color: "gray" }} />
+          Remove
+        </MenuItem>
+        <MenuItem onClick={handleClose}>
+          <BlockIcon sx={{ color: "red" }} />
+          Block
+        </MenuItem>
+      </Menu>
     </div>
   );
 };
@@ -603,7 +716,7 @@ export const BottomNavigationBar = ({ dispatch }) => {
         bottom: 0,
         left: 0,
         right: 0,
-        background: "rgba(68, 27, 121, 0.445)",
+        background: "rgb(68, 27, 121)",
       }}
       value={value}
       onChange={handleChange}

@@ -22,7 +22,6 @@
     "file-saver": "^2.0.5",
     "firebase": "^8.6.1",
     "jwt-decode": "^3.1.2",
-    "lodash": "^4.17.21",
     "react": "^17.0.2",
     "react-bootstrap": "^1.6.0",
     "react-dom": "^17.0.2",
@@ -39,6 +38,7 @@
     "simple-peer": "^9.11.0",
     "simple-react-lightbox": "^3.6.6",
     "socket.io-client": "^4.1.1",
+    "time-ago": "^0.2.1",
     "time-counting": "^2.0.2",
     "timeago-react": "^3.0.2",
     "web-vitals": "^1.1.2"

@@ -16,21 +16,26 @@ import { useParams } from "react-router";
 const UpdateAccount = () => {
   const { identity } = useParams();
   const dispatch = useDispatch();
-  const { userInfo, profileUpdateSpinner, groupInfo } = useSelector(
-    (state) => ({
+  const { userInfo, profileUpdateSpinner, groupInfo, userInfoSpinner } =
+    useSelector((state) => ({
       userInfo: state.userReducer.userInfo,
       profileUpdateSpinner: state.userReducer.profileUpdateSpinner,
       groupInfo: state.userReducer.groupInfo,
-    })
-  );
+      userInfoSpinner: state.userReducer.userInfoSpinner,
+    }));
   const [chosenImg, setChosenImg] = useState({});
   const [openImageCropModal, setOpenImageCropModal] = useState(false);
-  const [birthday, setBirthday] = useState(userInfo?.birthday);
+  const [birthday, setBirthday] = useState(new Date());
   const [croppedImgUrl, setCroppedImgUrl] = useState(null);
   const [blob, setBlob] = useState(null);
   const [gender, setGender] = useState("");
   const [relationship, setRelationship] = useState("");
   const [photoIdURL, setPhotoIdURL] = useState("");
+  const [message, setMessage] = useState({});
+
+  useEffect(() => {
+    setBirthday(userInfo?.birthday);
+  }, [userInfo]);
 
   useEffect(() => {
     let url;
@@ -83,9 +88,9 @@ const UpdateAccount = () => {
         relationship !== userInfo?.relationshipStatus ||
         (birthday.trim() && birthday !== userInfo?.birthday)
       ) {
-        dispatch(profileUpdate(pic, profileInfo));
+        dispatch(profileUpdate(pic, profileInfo, setMessage));
       } else {
-        dispatch(profileUpdate(pic, ""));
+        dispatch(profileUpdate(pic, "", setMessage));
       }
     } else {
       if (
@@ -97,7 +102,7 @@ const UpdateAccount = () => {
         relationship !== userInfo?.relationshipStatus ||
         (birthday.trim() && birthday !== userInfo?.birthday)
       ) {
-        dispatch(profileUpdate("", profileInfo));
+        dispatch(profileUpdate("", profileInfo, setMessage));
       }
     }
   };
@@ -116,19 +121,27 @@ const UpdateAccount = () => {
       pic.append("_id", groupInfo._id);
 
       if (groupName.trim() && groupName !== groupInfo?.groupName) {
-        dispatch(profileUpdate(pic, updatedData));
+        dispatch(profileUpdate(pic, updatedData, setMessage));
       } else {
-        dispatch(profileUpdate(pic, ""));
+        dispatch(profileUpdate(pic, "", setMessage));
       }
     } else {
       if (groupName.trim() && groupName !== groupInfo?.groupName) {
-        dispatch(profileUpdate("", updatedData));
+        dispatch(profileUpdate("", updatedData, setMessage));
       }
     }
   };
 
   return (
     <div className="update__account">
+      {userInfoSpinner && (
+        <>
+          <div className="back__drop" />
+          <div className="loading__spinner">
+            <CircularProgress style={{ color: "rgb(55, 26, 134)" }} />
+          </div>
+        </>
+      )}
       <div className="d-flex justify-content-center align-items-center my-4">
         <IconButton
           onChange={(e) => handleChosenImg(e.target.files[0])}

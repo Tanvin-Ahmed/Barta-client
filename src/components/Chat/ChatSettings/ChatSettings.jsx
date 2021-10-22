@@ -1,7 +1,7 @@
 import { Avatar, Badge, CardActionArea, Tooltip } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import "./ChatSettings.css";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import CallIcon from "@mui/icons-material/Call";
 import VideoCallIcon from "@mui/icons-material/VideoCall";
@@ -14,17 +14,15 @@ import EditIcon from "@mui/icons-material/Edit";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import LogoutIcon from "@mui/icons-material/Logout";
 import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
-import {
-  leaveFromGroup,
-  addMemberInGroup,
-} from "../../../app/actions/userAction";
+import { leaveFromGroup } from "../../../app/actions/userAction";
+import CircularProgress from "@mui/material/CircularProgress";
 import AddMemberModal from "../AddMemberModal/AddMemberModal";
 
 const ChatSettings = () => {
-  const dispatch = useDispatch();
   const history = useHistory();
   const [information, setInformation] = useState({});
   const [modalIsOpen, setIsOpen] = React.useState(false);
+  const [lading, setLoading] = useState(false);
 
   const { receiverInfo, groupInfo, userInfo } = useSelector((state) => ({
     receiverInfo: state.userReducer.receiverInfo,
@@ -39,10 +37,6 @@ const ChatSettings = () => {
       setInformation(receiverInfo);
     }
   }, [groupInfo, receiverInfo]);
-
-  const submitMembersData = () => {
-    addMemberInGroup();
-  };
 
   return (
     <section className="chat__settings p-3">
@@ -131,11 +125,24 @@ const ChatSettings = () => {
             <CardActionArea
               className="py-2 px-2 my-1"
               onClick={() =>
-                leaveFromGroup({ _id: groupInfo?._id, email: userInfo?.email })
+                leaveFromGroup(
+                  { _id: groupInfo?._id, email: userInfo?.email },
+                  setLoading,
+                  history
+                )
               }
             >
               <div className="d-flex justify-content-between align-items-center">
                 <h6>Leave group</h6>
+                {lading && (
+                  <CircularProgress
+                    style={{
+                      color: "white",
+                      height: "1rem",
+                      width: "1rem",
+                    }}
+                  />
+                )}
                 <LogoutIcon style={{ color: "white" }} />
               </div>
             </CardActionArea>

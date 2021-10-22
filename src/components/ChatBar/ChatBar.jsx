@@ -130,6 +130,7 @@ const ChatBar = ({ socket }) => {
                 friendNotAvailable={friendNotAvailable}
                 largeScreen={largeScreen}
                 userInfo={userInfo}
+                dispatch={dispatch}
               />
             </>
           )}
@@ -141,6 +142,7 @@ const ChatBar = ({ socket }) => {
                 spinnerForGroupList={spinnerForGroupList}
                 largeScreen={largeScreen}
                 userInfo={userInfo}
+                dispatch={dispatch}
               />
             </>
           )}

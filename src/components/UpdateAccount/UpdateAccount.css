@@ -83,3 +83,21 @@
   color: #fff;
   background-color: rgb(88, 48, 177);
 }
+
+.update__account .back__drop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background-color: rgba(255, 255, 255, 0.246);
+  z-index: 100;
+}
+
+.update__account .loading__spinner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 200;
+}
