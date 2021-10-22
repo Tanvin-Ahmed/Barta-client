@@ -35,7 +35,7 @@ import {
   updateMessageStatus,
 } from "../../app/actions/messageAction";
 import AccountDeleteAlert from "../Alert/AccountDeleteAlert/AccountDeleteAlert";
-import { useHistory } from "react-router-dom";
+import { useHistory } from "react-router";
 
 const Home = ({ socket }) => {
   const history = useHistory();
@@ -125,22 +125,29 @@ const Home = ({ socket }) => {
   }, [userInfo?.email, dispatch, friendListOpen, openGroupList, accessToken]);
 
   //////////////// Friend List Update ///////////////
+  const newFriendRef = useRef("");
   useEffect(() => {
-    if (socket === null) return;
     socket.on("update-friend-list", (info) => {
       if (info._id === userInfo?._id) {
         if (info?.chatList.length) {
-          if (chatList.length < info.chatList.length) {
-            dispatch(getFriendInfoFromSocket(info?.chatList));
-          } else {
-            dispatch(
-              removeFriendFromChatList(
-                chatList,
-                info?.chatList,
-                receiverInfo,
-                history
-              )
-            );
+          if (
+            newFriendRef.current !==
+            info?.chatList[info.chatList.length - 1]?.email
+          ) {
+            newFriendRef.current =
+              info?.chatList[info.chatList.length - 1]?.email;
+            if (chatList.length < info.chatList.length) {
+              dispatch(getFriendInfoFromSocket(info?.chatList, userInfo));
+            } else if (chatList.length > info.chatList.length) {
+              dispatch(
+                removeFriendFromChatList(
+                  chatList,
+                  info?.chatList,
+                  receiverInfo,
+                  history
+                )
+              );
+            }
           }
         } else {
           dispatch(removeFriendList());
@@ -151,16 +158,23 @@ const Home = ({ socket }) => {
   }, [socket, dispatch, userInfo, chatList, receiverInfo, history]);
 
   //////////////// Group List Update ///////////////
+  const newGroupIdRef = useRef("");
   useEffect(() => {
-    if (socket === null) return;
     socket.on("update-group-list", (groupInfo) => {
       if (groupInfo._id === userInfo?._id) {
         if (groupInfo.groupList.length) {
-          if (groups?.length < groupInfo.groupList.length) {
-            const info = groupInfo.groupList[groupInfo.groupList.length - 1];
-            dispatch(getGroupIdForChatBar(info.groupId, "chatBar"));
-          } else {
-            dispatch(removeGroupInfo(groupInfo.groupList, groups));
+          if (
+            newGroupIdRef.current !==
+            groupInfo.groupList[groupInfo.groupList.length - 1]?.groupId
+          ) {
+            newGroupIdRef.current =
+              groupInfo.groupList[groupInfo.groupList.length - 1]?.groupId;
+            if (groups?.length < groupInfo.groupList.length) {
+              const info = groupInfo.groupList[groupInfo.groupList.length - 1];
+              dispatch(getGroupIdForChatBar(info.groupId, "chatBar"));
+            } else {
+              dispatch(removeGroupInfo(groupInfo.groupList, groups));
+            }
           }
         } else {
           dispatch(removeGroupList());

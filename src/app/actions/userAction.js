@@ -237,17 +237,28 @@ export const updateFriendStatus = (friendList) => {
   };
 };
 
-export const getFriendInfoFromSocket = (friendEmail) => {
+export const getFriendInfoFromSocket = (friendsInfo, userInfo) => {
   return (dispatch) => {
+    const friendEmail = friendsInfo[friendsInfo.length - 1]?.email;
+    userInfo.chatList = [
+      ...userInfo?.chatList,
+      friendsInfo[friendsInfo.length - 1],
+    ];
+    dispatch({
+      type: GET_USER_INFO,
+      payload: userInfo,
+    });
+    console.log(userInfo, friendEmail);
     axios(
       `http://localhost:5000/user/account/getFriendDetailsByEmail/${friendEmail}`,
       {
         headers: { Authorization: `Bearer ${accessToken}` },
       }
-    ).then((data) => {
+    ).then(({ data }) => {
+      console.log(data);
       dispatch({
         type: GET_FRIEND_INFO_FROM_SOCKET,
-        payload: data.data,
+        payload: data,
       });
     });
   };
@@ -649,7 +660,7 @@ export const removeFriendFromChatList = (
         ({ email }) => email === friend.email
       );
       if (updatedFriend) {
-        updatedChatList.push(updatedFriend);
+        updatedChatList.push(friend);
       } else {
         if (receiverInfo?.email === friend?.email) {
           dispatch({

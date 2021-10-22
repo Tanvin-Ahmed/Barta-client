@@ -251,21 +251,27 @@ export const ChatList = ({
                   </div>
                 </CardActionArea>
                 {loading ? (
-                  <CircularProgress
-                    style={{ color: "white", height: "1rem", width: "1rem" }}
-                  />
+                  friendEmail === friend?.email && (
+                    <CircularProgress
+                      style={{ color: "white", height: "1rem", width: "1rem" }}
+                    />
+                  )
                 ) : error ? (
-                  <HighlightOffIcon
-                    style={{
-                      color: "rgb(255, 166, 0)",
-                      height: "1rem",
-                      width: "1rem",
-                    }}
-                  />
+                  friendEmail === friend?.email && (
+                    <HighlightOffIcon
+                      style={{
+                        color: "rgb(255, 166, 0)",
+                        height: "1rem",
+                        width: "1rem",
+                      }}
+                    />
+                  )
                 ) : removed ? (
-                  <CheckCircleOutlineIcon
-                    style={{ color: "red", height: "1rem", width: "1rem" }}
-                  />
+                  friendEmail === friend?.email && (
+                    <CheckCircleOutlineIcon
+                      style={{ color: "red", height: "1rem", width: "1rem" }}
+                    />
+                  )
                 ) : (
                   <div onClick={() => setFriendEmail(friend?.email)}>
                     <FriendMoreButton
