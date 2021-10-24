@@ -59,7 +59,7 @@ const Chat = ({
 
   useEffect(() => {
     const refetchData = () => {
-      id && JSON.parse(sessionStorage.getItem("barta/groupName"))?.groupName
+      id && JSON.parse(sessionStorage.getItem("barta/groupId"))?.groupId
         ? getGroupInfo(dispatch, id)
         : getUsersData(dispatch, id);
     };
@@ -153,7 +153,7 @@ const Chat = ({
   ////////// GET ROOM ID //////////
   const roomId = useMemo(() => {
     if (id) {
-      if (JSON.parse(sessionStorage.getItem("barta/groupName"))?.groupName) {
+      if (JSON.parse(sessionStorage.getItem("barta/groupId"))?.groupId) {
         const ID = id;
         dispatch(setRoomId(ID));
         return ID;
@@ -299,7 +299,7 @@ const Chat = ({
 
   const callUser = (video) => {
     dispatch(isVideoChat(video));
-    if (JSON.parse(sessionStorage.getItem("barta/groupName"))?.groupName) {
+    if (JSON.parse(sessionStorage.getItem("barta/groupId"))?.groupId) {
       dispatch(setGroupCallIsOpen(true));
       makeGroupCall(
         dispatch,
@@ -307,6 +307,7 @@ const Chat = ({
         video,
         myStream,
         roomId,
+        groupInfo?.groupName,
         senderInfo,
         groupInfo,
         groupPeersRef,
@@ -364,7 +365,7 @@ const Chat = ({
             callUser={callUser}
             // for group
             groupInfo={groupInfo}
-            showCallButtons={showCallButtons}
+            roomIdOfReceivingGroupCall={roomIdOfReceivingGroupCall}
             acceptCall={acceptCall}
             // settings
             history={history}

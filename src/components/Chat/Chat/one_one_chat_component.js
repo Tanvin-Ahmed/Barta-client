@@ -1,5 +1,4 @@
 import "./Chat.css";
-import TimeAgo from "timeago-react";
 import time_ago from "time-ago";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 import CallIcon from "@material-ui/icons/Call";
@@ -72,7 +71,7 @@ export const ChatHeader = ({
   callUser,
   // group chat
   groupInfo,
-  showCallButtons,
+  roomIdOfReceivingGroupCall,
   acceptCall,
   // settings
   history,
@@ -82,12 +81,10 @@ export const ChatHeader = ({
       <div className="header__info">
         <Avatar
           src={
-            receiverInfo?.displayName
-              ? receiverInfo?.photoURL
-                ? receiverInfo.photoURL
-                : `http://localhost:5000/user/account/get-profile-img/${receiverInfo?.photoId}`
+            receiverInfo?.photoId
+              ? `https://barta-the-real-time-chat-app.herokuapp.com/user/account/get-profile-img/${receiverInfo?.photoId}`
               : groupInfo?.photoId &&
-                `http://localhost:5000/groupAccount/get-profile-img/${groupInfo?.photoId}`
+                `https://barta-the-real-time-chat-app.herokuapp.com/groupAccount/get-profile-img/${groupInfo?.photoId}`
           }
         />
 
@@ -111,28 +108,31 @@ export const ChatHeader = ({
             className="p-0 m-0"
           >
             {largeScreen
-              ? receiverInfo?.displayName ||
-                groupInfo?.groupName?.split("◉_◉")[0]
+              ? receiverInfo?.displayName || groupInfo?.groupName
               : receiverInfo?.displayName?.split(" ")[0] ||
-                groupInfo?.groupName?.split("◉_◉")[0]?.split(" ")[0]}
+                groupInfo?.groupName?.split(" ")[0]}
           </h6>
           {friendListOpen && receiverInfo?.status === "inactive" && (
             <small style={{ color: "rgb(231, 231, 231)" }} className="p-0 m-0">
               {largeScreen
-                ? `active ${(<TimeAgo datetime={receiverInfo?.goOffLine} />)}`
+                ? `active ${time_ago.ago(receiverInfo?.goOffLine)}`
                 : `${time_ago.ago(receiverInfo?.goOffLine, true)} ago`}
             </small>
           )}
         </div>
       </div>
       <div className="chat__options">
-        {JSON.parse(sessionStorage.getItem("barta/groupName"))?.groupName ? (
-          showCallButtons ? (
-            <CallButtons callUser={callUser} />
-          ) : (
+        {JSON.parse(sessionStorage.getItem("barta/groupId"))?.groupId ? (
+          roomIdOfReceivingGroupCall?.find(
+            ({ roomId }) =>
+              roomId ===
+              JSON.parse(sessionStorage.getItem("barta/groupId"))?.groupId
+          ) ? (
             <button onClick={acceptCall} type="button" className="join__button">
               Join
             </button>
+          ) : (
+            <CallButtons callUser={callUser} />
           )
         ) : (
           <CallButtons callUser={callUser} />
@@ -353,7 +353,7 @@ export const ChatBody = ({
   const [destination, setDestination] = useState("");
 
   useEffect(() => {
-    if (JSON.parse(sessionStorage.getItem("barta/groupName"))?.groupName) {
+    if (JSON.parse(sessionStorage.getItem("barta/groupId"))?.groupId) {
       setDestination("groupChat");
     } else {
       setDestination("chatMessage");
@@ -476,7 +476,7 @@ export const ChatBody = ({
                                   key={index}
                                   href={
                                     file.fileId
-                                      ? `http://localhost:5000/${destination}/file/${file?.filename}`
+                                      ? `https://barta-the-real-time-chat-app.herokuapp.com/${destination}/file/${file?.filename}`
                                       : file?.url
                                   }
                                 >
@@ -485,7 +485,7 @@ export const ChatBody = ({
                                     className="chat__img"
                                     src={
                                       file.fileId
-                                        ? `http://localhost:5000/${destination}/file/${file?.filename}`
+                                        ? `https://barta-the-real-time-chat-app.herokuapp.com/${destination}/file/${file?.filename}`
                                         : file?.url
                                     }
                                     alt={`${index + 1}`}
@@ -513,7 +513,7 @@ export const ChatBody = ({
                                     className="chat__img"
                                     src={
                                       file.fileId
-                                        ? `http://localhost:5000/${destination}/file/${file?.filename}`
+                                        ? `https://barta-the-real-time-chat-app.herokuapp.com/${destination}/file/${file?.filename}`
                                         : file?.url
                                     }
                                     controls

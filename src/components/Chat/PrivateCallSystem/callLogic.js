@@ -291,6 +291,7 @@ export const makeGroupCall = (
   video,
   myStream,
   roomId,
+  groupName,
   senderInfo,
   groupInfo,
   groupPeersRef,
@@ -311,7 +312,7 @@ export const makeGroupCall = (
         members: members,
         callerID: senderInfo?.email,
         callerName: senderInfo?.displayName,
-        roomID: roomId,
+        roomID: { roomId, groupName },
         callType: videoChat ? "Video Call" : "Audio Call",
       });
 
@@ -364,7 +365,8 @@ export const acceptGroupCall = (
   userInfo,
   groupPeersRef,
   myStream,
-  videoChat
+  videoChat,
+  callAcceptFromModal = false
 ) => {
   dispatch(setAcceptedGroupCall(true));
   navigator.mediaDevices
@@ -376,27 +378,59 @@ export const acceptGroupCall = (
       dispatch(getStream(stream));
       myStream.current.srcObject = stream;
 
+      const presentGroupId = JSON.parse(
+        sessionStorage.getItem("barta/groupId")
+      )?.groupId;
       socket.emit("join room", {
-        roomID: roomIdOfReceivingGroupCall,
+        roomID: callAcceptFromModal
+          ? roomIdOfReceivingGroupCall?.at(-1)
+          : roomIdOfReceivingGroupCall?.find(
+              ({ roomId }) => roomId === presentGroupId
+            ),
         userID: userInfo?.email,
         userName: userInfo?.displayName,
       });
 
       socket.on("all users", ({ usersInThisRoom, roomID }) => {
         const users = usersInThisRoom;
-        if (roomIdOfReceivingGroupCall !== roomID) return;
+        if (
+          (callAcceptFromModal &&
+            roomIdOfReceivingGroupCall.at(-1)?.roomId !== roomID?.roomId) ||
+          !roomIdOfReceivingGroupCall.find(
+            ({ roomId }) => roomId === roomID?.roomId
+          )
+        ) {
+          return;
+        }
+
         if (!users.length) return;
 
         const peers = [];
         users.forEach((otherID) => {
-          const peer = createPeer(
-            roomIdOfReceivingGroupCall,
-            otherID?.id,
-            userInfo?.email,
-            userInfo?.displayName,
-            stream,
-            socket
-          );
+          let peer;
+          if (callAcceptFromModal) {
+            peer = createPeer(
+              roomIdOfReceivingGroupCall.at(-1),
+              otherID?.id,
+              userInfo?.email,
+              userInfo?.displayName,
+              stream,
+              socket
+            );
+          } else {
+            const roomID = roomIdOfReceivingGroupCall?.find(
+              ({ roomId }) => roomId === presentGroupId
+            );
+            peer = createPeer(
+              roomID,
+              otherID?.id,
+              userInfo?.email,
+              userInfo?.displayName,
+              stream,
+              socket
+            );
+          }
+
           groupPeersRef.current.push({
             peerID: otherID?.id,
             peerName: otherID?.name,
@@ -412,7 +446,13 @@ export const acceptGroupCall = (
       });
 
       socket.on("user joined", (payload) => {
-        if (roomIdOfReceivingGroupCall === payload.roomID) {
+        if (
+          (callAcceptFromModal &&
+            roomIdOfReceivingGroupCall.at(-1) === payload?.roomID?.roomId) ||
+          roomIdOfReceivingGroupCall.find(
+            ({ roomId }) => roomId === payload?.roomID?.roomId
+          )
+        ) {
           if (payload.userToSignal === userInfo?.email) {
             const peer = addPeer(
               payload.signal,
@@ -443,7 +483,14 @@ export const acceptGroupCall = (
       });
 
       socket.on("receiving returned signal", (payload) => {
-        if (payload.roomID === roomIdOfReceivingGroupCall) {
+        if (
+          (callAcceptFromModal &&
+            payload.roomID?.roomId ===
+              roomIdOfReceivingGroupCall.at(-1)?.roomId) ||
+          roomIdOfReceivingGroupCall.find(
+            ({ roomId }) => roomId === payload.roomID?.roomId
+          )
+        ) {
           if (payload.callerID === userInfo.email) {
             const item = groupPeersRef.current.find(
               (p) => p.peerID === payload.id

@@ -39,10 +39,10 @@ const UpdateAccount = () => {
 
   useEffect(() => {
     let url;
-    if (JSON.parse(sessionStorage.getItem("barta/groupName"))?.groupName) {
-      url = `http://localhost:5000/groupAccount/get-profile-img/${groupInfo?.photoId}`;
+    if (JSON.parse(sessionStorage.getItem("barta/groupId"))?.groupId) {
+      url = `https://barta-the-real-time-chat-app.herokuapp.com/groupAccount/get-profile-img/${groupInfo?.photoId}`;
     } else {
-      url = `http://localhost:5000/user/account/get-profile-img/${userInfo?.photoId}`;
+      url = `https://barta-the-real-time-chat-app.herokuapp.com/user/account/get-profile-img/${userInfo?.photoId}`;
     }
     setPhotoIdURL(url);
   }, [groupInfo, userInfo]);
@@ -183,7 +183,7 @@ const UpdateAccount = () => {
             defaultValue={
               identity === "userAccount"
                 ? userInfo?.displayName
-                : groupInfo?.groupName?.split("◉_◉")[0]
+                : groupInfo?.groupName
             }
             {...register("name", { required: true })}
             placeholder="Name"

@@ -78,8 +78,9 @@ const Home = ({ socket }) => {
     receiverInfo: state.userReducer.receiverInfo,
   }));
 
-  const [roomIdOfReceivingGroupCall, setRoomIdOfReceivingGroupCall] =
-    useState("");
+  const [roomIdOfReceivingGroupCall, setRoomIdOfReceivingGroupCall] = useState(
+    []
+  );
   const [receivingGroupCall, setReceivingGroupCall] = useState(false);
   const [removeGroupCallModal, setRemoveGroupCallModal] = useState(true);
 
@@ -280,10 +281,22 @@ const Home = ({ socket }) => {
       "group call for you",
       ({ callerID, callerName, member, roomID, callType }) => {
         if (member === userInfo?.email) {
-          setRemoveGroupCallModal(false);
+          if (
+            !openGroupCall ||
+            !acceptedGroupCall ||
+            !openPrivateCall ||
+            !receivingCall ||
+            !callAccepted ||
+            removeGroupCallModal
+          ) {
+            setRemoveGroupCallModal(false);
+            dispatch(setCallerName(callerName));
+          }
           setReceivingGroupCall(true);
-          setRoomIdOfReceivingGroupCall(roomID);
-          dispatch(setCallerName(callerName));
+          setRoomIdOfReceivingGroupCall([
+            ...roomIdOfReceivingGroupCall,
+            roomID,
+          ]);
           if (callType === "Video Call") {
             dispatch(isVideoChat(true));
           } else if (callType === "Audio Call") {
@@ -294,7 +307,35 @@ const Home = ({ socket }) => {
       }
     );
     return () => socket.off("group call for you");
-  }, [socket, dispatch, userInfo?.email, receivingCall, receivingGroupCall]);
+  }, [
+    socket,
+    dispatch,
+    userInfo?.email,
+    receivingCall,
+    receivingGroupCall,
+    acceptedGroupCall,
+    callAccepted,
+    openGroupCall,
+    openPrivateCall,
+    removeGroupCallModal,
+    roomIdOfReceivingGroupCall,
+  ]);
+
+  ///////// close group call ////////
+  useEffect(() => {
+    socket.on("group call is closed", (roomID) => {
+      const groupCall = roomIdOfReceivingGroupCall?.find(
+        ({ roomId }) => roomId === roomID
+      );
+      if (groupCall) {
+        const roomIds = roomIdOfReceivingGroupCall?.filter(
+          ({ roomId }) => roomId !== roomID
+        );
+        setRoomIdOfReceivingGroupCall(roomIds);
+      }
+    });
+    return () => socket.off("group call is closed");
+  }, [socket, userInfo, roomIdOfReceivingGroupCall]);
 
   // useEffect(() => {
   //   // socket.emit("is user present in group call", roomId);
@@ -345,12 +386,7 @@ const Home = ({ socket }) => {
                   <ResetPassword />
                 </Route>
                 <PrivateRoute exact path="/">
-                  <ChatBar
-                    socket={socket}
-                    myStream={myStream}
-                    groupPeersRef={groupPeersRef}
-                    roomIdOfReceivingGroupCall={roomIdOfReceivingGroupCall}
-                  />
+                  <ChatBar socket={socket} />
                 </PrivateRoute>
                 <PrivateRoute path="/view-profile/:identity">
                   <Profile />

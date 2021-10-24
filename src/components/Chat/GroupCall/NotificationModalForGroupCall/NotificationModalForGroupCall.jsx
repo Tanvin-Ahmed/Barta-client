@@ -30,7 +30,8 @@ const NotificationModalForGroupCall = ({
       userInfo,
       groupPeersRef,
       myStream,
-      videoChat
+      videoChat,
+      true
     );
   };
 
@@ -48,7 +49,7 @@ const NotificationModalForGroupCall = ({
             <span style={{ fontWeight: "700" }}>{callerName}</span> <br />{" "}
             <small>make a group call from</small> <br />
             <span style={{ fontWeight: "700" }}>
-              {roomIdOfReceivingGroupCall?.split("◉_◉")[0]}
+              {roomIdOfReceivingGroupCall.at(-1)?.groupName}
             </span>
           </div>
         </div>

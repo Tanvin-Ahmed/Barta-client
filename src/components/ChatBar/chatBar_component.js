@@ -44,6 +44,10 @@ import {
 import { useState } from "react";
 import { MenuItem } from "@mui/material";
 import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
+import CallMadeIcon from "@material-ui/icons/CallMade";
+import CallReceivedIcon from "@material-ui/icons/CallReceived";
+import CallMissedOutgoingIcon from "@material-ui/icons/CallMissedOutgoing";
+import CallMissedIcon from "@material-ui/icons/CallMissed";
 
 export const ChatBarHeader = ({ userPhotoURL, photoId, name }) => {
   return (
@@ -56,7 +60,7 @@ export const ChatBarHeader = ({ userPhotoURL, photoId, name }) => {
               src={
                 userPhotoURL
                   ? userPhotoURL
-                  : `http://localhost:5000/user/account/get-profile-img/${photoId}`
+                  : `https://barta-the-real-time-chat-app.herokuapp.com/user/account/get-profile-img/${photoId}`
               }
             />
             <div className="onLine" />
@@ -137,7 +141,7 @@ export const ChatList = ({
                       src={
                         friend?.photoURL
                           ? friend?.photoURL
-                          : `http://localhost:5000/user/account/get-profile-img/${friend?.photoId}`
+                          : `https://barta-the-real-time-chat-app.herokuapp.com/user/account/get-profile-img/${friend?.photoId}`
                       }
                     />
                     <div
@@ -236,15 +240,68 @@ export const ChatList = ({
                               : "seenMessage mx-4"
                           }
                         >
-                          <small>
-                            {handleText(
-                              friend?.lastMessage?.message,
-                              largeScreen
-                            )}
-                          </small>
-                          <small className="ml-1">
-                            {time_ago.ago(friend?.lastMessage?.timeStamp, true)}
-                          </small>
+                          {friend?.lastMessage?.message ? (
+                            <div className="d-flex justify-content-between align-items-center">
+                              <small>
+                                {handleText(
+                                  friend?.lastMessage?.message,
+                                  largeScreen
+                                )}
+                              </small>
+                              <small className="ml-1">
+                                {time_ago.ago(
+                                  friend?.lastMessage?.timeStamp,
+                                  true
+                                )}
+                              </small>
+                            </div>
+                          ) : (
+                            <div className="d-flex align-items-center">
+                              <small className="d-flex justify-content-center align-items-center">
+                                {friend?.lastMessage?.callDuration?.duration ? (
+                                  friend?.lastMessage?.sender ===
+                                  userInfo.email ? (
+                                    <CallMadeIcon
+                                      className="mr-2"
+                                      variant="contained"
+                                      size="small"
+                                      style={{ color: "blue" }}
+                                    />
+                                  ) : (
+                                    <CallReceivedIcon
+                                      className="mr-2"
+                                      variant="contained"
+                                      size="small"
+                                      style={{ color: "green" }}
+                                    />
+                                  )
+                                ) : friend?.lastMessage?.sender ===
+                                  userInfo.email ? (
+                                  <CallMissedOutgoingIcon
+                                    className="mr-2"
+                                    variant="contained"
+                                    size="small"
+                                    style={{ color: "red" }}
+                                  />
+                                ) : (
+                                  <CallMissedIcon
+                                    className="mr-2"
+                                    variant="contained"
+                                    size="small"
+                                    style={{ color: "red" }}
+                                  />
+                                )}
+                                {friend?.lastMessage?.callDescription}
+                              </small>
+                              &nbsp; &nbsp;
+                              <small className="ml-1">
+                                {time_ago.ago(
+                                  friend?.lastMessage?.timeStamp,
+                                  true
+                                )}
+                              </small>
+                            </div>
+                          )}
                         </div>
                       )
                     ) : null}
@@ -335,7 +392,7 @@ export const GroupList = ({
                 >
                   <div style={{ position: "relative" }} className="mr-3">
                     <Avatar
-                      src={`http://localhost:5000/groupAccount/get-profile-img/${group?.photoId}`}
+                      src={`https://barta-the-real-time-chat-app.herokuapp.com/groupAccount/get-profile-img/${group?.photoId}`}
                     />
                     <div
                       className={
@@ -345,7 +402,7 @@ export const GroupList = ({
                   </div>
                   <div>
                     <h6 style={{ letterSpacing: "1px" }} className="mx-4 mb-0">
-                      {group?.groupName?.split("◉_◉")[0]}
+                      {group?.groupName}
                     </h6>
                     {group?.lastMessage?.status ? (
                       group?.lastMessage?.files?.length > 0 ? (
@@ -433,15 +490,68 @@ export const GroupList = ({
                               : "seenMessage mx-4"
                           }
                         >
-                          <small>
-                            {handleText(
-                              group?.lastMessage?.message,
-                              largeScreen
-                            )}
-                          </small>
-                          <small className="ml-1">
-                            {time_ago.ago(group?.lastMessage?.timeStamp, true)}
-                          </small>
+                          {group?.lastMessage?.message ? (
+                            <div className="d-flex justify-content-between align-items-center">
+                              <small>
+                                {handleText(
+                                  group?.lastMessage?.message,
+                                  largeScreen
+                                )}
+                              </small>
+                              <small className="ml-1">
+                                {time_ago.ago(
+                                  group?.lastMessage?.timeStamp,
+                                  true
+                                )}
+                              </small>
+                            </div>
+                          ) : (
+                            <div className="d-flex align-items-center">
+                              <small className="d-flex justify-content-center align-items-center">
+                                {group?.lastMessage?.callDuration?.duration ? (
+                                  group?.lastMessage?.sender ===
+                                  userInfo.email ? (
+                                    <CallMadeIcon
+                                      className="mr-2"
+                                      variant="contained"
+                                      size="small"
+                                      style={{ color: "blue" }}
+                                    />
+                                  ) : (
+                                    <CallReceivedIcon
+                                      className="mr-2"
+                                      variant="contained"
+                                      size="small"
+                                      style={{ color: "green" }}
+                                    />
+                                  )
+                                ) : group?.lastMessage?.sender ===
+                                  userInfo.email ? (
+                                  <CallMissedOutgoingIcon
+                                    className="mr-2"
+                                    variant="contained"
+                                    size="small"
+                                    style={{ color: "red" }}
+                                  />
+                                ) : (
+                                  <CallMissedIcon
+                                    className="mr-2"
+                                    variant="contained"
+                                    size="small"
+                                    style={{ color: "red" }}
+                                  />
+                                )}
+                                {group?.lastMessage?.callDescription}
+                              </small>
+                              &nbsp; &nbsp;
+                              <small className="ml-1">
+                                {time_ago.ago(
+                                  group?.lastMessage?.timeStamp,
+                                  true
+                                )}
+                              </small>
+                            </div>
+                          )}
                         </div>
                       )
                     ) : (
@@ -551,11 +661,7 @@ export const SearchFriend = ({
                   size="small"
                 />
                 <Avatar
-                  src={
-                    selectedId?.photoURL
-                      ? selectedId?.photoURL
-                      : `http://localhost:5000/user/account/get-profile-img/${selectedId?.photoId}`
-                  }
+                  src={`https://barta-the-real-time-chat-app.herokuapp.com/user/account/get-profile-img/${selectedId?.photoId}`}
                 />
               </div>
             ))}
@@ -608,11 +714,7 @@ export const SearchFriend = ({
                 >
                   <div className="mr-3">
                     <Avatar
-                      src={
-                        otherUser?.photoURL
-                          ? otherUser?.photoURL
-                          : `http://localhost:5000/user/account/get-profile-img/${otherUser?.photoId}`
-                      }
+                      src={`https://barta-the-real-time-chat-app.herokuapp.com/user/account/get-profile-img/${otherUser?.photoId}`}
                     />
                   </div>
                   <h6 className="m-4">{otherUser?.displayName}</h6>
@@ -659,7 +761,9 @@ export const FinalProcessToCreateGroup = ({
                 className="times_for_selectedId"
                 size="small"
               />
-              <Avatar src={selectedId?.photoURL} />
+              <Avatar
+                src={`http://localhost:5000/user/account/get-profile-img/${selectedId?.photoId}`}
+              />
             </div>
           ))}
         </div>

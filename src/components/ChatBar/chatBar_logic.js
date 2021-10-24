@@ -64,8 +64,8 @@ export const handleReceiverInfo = (receiver, history) => {
 export const handleGroupInfo = (group, history) => {
   sessionStorage.removeItem("barta/receiver");
   sessionStorage.setItem(
-    "barta/groupName",
-    JSON.stringify({ groupName: group?.groupName })
+    "barta/groupId",
+    JSON.stringify({ groupId: group?._id })
   );
   history.push(`/chat/${group._id}`);
 };
@@ -122,18 +122,22 @@ export const createGroupForFirst = (
 
 export const handleText = (str, largeScreen) => {
   if (largeScreen) {
-    return str.length > 15
+    return str?.length > 15
       ? str
-          .split("<br/>")
-          .join(" ")
-          .split("&nbsp;")
-          .join(" ")
-          .substring(0, 14) + "..."
+          ?.split("<br/>")
+          ?.join(" ")
+          ?.split("&nbsp;")
+          ?.join(" ")
+          ?.substring(0, 14) + "..."
       : str;
   } else {
-    return str.length > 7
-      ? str.split("<br/>").join(" ").split("&nbsp;").join(" ").substring(0, 6) +
-          "..."
+    return str?.length > 7
+      ? str
+          ?.split("<br/>")
+          ?.join(" ")
+          ?.split("&nbsp;")
+          ?.join(" ")
+          ?.substring(0, 6) + "..."
       : str;
   }
 };

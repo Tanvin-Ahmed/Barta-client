@@ -31,7 +31,7 @@ const ChatSettings = () => {
   }));
 
   useEffect(() => {
-    if (JSON.parse(sessionStorage.getItem("barta/groupName"))?.groupName) {
+    if (JSON.parse(sessionStorage.getItem("barta/groupId"))?.groupId) {
       setInformation(groupInfo);
     } else {
       setInformation(receiverInfo);
@@ -45,15 +45,13 @@ const ChatSettings = () => {
           src={
             information?.photoURL
               ? information.photoURL
-              : JSON.parse(sessionStorage.getItem("barta/groupName"))?.groupName
-              ? `http://localhost:5000/groupAccount/get-profile-img/${information?.photoId}`
-              : `http://localhost:5000/user/account/get-profile-img/${information?.photoId}`
+              : JSON.parse(sessionStorage.getItem("barta/groupId"))?.groupId
+              ? `https://barta-the-real-time-chat-app.herokuapp.com/groupAccount/get-profile-img/${information?.photoId}`
+              : `https://barta-the-real-time-chat-app.herokuapp.com/user/account/get-profile-img/${information?.photoId}`
           }
           style={{ height: "10rem", width: "10rem" }}
         />
-        <h4>
-          {information?.displayName || information?.groupName?.split("◉_◉")[0]}
-        </h4>
+        <h4>{information?.displayName || information?.groupName}</h4>
         <div className="d-flex justify-content-around align-items-center">
           <Tooltip title="Audio call">
             <IconButton>
@@ -65,7 +63,7 @@ const ChatSettings = () => {
               <VideoCallIcon style={{ color: "white" }} />
             </IconButton>
           </Tooltip>
-          {JSON.parse(sessionStorage.getItem("barta/groupName"))?.groupName ? (
+          {JSON.parse(sessionStorage.getItem("barta/groupId"))?.groupId ? (
             <>
               <Tooltip title="Edit profile">
                 <IconButton
@@ -109,7 +107,7 @@ const ChatSettings = () => {
             <SearchIcon style={{ color: "white" }} />
           </div>
         </CardActionArea>
-        {JSON.parse(sessionStorage.getItem("barta/groupName"))?.groupName && (
+        {JSON.parse(sessionStorage.getItem("barta/groupId"))?.groupId && (
           <>
             <CardActionArea className="py-2 px-2 my-1">
               <div className="d-flex justify-content-between align-items-center">
