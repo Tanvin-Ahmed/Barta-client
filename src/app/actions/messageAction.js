@@ -616,3 +616,38 @@ export const deleteMessageFromChatBar = (id, chatList, groups) => {
     });
   };
 };
+
+export const deleteConversation = (roomId, setLoading, setMessage) => {
+  setLoading(true);
+  setMessage({});
+  let destination = "";
+  if (JSON.parse(sessionStorage.getItem("barta/groupId"))?.groupId) {
+    destination = "groupChat";
+  } else {
+    destination = "chatMessage";
+  }
+  axios
+    .delete(
+      `https://barta-the-real-time-chat-app.herokuapp.com/${destination}/delete-conversation/${roomId}`,
+      {
+        headers: {
+          Authorization:
+            "Bearer " + JSON.parse(localStorage.getItem("accessToken")),
+        },
+      }
+    )
+    .then(() => {
+      setLoading(false);
+      setMessage({
+        message: "Delete Conversation successfully!!",
+        status: "ok",
+      });
+    })
+    .catch(() => {
+      setLoading(false);
+      setMessage({
+        message: "Something went wrong, please try again!",
+        status: "error",
+      });
+    });
+};

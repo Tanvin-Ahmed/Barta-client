@@ -47,11 +47,10 @@ const AccountDeleteAlert = () => {
   }, [message, dispatch]);
 
   return (
-    <div className="delete_alert_modal">
-      <div
-        onClick={() => dispatch(setDeleteAccountAlert(false))}
-        className="back__drop"
-      />
+    <div
+      onClick={() => dispatch(setDeleteAccountAlert(false))}
+      className="delete_alert_modal"
+    >
       <section className="account__delete">
         <div className="container">
           <h5 className="text-light text-center">Delete Account Forever</h5>

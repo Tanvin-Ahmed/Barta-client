@@ -34,7 +34,7 @@ const Profile = () => {
             }
             style={{ width: "10rem", height: "10rem" }}
           />
-          <div className="online" />
+          {user?.status === "active" && <div className="online" />}
         </div>
         <h4 className="user__name">{user?.displayName}</h4>
       </div>

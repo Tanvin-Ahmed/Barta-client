@@ -17,12 +17,17 @@ import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
 import { leaveFromGroup } from "../../../app/actions/userAction";
 import CircularProgress from "@mui/material/CircularProgress";
 import AddMemberModal from "../AddMemberModal/AddMemberModal";
+import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
+import CloseIcon from "@mui/icons-material/Close";
+import { deleteConversation } from "../../../app/actions/messageAction";
 
 const ChatSettings = () => {
   const history = useHistory();
   const [information, setInformation] = useState({});
-  const [modalIsOpen, setIsOpen] = React.useState(false);
+  const [modalIsOpen, setIsOpen] = useState(false);
   const [lading, setLoading] = useState(false);
+  const [deleteModal, setDeleteModal] = useState(false);
+  const [roomIdToDelete, setRoomIdToDelete] = useState("");
 
   const { receiverInfo, groupInfo, userInfo } = useSelector((state) => ({
     receiverInfo: state.userReducer.receiverInfo,
@@ -33,10 +38,17 @@ const ChatSettings = () => {
   useEffect(() => {
     if (JSON.parse(sessionStorage.getItem("barta/groupId"))?.groupId) {
       setInformation(groupInfo);
+      setRoomIdToDelete(groupInfo?._id);
     } else {
       setInformation(receiverInfo);
+      let roomId = [
+        userInfo?.email?.split("@")[0],
+        receiverInfo?.email?.split("@")[0],
+      ].sort();
+      roomId = `${roomId[0]}_${roomId[1]}`;
+      setRoomIdToDelete(roomId);
     }
-  }, [groupInfo, receiverInfo]);
+  }, [groupInfo, receiverInfo, userInfo]);
 
   return (
     <section className="chat__settings p-3">
@@ -107,6 +119,15 @@ const ChatSettings = () => {
             <SearchIcon style={{ color: "white" }} />
           </div>
         </CardActionArea>
+        <CardActionArea
+          onClick={() => setDeleteModal(true)}
+          className="py-2 px-2 my-1"
+        >
+          <div className="d-flex justify-content-between align-items-center">
+            <h6>Delete conversation</h6>
+            <DeleteForeverIcon style={{ color: "rgb(255, 29, 78)" }} />
+          </div>
+        </CardActionArea>
         {JSON.parse(sessionStorage.getItem("barta/groupId"))?.groupId && (
           <>
             <CardActionArea className="py-2 px-2 my-1">
@@ -153,8 +174,73 @@ const ChatSettings = () => {
           groupMembers={groupInfo?.members}
         />
       )}
+      {deleteModal && (
+        <RemoveChatModal
+          setDeleteModal={setDeleteModal}
+          roomIdToDelete={roomIdToDelete}
+        />
+      )}
     </section>
   );
 };
 
 export default ChatSettings;
+
+const RemoveChatModal = ({ setDeleteModal, roomIdToDelete }) => {
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState({});
+  const handleDeleteMessages = () => {
+    if (roomIdToDelete.trim()) {
+      deleteConversation(roomIdToDelete, setLoading, setMessage);
+    }
+  };
+  return (
+    <section
+      onClick={() => !loading && setDeleteModal(false)}
+      className="remove_chat_modal"
+    >
+      <div className="container">
+        <h5 className="text-center text-danger">Remove conversation</h5>
+        <small className="d-block text-center text-light">
+          There is no recover option for this conversation. Even all chats
+          remove from your friend conversation also.
+        </small>
+        <small className="d-block text-center text-danger mb-3">
+          Are you sure!!??
+        </small>
+        <div className="d-flex justify-content-around align-items-center">
+          <button
+            onClick={() => !loading && setDeleteModal(false)}
+            type="button"
+            className="cancel__button"
+          >
+            <CloseIcon style={{ color: "white" }} /> Cancel
+          </button>
+          <button
+            onClick={handleDeleteMessages}
+            type="submit"
+            className="submit__button"
+          >
+            <DeleteForeverIcon style={{ color: "white" }} /> Delete
+          </button>
+        </div>
+        {loading && (
+          <div className="d-flex justify-content-center align-items-center my-2">
+            <CircularProgress style={{ color: "rgb(255, 29, 78)" }} />
+          </div>
+        )}
+        {message?.status ? (
+          message?.status === "ok" ? (
+            <small className="d-block text-light text-center my-2">
+              {message?.message}
+            </small>
+          ) : (
+            <span className="d-block text-center text-warning my-2">
+              {message?.message}
+            </span>
+          )
+        ) : null}
+      </div>
+    </section>
+  );
+};

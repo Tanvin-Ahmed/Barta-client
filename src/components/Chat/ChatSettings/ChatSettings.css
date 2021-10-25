@@ -15,3 +15,71 @@
   letter-spacing: 1px;
   color: #fff;
 }
+.remove_chat_modal .container {
+  position: absolute;
+  top: 35%;
+  left: 0;
+  right: 0;
+  width: 100%;
+  z-index: 200;
+  background: rgb(73, 20, 143);
+  padding: 1rem;
+  border-radius: 10px;
+}
+
+.remove_chat_modal {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 100;
+  background-color: rgba(0, 0, 0, 0.267);
+  height: 95vh;
+}
+
+.remove_chat_modal .cancel__button {
+  background: rgb(106, 57, 185);
+  color: #fff;
+  padding: 0.2rem 0.5rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+  border: none;
+  border-radius: 5px;
+  font-size: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.5s;
+}
+.remove_chat_modal .cancel__button:hover {
+  background-color: rgb(77, 34, 146);
+}
+.remove_chat_modal .submit__button {
+  background: rgb(255, 35, 64);
+  color: #fff;
+  padding: 0.2rem 0.5rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+  border: none;
+  border-radius: 5px;
+  font-size: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.5s;
+}
+.remove_chat_modal .submit__button:hover {
+  background-color: rgb(223, 20, 47);
+}
+
+.remove_chat_modal small {
+  font-size: 15px;
+  letter-spacing: 1px;
+  font-weight: 500;
+}
+
+.remove_chat_modal h5 {
+  font-weight: 600;
+  letter-spacing: 1px;
+}

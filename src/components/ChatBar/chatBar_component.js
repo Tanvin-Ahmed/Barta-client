@@ -762,7 +762,7 @@ export const FinalProcessToCreateGroup = ({
                 size="small"
               />
               <Avatar
-                src={`http://localhost:5000/user/account/get-profile-img/${selectedId?.photoId}`}
+                src={`https://barta-the-real-time-chat-app.herokuapp.com/user/account/get-profile-img/${selectedId?.photoId}`}
               />
             </div>
           ))}
