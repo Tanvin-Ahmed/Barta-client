@@ -159,16 +159,12 @@ export const setReceiver = (bol) => {
 
 export const setCallInfoInDatabase = (callInfo) => {
   axios
-    .post(
-      "https://barta-the-real-time-chat-app.herokuapp.com/chatMessage/postCallInfo",
-      callInfo,
-      {
-        headers: {
-          Authorization:
-            "Bearer " + JSON.parse(localStorage.getItem("accessToken")),
-        },
-      }
-    )
+    .post("http://localhost:5000/chatMessage/postCallInfo", callInfo, {
+      headers: {
+        Authorization:
+          "Bearer " + JSON.parse(localStorage.getItem("accessToken")),
+      },
+    })
     .then((res) => res)
     .catch((err) => err.message);
 };

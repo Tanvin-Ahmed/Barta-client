@@ -36,6 +36,7 @@ export const DELETE_CHAT_MESSAGE = "delete_chat_message";
 export const SET_ROOM_ID = "set_room_id";
 export const REFETCH_MESSAGE = "refetch_message";
 export const GET_MESSAGE_SPINNER = "get_message_spinner";
+export const SET_WEBCAM_OPEN = "set_webcam_open";
 
 // file upload
 export const SELECTED_FILES = "selected_files";

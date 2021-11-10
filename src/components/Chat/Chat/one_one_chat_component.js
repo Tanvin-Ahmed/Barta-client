@@ -13,6 +13,7 @@ import CircularProgress from "@material-ui/core/CircularProgress";
 import Picker from "emoji-picker-react";
 import CheckIcon from "@mui/icons-material/Check";
 import DoneAllIcon from "@mui/icons-material/DoneAll";
+import CameraAltIcon from "@mui/icons-material/CameraAlt";
 import {
   deleteChosenFiles,
   fileUpload,
@@ -24,7 +25,11 @@ import {
 import AddCircleIcon from "@material-ui/icons/AddCircle";
 import InsertPhotoIcon from "@material-ui/icons/InsertPhoto";
 import VideoLibraryIcon from "@material-ui/icons/VideoLibrary";
-import { deleteChat, download } from "../../../app/actions/messageAction";
+import {
+  deleteChat,
+  download,
+  setWebcamOpen,
+} from "../../../app/actions/messageAction";
 import HighlightOffIcon from "@material-ui/icons/HighlightOff";
 import DeleteIcon from "@material-ui/icons/Delete";
 import AddReactionIcon from "@material-ui/icons/AddReaction";
@@ -82,9 +87,9 @@ export const ChatHeader = ({
         <Avatar
           src={
             receiverInfo?.photoId
-              ? `https://barta-the-real-time-chat-app.herokuapp.com/user/account/get-profile-img/${receiverInfo?.photoId}`
+              ? `http://localhost:5000/user/account/get-profile-img/${receiverInfo?.photoId}`
               : groupInfo?.photoId &&
-                `https://barta-the-real-time-chat-app.herokuapp.com/groupAccount/get-profile-img/${groupInfo?.photoId}`
+                `http://localhost:5000/groupAccount/get-profile-img/${groupInfo?.photoId}`
           }
         />
 
@@ -476,7 +481,7 @@ export const ChatBody = ({
                                   key={index}
                                   href={
                                     file.fileId
-                                      ? `https://barta-the-real-time-chat-app.herokuapp.com/${destination}/file/${file?.filename}`
+                                      ? `http://localhost:5000/${destination}/file/${file?.filename}`
                                       : file?.url
                                   }
                                 >
@@ -485,7 +490,7 @@ export const ChatBody = ({
                                     className="chat__img"
                                     src={
                                       file.fileId
-                                        ? `https://barta-the-real-time-chat-app.herokuapp.com/${destination}/file/${file?.filename}`
+                                        ? `http://localhost:5000/${destination}/file/${file?.filename}`
                                         : file?.url
                                     }
                                     alt={`${index + 1}`}
@@ -513,7 +518,7 @@ export const ChatBody = ({
                                     className="chat__img"
                                     src={
                                       file.fileId
-                                        ? `https://barta-the-real-time-chat-app.herokuapp.com/${destination}/file/${file?.filename}`
+                                        ? `http://localhost:5000/${destination}/file/${file?.filename}`
                                         : file?.url
                                     }
                                     controls
@@ -847,6 +852,11 @@ const FilePicker = ({ dispatch }) => {
     setAnchorEl(null);
   };
 
+  const handleWebcam = () => {
+    dispatch(setWebcamOpen(true));
+    handleClose();
+  };
+
   return (
     <div>
       <IconButton
@@ -868,7 +878,12 @@ const FilePicker = ({ dispatch }) => {
           "aria-labelledby": "basic-button",
         }}
       >
+        <MenuItem style={{ backgroundColor: "black" }} onClick={handleWebcam}>
+          <span style={{ color: "rgb(144, 89, 233)" }}>Take photo</span>
+          <CameraAltIcon style={{ color: "rgb(144, 89, 233)" }} size="small" />
+        </MenuItem>
         <MenuItem
+          style={{ backgroundColor: "black" }}
           onChange={(e) => {
             fileUpload(e, dispatch);
             handleClose();
@@ -883,6 +898,7 @@ const FilePicker = ({ dispatch }) => {
           </label>
         </MenuItem>
         <MenuItem
+          style={{ backgroundColor: "black" }}
           onChange={(e) => {
             fileUpload(e, dispatch);
             handleClose();
@@ -897,6 +913,7 @@ const FilePicker = ({ dispatch }) => {
           </label>
         </MenuItem>
         <MenuItem
+          style={{ backgroundColor: "black" }}
           onChange={(e) => {
             fileUpload(e, dispatch);
             handleClose();

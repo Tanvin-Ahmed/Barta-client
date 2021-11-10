@@ -1,0 +1,6 @@
+.webCamCapture {
+  position: relative;
+  margin-top: -20px;
+  overflow-x: hidden;
+  overflow-y: auto;
+}

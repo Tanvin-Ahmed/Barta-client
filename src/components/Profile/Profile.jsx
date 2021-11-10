@@ -30,7 +30,7 @@ const Profile = () => {
             src={
               user?.photoURL
                 ? user?.photoURL
-                : `https://barta-the-real-time-chat-app.herokuapp.com/user/account/get-profile-img/${user?.photoId}`
+                : `http://localhost:5000/user/account/get-profile-img/${user?.photoId}`
             }
             style={{ width: "10rem", height: "10rem" }}
           />

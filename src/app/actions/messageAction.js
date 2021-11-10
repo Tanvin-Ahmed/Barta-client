@@ -17,6 +17,7 @@ import {
   GET_OLD_MESSAGES_FROM_DB,
   GET_FRIEND_INFO,
   SET_GROUP_LIST_FROM_DATABASE,
+  SET_WEBCAM_OPEN,
 } from "../types";
 import FileServer from "file-saver";
 import path from "path";
@@ -43,11 +44,9 @@ export const sendMessageInDatabase = (chat) => {
 
     let URL;
     if (JSON.parse(sessionStorage.getItem("barta/groupId"))?.groupId) {
-      URL =
-        "https://barta-the-real-time-chat-app.herokuapp.com/groupChat/messages/post";
+      URL = "http://localhost:5000/groupChat/messages/post";
     } else {
-      URL =
-        "https://barta-the-real-time-chat-app.herokuapp.com/chatMessage/postOneOneChat";
+      URL = "http://localhost:5000/chatMessage/postOneOneChat";
     }
 
     axios
@@ -100,11 +99,7 @@ export const uploadFiles = (chosenFiles) => {
     }
 
     axios
-      .post(
-        `https://barta-the-real-time-chat-app.herokuapp.com/${destination}/upload`,
-        chosenFiles,
-        options
-      )
+      .post(`http://localhost:5000/${destination}/upload`, chosenFiles, options)
       .then(() => {
         dispatch({
           type: CHAT_UPLOAD_PERCENTAGE,
@@ -158,9 +153,9 @@ export const getMessagesFromDatabase = (data, oldMessage = false) => {
 
     let URL;
     if (JSON.parse(sessionStorage.getItem("barta/groupId"))?.groupId) {
-      URL = `https://barta-the-real-time-chat-app.herokuapp.com/groupChat/messages/${data?.roomId}`;
+      URL = `http://localhost:5000/groupChat/messages/${data?.roomId}`;
     } else {
-      URL = `https://barta-the-real-time-chat-app.herokuapp.com/chatMessage/getOneOneChat/${data?.roomId}`;
+      URL = `http://localhost:5000/chatMessage/getOneOneChat/${data?.roomId}`;
     }
 
     axios
@@ -250,7 +245,7 @@ export const download = (filename) => {
   }
   axios({
     method: "GET",
-    url: `https://barta-the-real-time-chat-app.herokuapp.com/${destination}/file/${filename}`,
+    url: `http://localhost:5000/${destination}/file/${filename}`,
     responseType: "blob",
   })
     .then(({ data }) => {
@@ -271,16 +266,12 @@ export const updateChatMessage = (react) => {
     destination = "chatMessage";
   }
   axios
-    .put(
-      `https://barta-the-real-time-chat-app.herokuapp.com/${destination}/updateChatMessage`,
-      react,
-      {
-        headers: {
-          Authorization:
-            "Bearer " + JSON.parse(localStorage.getItem("accessToken")),
-        },
-      }
-    )
+    .put(`http://localhost:5000/${destination}/updateChatMessage`, react, {
+      headers: {
+        Authorization:
+          "Bearer " + JSON.parse(localStorage.getItem("accessToken")),
+      },
+    })
     .then(() => console.log("update message successfully"))
     .catch(() => alert("react not set, please try again"));
 };
@@ -293,16 +284,12 @@ export const updatePreReact = (react) => {
     destination = "chatMessage";
   }
   axios
-    .put(
-      `https://barta-the-real-time-chat-app.herokuapp.com/${destination}/updateOnlyReact`,
-      react,
-      {
-        headers: {
-          Authorization:
-            "Bearer " + JSON.parse(localStorage.getItem("accessToken")),
-        },
-      }
-    )
+    .put(`http://localhost:5000/${destination}/updateOnlyReact`, react, {
+      headers: {
+        Authorization:
+          "Bearer " + JSON.parse(localStorage.getItem("accessToken")),
+      },
+    })
     .then(() => console.log("update message successfully"))
     .catch(() => alert("react not set, please try again"));
 };
@@ -315,16 +302,12 @@ export const deleteReact = (react) => {
     destination = "chatMessage";
   }
   axios
-    .put(
-      `https://barta-the-real-time-chat-app.herokuapp.com/${destination}/removeReact`,
-      react,
-      {
-        headers: {
-          Authorization:
-            "Bearer " + JSON.parse(localStorage.getItem("accessToken")),
-        },
-      }
-    )
+    .put(`http://localhost:5000/${destination}/removeReact`, react, {
+      headers: {
+        Authorization:
+          "Bearer " + JSON.parse(localStorage.getItem("accessToken")),
+      },
+    })
     .then(() => console.log("update message successfully"))
     .catch(() => alert("react not remove, please try again"));
 };
@@ -337,15 +320,12 @@ const deleteChatMessage = (id) => {
     destination = "chatMessage";
   }
   axios
-    .delete(
-      `https://barta-the-real-time-chat-app.herokuapp.com/${destination}/deleteChatMessage/${id}`,
-      {
-        headers: {
-          Authorization:
-            "Bearer " + JSON.parse(localStorage.getItem("accessToken")),
-        },
-      }
-    )
+    .delete(`http://localhost:5000/${destination}/deleteChatMessage/${id}`, {
+      headers: {
+        Authorization:
+          "Bearer " + JSON.parse(localStorage.getItem("accessToken")),
+      },
+    })
     .then(() => console.log("deleted successfully"))
     .catch(() => alert("failed to delete, please try again"));
 };
@@ -361,15 +341,12 @@ export const deleteChat = (message) => {
     for (let i = 0; i < message?.files.length; i++) {
       const id = message?.files[i].fileId;
       axios
-        .delete(
-          `https://barta-the-real-time-chat-app.herokuapp.com/${destination}/file/delete/${id}`,
-          {
-            headers: {
-              Authorization:
-                "Bearer " + JSON.parse(localStorage.getItem("accessToken")),
-            },
-          }
-        )
+        .delete(`http://localhost:5000/${destination}/file/delete/${id}`, {
+          headers: {
+            Authorization:
+              "Bearer " + JSON.parse(localStorage.getItem("accessToken")),
+          },
+        })
         .then(() => {
           console.log("delete file successfully");
           if (i === message?.files?.length - 1) {
@@ -487,17 +464,13 @@ export const updateMessageStatus = (ids) => {
     destination = "chatMessage";
   }
   axios
-    .post(
-      `https://barta-the-real-time-chat-app.herokuapp.com/${destination}/unseen-message-to-seen`,
-      ids,
-      {
-        headers: {
-          Authorization: `Bearer ${JSON.parse(
-            localStorage.getItem("accessToken")
-          )}`,
-        },
-      }
-    )
+    .post(`http://localhost:5000/${destination}/unseen-message-to-seen`, ids, {
+      headers: {
+        Authorization: `Bearer ${JSON.parse(
+          localStorage.getItem("accessToken")
+        )}`,
+      },
+    })
     .catch((err) => console.log(err.response));
 };
 
@@ -576,7 +549,7 @@ export const deleteMessageFromChatBar = (id, chatList, groups) => {
     groups.forEach((group) => {
       if (group?.lastMessage?._id === id) {
         axios(
-          `https://barta-the-real-time-chat-app.herokuapp.com/groupChat/get-lastMessage-for-chatBar/${group?._id}`,
+          `http://localhost:5000/groupChat/get-lastMessage-for-chatBar/${group?._id}`,
           {
             headers: {
               Authorization:
@@ -597,7 +570,7 @@ export const deleteMessageFromChatBar = (id, chatList, groups) => {
     chatList.forEach((friend) => {
       if (friend.lastMessage?._id === id) {
         axios(
-          `https://barta-the-real-time-chat-app.herokuapp.com/chatMessage/get-lastMessage-for-chatBar/${friend?.lastMessage?.id}`,
+          `http://localhost:5000/chatMessage/get-lastMessage-for-chatBar/${friend?.lastMessage?.id}`,
           {
             headers: {
               Authorization:
@@ -628,7 +601,7 @@ export const deleteConversation = (roomId, setLoading, setMessage) => {
   }
   axios
     .delete(
-      `https://barta-the-real-time-chat-app.herokuapp.com/${destination}/delete-conversation/${roomId}`,
+      `http://localhost:5000/${destination}/delete-conversation/${roomId}`,
       {
         headers: {
           Authorization:
@@ -650,4 +623,11 @@ export const deleteConversation = (roomId, setLoading, setMessage) => {
         status: "error",
       });
     });
+};
+
+export const setWebcamOpen = (bool) => {
+  return {
+    type: SET_WEBCAM_OPEN,
+    payload: bool,
+  };
 };

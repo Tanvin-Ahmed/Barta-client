@@ -15,7 +15,6 @@ import {
   ChatFooter,
   ChatHeader,
   ShowFileBeforeUpload,
-  UploadFile,
   UploadProgressBar,
 } from "./one_one_chat_component";
 import PrivateCall from "../PrivateCallSystem/PrivateCall";
@@ -27,16 +26,12 @@ import {
   setPrivateCallIsOpen,
 } from "../../../app/actions/privateCallAction";
 import {
-  deleteMessage,
   getMessagesFromDatabase,
-  getNewMessageFromSocket,
   isTyping,
   messageWithUpdatedStatus,
   setRoomId,
   stopReFetchMessage,
-  updateMessageStatus,
   updateReactInChat,
-  setSendedMessage,
 } from "../../../app/actions/messageAction";
 import { updateChatStatus } from "../../../app/actions/userAction";
 import {
@@ -46,6 +41,7 @@ import {
   makeGroupCall,
 } from "../PrivateCallSystem/callLogic";
 import { setGroupCallIsOpen } from "../../../app/actions/groupCallAction";
+import WebcamCapture from "../WebcamCapture/WebcamCapture";
 
 const Chat = ({
   socket,
@@ -78,6 +74,7 @@ const Chat = ({
   }, [dispatch, id]);
 
   const {
+    webcamIsOpen,
     userInfo,
     senderInfo,
     receiverInfo,
@@ -102,6 +99,7 @@ const Chat = ({
     userStatusToReceiveOtherCall,
     showCallButtons,
   } = useSelector((state) => ({
+    webcamIsOpen: state.messageReducer.webcamIsOpen,
     userInfo: state.userReducer.userInfo,
     // private chat
     senderInfo: state.userReducer.userInfo,
@@ -356,6 +354,8 @@ const Chat = ({
           connectionRef={connectionRef}
           Peer={Peer}
         />
+      ) : webcamIsOpen ? (
+        <WebcamCapture />
       ) : (
         <>
           <ChatHeader

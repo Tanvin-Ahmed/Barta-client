@@ -88,13 +88,13 @@ const Dropdown = () => {
       >
         <MenuItem onClick={() => history.push("/view-profile/userInfo")}>
           <Avatar
-            src={`https://barta-the-real-time-chat-app.herokuapp.com/user/account/get-profile-img/${userInfo?.photoId}`}
+            src={`http://localhost:5000/user/account/get-profile-img/${userInfo?.photoId}`}
           />{" "}
           Profile
         </MenuItem>
         <MenuItem onClick={() => history.push("/update-account/userAccount")}>
           <Avatar
-            src={`https://barta-the-real-time-chat-app.herokuapp.com/user/account/get-profile-img/${userInfo?.photoId}`}
+            src={`http://localhost:5000/user/account/get-profile-img/${userInfo?.photoId}`}
           />{" "}
           Update profile
         </MenuItem>

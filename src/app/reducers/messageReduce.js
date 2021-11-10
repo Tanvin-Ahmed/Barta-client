@@ -14,6 +14,7 @@ import {
   REFETCH_MESSAGE,
   GET_MESSAGE_SPINNER,
   GET_OLD_MESSAGES_FROM_DB,
+  SET_WEBCAM_OPEN,
 } from "../types";
 
 const initialState = {
@@ -30,6 +31,7 @@ const initialState = {
   reactTabIsOpen: false,
   roomId: "",
   reFetchMessage: false,
+  webcamIsOpen: false,
 };
 
 const messageReducer = (state = initialState, action) => {
@@ -118,6 +120,12 @@ const messageReducer = (state = initialState, action) => {
       return {
         ...state,
         roomId: action.payload,
+      };
+
+    case SET_WEBCAM_OPEN:
+      return {
+        ...state,
+        webcamIsOpen: action.payload,
       };
 
     default:
