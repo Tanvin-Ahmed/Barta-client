@@ -624,10 +624,3 @@ export const deleteConversation = (roomId, setLoading, setMessage) => {
       });
     });
 };
-
-export const setWebcamOpen = (bool) => {
-  return {
-    type: SET_WEBCAM_OPEN,
-    payload: bool,
-  };
-};

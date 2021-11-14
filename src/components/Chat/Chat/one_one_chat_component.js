@@ -25,11 +25,7 @@ import {
 import AddCircleIcon from "@material-ui/icons/AddCircle";
 import InsertPhotoIcon from "@material-ui/icons/InsertPhoto";
 import VideoLibraryIcon from "@material-ui/icons/VideoLibrary";
-import {
-  deleteChat,
-  download,
-  setWebcamOpen,
-} from "../../../app/actions/messageAction";
+import { deleteChat, download } from "../../../app/actions/messageAction";
 import HighlightOffIcon from "@material-ui/icons/HighlightOff";
 import DeleteIcon from "@material-ui/icons/Delete";
 import AddReactionIcon from "@material-ui/icons/AddReaction";
@@ -44,6 +40,7 @@ import Timer from "../PrivateCallSystem/Timer.jsx";
 import path from "path";
 import { useState, useEffect } from "react";
 import { Menu, MenuItem } from "@mui/material";
+import { setWebcamOpen } from "../../../app/actions/webcamAction";
 
 const CallButtons = ({ callUser }) => {
   return (

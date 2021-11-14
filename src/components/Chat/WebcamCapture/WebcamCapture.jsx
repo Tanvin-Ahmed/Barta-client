@@ -1,9 +1,15 @@
 import React, { useRef, useCallback, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import Webcam from "react-webcam";
-import { setWebcamOpen } from "../../../app/actions/messageAction";
 import "./WebcamCapture.css";
 import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
+import {
+  setWebcamCapture,
+  setWebcamOpen,
+} from "../../../app/actions/webcamAction";
+import { IconButton } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
+import SendIcon from "@mui/icons-material/Send";
 
 const videoConstraints = {
   height: "100%",
@@ -14,37 +20,83 @@ const videoConstraints = {
 const WebcamCapture = () => {
   const dispatch = useDispatch();
   const webcamRef = useRef(null);
-  const [image, setImage] = useState(null);
+  const [openImageView, setOpenImageView] = useState(false);
+
+  const { image } = useSelector((state) => ({
+    image: state.webcamReducer.image,
+  }));
 
   const handleWebcam = () => {
     dispatch(setWebcamOpen(false));
+    dispatch(setWebcamCapture(null));
   };
 
   const capture = useCallback(() => {
     const imageSrc = webcamRef.current.getScreenshot();
-    setImage(imageSrc);
-  }, [webcamRef]);
+    dispatch(setWebcamCapture(imageSrc));
+    setOpenImageView(true);
+  }, [webcamRef, dispatch]);
+
+  const handleSendImage = () => {};
 
   return (
-    <div className="webCamCapture">
-      <Webcam
-        audio={false}
-        height={videoConstraints.height}
-        ref={webcamRef}
-        screenShotFormat="image/jpeg"
-        width={videoConstraints.width}
-        videoConstraints={videoConstraints}
-      />
-      <button onClick={handleWebcam}>close</button>
-      <RadioButtonUncheckedIcon
-        className="webcam__button"
-        onClick={capture}
-        fontSize="large"
-        style={{ color: "white", cursor: "pointer" }}
-      />
+    <section className="webCamCapture">
+      {openImageView ? (
+        <div>
+          <img className="image__view" src={image} alt="" />
+          <IconButton
+            fontSize="small"
+            style={{ background: "rgb(236, 32, 83)" }}
+            onClick={() => {
+              setOpenImageView(false);
+              dispatch(setWebcamCapture(null));
+            }}
+            className="close__webcam"
+          >
+            <CloseIcon style={{ color: "white" }} fontSize="small" />
+          </IconButton>
 
-      <img src={image} alt="" style={{ height: "100px", width: "100px" }} />
-    </div>
+          <IconButton
+            fontSize="small"
+            style={{ background: "dodgerblue" }}
+            onClick={handleSendImage}
+            className="send__image"
+          >
+            <SendIcon style={{ color: "white" }} fontSize="small" />
+          </IconButton>
+        </div>
+      ) : (
+        <div>
+          <Webcam
+            audio={false}
+            height={videoConstraints.height}
+            ref={webcamRef}
+            screenShotFormat="image/jpeg"
+            width={videoConstraints.width}
+            videoConstraints={videoConstraints}
+          />
+          <IconButton
+            fontSize="small"
+            style={{ background: "rgb(236, 32, 83)" }}
+            onClick={handleWebcam}
+            className="close__webcam"
+          >
+            <CloseIcon style={{ color: "white" }} fontSize="small" />
+          </IconButton>
+          <IconButton
+            onClick={capture}
+            className="capture__image"
+            style={{ background: "rgb(0, 140, 255)" }}
+          >
+            <RadioButtonUncheckedIcon
+              className="webcam__button"
+              fontSize="large"
+              style={{ color: "white", cursor: "pointer" }}
+            />
+          </IconButton>
+        </div>
+      )}
+    </section>
   );
 };
 

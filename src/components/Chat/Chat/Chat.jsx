@@ -99,7 +99,7 @@ const Chat = ({
     userStatusToReceiveOtherCall,
     showCallButtons,
   } = useSelector((state) => ({
-    webcamIsOpen: state.messageReducer.webcamIsOpen,
+    webcamIsOpen: state.webcamReducer.webcamIsOpen,
     userInfo: state.userReducer.userInfo,
     // private chat
     senderInfo: state.userReducer.userInfo,

@@ -1,6 +1,32 @@
 .webCamCapture {
   position: relative;
-  margin-top: -20px;
-  overflow-x: hidden;
-  overflow-y: auto;
+}
+
+.webCamCapture video {
+  object-fit: cover !important;
+  height: 95vh !important;
+}
+
+.webCamCapture .close__webcam {
+  position: absolute;
+  bottom: 2%;
+  left: 0;
+}
+
+.webCamCapture .capture__image {
+  position: absolute;
+  bottom: 2%;
+  left: 45%;
+}
+
+.webCamCapture .image__view {
+  object-fit: cover !important;
+  height: 95vh !important;
+  width: 100%;
+}
+
+.webCamCapture .send__image {
+  position: absolute;
+  bottom: 2%;
+  right: 0;
 }
