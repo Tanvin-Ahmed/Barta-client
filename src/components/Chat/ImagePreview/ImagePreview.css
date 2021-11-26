@@ -1,0 +1,17 @@
+.ImagePreview .image__view {
+	object-fit: cover !important;
+	height: 95vh !important;
+	width: 100%;
+}
+
+.ImagePreview .send__image {
+	position: absolute;
+	bottom: 2%;
+	right: 0;
+}
+
+.ImagePreview .close__webcam {
+	position: absolute;
+	bottom: 2%;
+	left: 0;
+}

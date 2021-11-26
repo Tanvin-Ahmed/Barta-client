@@ -36,12 +36,15 @@ import {
 } from "../../app/actions/messageAction";
 import AccountDeleteAlert from "../Alert/AccountDeleteAlert/AccountDeleteAlert";
 import { useHistory } from "react-router";
+import WebcamCapture from "../Chat/WebcamCapture/WebcamCapture";
+import ImagePreview from "../Chat/ImagePreview/ImagePreview";
 
 const Home = ({ socket }) => {
   const history = useHistory();
   const myStream = useRef(null);
   const groupPeersRef = useRef([]);
   const dispatch = useDispatch();
+
   const {
     userInfo,
     openGroupCall,
@@ -394,13 +397,19 @@ const Home = ({ socket }) => {
                 <PrivateRoute path="/update-account/:identity">
                   <UpdateAccount />
                 </PrivateRoute>
-                <PrivateRoute path="/chat/:id">
+                <PrivateRoute exact path="/chat/:id">
                   <Chat
                     socket={socket}
                     myStream={myStream}
                     groupPeersRef={groupPeersRef}
                     roomIdOfReceivingGroupCall={roomIdOfReceivingGroupCall}
                   />
+                </PrivateRoute>
+                <PrivateRoute exact path={"/chat/:id/webcam"}>
+                  <WebcamCapture />
+                </PrivateRoute>
+                <PrivateRoute exact path={"/chat/:id/webcam/preview"}>
+                  <ImagePreview />
                 </PrivateRoute>
                 <PrivateRoute path="/chat-settings">
                   <ChatSettings />

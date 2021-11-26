@@ -1,26 +1,26 @@
-import { SET_CAPTURED_IMAGE, SET_WEBCAM_OPEN } from "../types";
+import { SET_CAPTURED_IMAGE, SET_IMAGE_VIEW, SET_WEBCAM_OPEN } from '../types';
 
 const initialState = {
-  webcamIsOpen: false,
-  image: null,
+	image: null,
+	openImageView: false
 };
 
 const webcamReducer = (state = initialState, action) => {
-  switch (action.type) {
-    case SET_WEBCAM_OPEN:
-      return {
-        ...state,
-        webcamIsOpen: action.payload,
-      };
+	switch (action.type) {
+		case SET_CAPTURED_IMAGE:
+			return {
+				...state,
+				image: action.payload
+			};
 
-    case SET_CAPTURED_IMAGE:
-      return {
-        ...state,
-        image: action.payload,
-      };
-    default:
-      return state;
-  }
+		case SET_IMAGE_VIEW:
+			return {
+				...state,
+				openImageView: action.payload
+			};
+		default:
+			return state;
+	}
 };
 
 export default webcamReducer;

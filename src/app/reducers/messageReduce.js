@@ -14,6 +14,7 @@ import {
   REFETCH_MESSAGE,
   GET_MESSAGE_SPINNER,
   GET_OLD_MESSAGES_FROM_DB,
+  DELETE_UNSENT_MESSAGE
 } from "../types";
 
 const initialState = {
@@ -43,6 +44,11 @@ const messageReducer = (state = initialState, action) => {
       return {
         ...state,
         chatMessages: [...action.payload, ...state.chatMessages],
+      };
+    case DELETE_UNSENT_MESSAGE: 
+      return { 
+        ...state,
+        chatMessages: state.chatMessages.filter((_, index) => index !== state.chatMessages.length - 1),
       };
     case GET_MESSAGE_SPINNER:
       return {

@@ -41,6 +41,7 @@ import path from "path";
 import { useState, useEffect } from "react";
 import { Menu, MenuItem } from "@mui/material";
 import { setWebcamOpen } from "../../../app/actions/webcamAction";
+import { useHistory, useParams } from "react-router";
 
 const CallButtons = ({ callUser }) => {
   return (
@@ -477,9 +478,9 @@ export const ChatBody = ({
                                 <a
                                   key={index}
                                   href={
-                                    file.fileId
+                                    file?.fileId
                                       ? `http://localhost:5000/${destination}/file/${file?.filename}`
-                                      : file?.url
+                                      : file?.base64Img ? file?.base64Img : file?.url
                                   }
                                 >
                                   <img
@@ -702,6 +703,7 @@ export const ChatFooter = ({
   handleOnEnter,
   chosenFiles,
   dispatch,
+  id
 }) => {
   const [openEmoji, setOpenEmoji] = useState(false);
   const [message, setMessage] = useState("");
@@ -739,7 +741,7 @@ export const ChatFooter = ({
               className="d-flex justify-content-between align-items-center"
               style={{ flex: 1 }}
             >
-              {!inputText.trim() && <FilePicker dispatch={dispatch} />}
+              {!inputText.trim() && <FilePicker dispatch={dispatch} id={id} />}
               <textarea
                 cols="30"
                 rows="2"
@@ -787,7 +789,7 @@ export const ChatFooter = ({
               className="d-flex justify-content-between align-items-center"
               style={{ flex: 1 }}
             >
-              {!inputText.trim() && <FilePicker dispatch={dispatch} />}
+              {!inputText.trim() && <FilePicker dispatch={dispatch} id={id} />}
               <textarea
                 cols="30"
                 rows="2"
@@ -839,7 +841,8 @@ export const ChatFooter = ({
   );
 };
 
-const FilePicker = ({ dispatch }) => {
+const FilePicker = ({ dispatch, id }) => {
+  const history = useHistory();
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
   const handleClick = (event) => {
@@ -850,7 +853,7 @@ const FilePicker = ({ dispatch }) => {
   };
 
   const handleWebcam = () => {
-    dispatch(setWebcamOpen(true));
+    history.push(`/chat/${id}/webcam`);
     handleClose();
   };
 

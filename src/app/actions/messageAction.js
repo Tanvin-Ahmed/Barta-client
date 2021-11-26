@@ -18,6 +18,7 @@ import {
   GET_FRIEND_INFO,
   SET_GROUP_LIST_FROM_DATABASE,
   SET_WEBCAM_OPEN,
+  DELETE_UNSENT_MESSAGE,
 } from "../types";
 import FileServer from "file-saver";
 import path from "path";
@@ -74,6 +75,11 @@ export const sendMessageInDatabase = (chat) => {
 
 export const uploadFiles = (chosenFiles) => {
   return (dispatch) => {
+  //   for (var pair of chosenFiles.entries()) {
+  //     console.log(pair[0]+ ', ' + pair[1]); 
+  // }
+  //   if(!chosenFiles) return;
+
     const options = {
       onUploadProgress: ({ loaded, total }) => {
         let percent = Math.floor((loaded * 100) / total);
@@ -123,6 +129,10 @@ export const uploadFiles = (chosenFiles) => {
           type: CHAT_ERROR,
           payload: err.message,
         });
+        // Delete: unsent message
+        dispatch({
+          type: DELETE_UNSENT_MESSAGE,
+        })
       });
   };
 };
@@ -251,7 +261,7 @@ export const download = (filename) => {
     .then(({ data }) => {
       FileServer.saveAs(
         data,
-        filename?.split("_")?.join(" ")?.split("◉ ◉")[0] +
+        filename?.split("_")?.join(" ")?.split("◉_◉")[0] +
           path.extname(filename)
       );
     })

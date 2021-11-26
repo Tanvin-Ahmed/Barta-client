@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import "./Chat.css";
 import { useDispatch, useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
+import { useParams, useLocation, Switch, Route } from "react-router-dom";
 import { useHistory } from "react-router";
 import Peer from "simple-peer";
 import {
@@ -41,7 +41,7 @@ import {
   makeGroupCall,
 } from "../PrivateCallSystem/callLogic";
 import { setGroupCallIsOpen } from "../../../app/actions/groupCallAction";
-import WebcamCapture from "../WebcamCapture/WebcamCapture";
+import { setWebcamCapture } from "../../../app/actions/webcamAction";
 
 const Chat = ({
   socket,
@@ -147,6 +147,11 @@ const Chat = ({
   useEffect(() => {
     text.current.selectionEnd = cursorPosition;
   }, [cursorPosition]);
+
+    // clear webcam image
+  useEffect(() => {
+    dispatch(setWebcamCapture(null));
+  }, [dispatch]);
 
   ////////// GET ROOM ID //////////
   const roomId = useMemo(() => {
@@ -354,8 +359,6 @@ const Chat = ({
           connectionRef={connectionRef}
           Peer={Peer}
         />
-      ) : webcamIsOpen ? (
-        <WebcamCapture />
       ) : (
         <>
           <ChatHeader
@@ -405,6 +408,7 @@ const Chat = ({
             handleOnEnter={handleOnEnter}
             chosenFiles={chosenFiles[0]}
             dispatch={dispatch}
+            id={id}
           />
         </>
       )}
