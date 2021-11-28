@@ -18,3 +18,9 @@
 	bottom: 2%;
 	left: 45%;
 }
+
+.webCamCapture .switch__camera {
+	position: absolute;
+	bottom: 2%;
+	right: 0;
+}
