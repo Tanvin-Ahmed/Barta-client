@@ -11,112 +11,112 @@ import CircularProgress from "@mui/material/CircularProgress";
 import { screen } from "./components/Chat/Chat/one_one_chat_logic";
 
 const App = () => {
-  const dispatch = useDispatch();
-  const { tokenVerifySpinner } = useSelector((state) => ({
-    tokenVerifySpinner: state.userReducer.tokenVerifySpinner,
-  }));
+	const dispatch = useDispatch();
+	const { tokenVerifySpinner } = useSelector(state => ({
+		tokenVerifySpinner: state.userReducer.tokenVerifySpinner,
+	}));
 
-  const [showPopup, setShowPopup] = useState(true);
-  const [socket, setSocket] = useState(null);
+	const [showPopup, setShowPopup] = useState(true);
+	const [socket, setSocket] = useState(null);
 
-  ////////////// SCREEN_SIZE //////////////
-  useEffect(() => {
-    window.addEventListener("resize", screen(dispatch));
-    return () => window.removeEventListener("resize", screen(dispatch));
-  }, [dispatch]);
+	////////////// SCREEN_SIZE //////////////
+	useEffect(() => {
+		window.addEventListener("resize", screen(dispatch));
+		return () => window.removeEventListener("resize", screen(dispatch));
+	}, [dispatch]);
 
-  useEffect(() => {
-    const getData = () => {
-      if (navigator.onLine) {
-        dispatch(getUserInfo("firstTime"));
-      }
-    };
-    const conditionOfNetwork = () => {
-      getData();
-    };
-    const webpageLoad = () => {
-      window.addEventListener("online", conditionOfNetwork);
-      window.addEventListener("offline", conditionOfNetwork);
-    };
-    window.addEventListener("load", webpageLoad);
-    getData();
+	useEffect(() => {
+		const getData = () => {
+			if (navigator.onLine) {
+				dispatch(getUserInfo("firstTime"));
+			}
+		};
+		const conditionOfNetwork = () => {
+			getData();
+		};
+		const webpageLoad = () => {
+			window.addEventListener("online", conditionOfNetwork);
+			window.addEventListener("offline", conditionOfNetwork);
+		};
+		window.addEventListener("load", webpageLoad);
+		getData();
 
-    return () => {
-      window.removeEventListener("load", webpageLoad);
-      window.removeEventListener("online", conditionOfNetwork);
-      window.removeEventListener("offline", conditionOfNetwork);
-    };
-  }, [dispatch]);
+		return () => {
+			window.removeEventListener("load", webpageLoad);
+			window.removeEventListener("online", conditionOfNetwork);
+			window.removeEventListener("offline", conditionOfNetwork);
+		};
+	}, [dispatch]);
 
-  // socket
-  useEffect(() => {
-    const s = io("http://localhost:5000/");
-    setSocket(s);
+	// socket
+	useEffect(() => {
+		const s = io("https://git.heroku.com/barta-the-real-time-chat-app.git/");
+		setSocket(s);
 
-    return () => s.close();
-  }, []);
+		return () => s.close();
+	}, []);
 
-  // refresh jwt
-  useEffect(() => {
-    setInterval(() => {
-      dispatch(getUserInfo());
-    }, 60 * 60000);
-  }, [dispatch]);
+	// refresh jwt
+	useEffect(() => {
+		setInterval(() => {
+			dispatch(getUserInfo());
+		}, 60 * 60000);
+	}, [dispatch]);
 
-  // PREVENT RELOAD PAGE //
-  useEffect(() => {
-    const preventReload = (e) => {
-      const ev = e || window.event;
-      if (ev.keyCode === 116) {
-        // F5 button
-        ev.preventDefault();
-      } else if (ev.keyCode === 82 && ev.ctrlKey) {
-        // ctrl + r
-        ev.preventDefault();
-      } else if (ev.keyCode === 123) {
-        // F12
-        ev.preventDefault();
-      } else if (ev.keyCode === 73 && ev.shiftKey && ev.ctrlKey) {
-        // ctrl + shift + i
-        ev.preventDefault();
-      }
-    };
-    document.addEventListener("keydown", preventReload);
+	// PREVENT RELOAD PAGE //
+	useEffect(() => {
+		const preventReload = e => {
+			const ev = e || window.event;
+			if (ev.keyCode === 116) {
+				// F5 button
+				ev.preventDefault();
+			} else if (ev.keyCode === 82 && ev.ctrlKey) {
+				// ctrl + r
+				ev.preventDefault();
+			} else if (ev.keyCode === 123) {
+				// F12
+				ev.preventDefault();
+			} else if (ev.keyCode === 73 && ev.shiftKey && ev.ctrlKey) {
+				// ctrl + shift + i
+				ev.preventDefault();
+			}
+		};
+		document.addEventListener("keydown", preventReload);
 
-    return () => document.removeEventListener("keydown", preventReload);
-  }, []);
+		return () => document.removeEventListener("keydown", preventReload);
+	}, []);
 
-  // reload issue ///
-  // useEffect(() => {
-  //   const reload = (e) => {
-  //     e.returnValue = "Data will be lost if you leave the page, are you sure?";
-  //   };
-  //   window.addEventListener("beforeunload", reload);
+	// reload issue ///
+	// useEffect(() => {
+	//   const reload = (e) => {
+	//     e.returnValue = "Data will be lost if you leave the page, are you sure?";
+	//   };
+	//   window.addEventListener("beforeunload", reload);
 
-  //   return () => window.removeEventListener("beforeunload", reload);
-  // }, []);
+	//   return () => window.removeEventListener("beforeunload", reload);
+	// }, []);
 
-  // popup-message
-  useEffect(() => {
-    const message = JSON.parse(sessionStorage.getItem("barta/popup-message"));
-    if (message === true || message === false) {
-      setShowPopup(message);
-    }
-  }, []);
+	// popup-message
+	useEffect(() => {
+		const message = JSON.parse(sessionStorage.getItem("barta/popup-message"));
+		if (message === true || message === false) {
+			setShowPopup(message);
+		}
+	}, []);
 
-  return (
-    <div className="App">
-      {showPopup ? (
-        <PopupMessage setShowPopup={setShowPopup} />
-      ) : tokenVerifySpinner ? (
-        <div className="token__spinner">
-          <CircularProgress className="spinner" size="small" />
-        </div>
-      ) : (
-        socket && <Home socket={socket} />
-      )}
-    </div>
-  );
+	return (
+		<div className="App">
+			{showPopup ? (
+				<PopupMessage setShowPopup={setShowPopup} />
+			) : tokenVerifySpinner ? (
+				<div className="token__spinner">
+					<CircularProgress className="spinner" size="small" />
+				</div>
+			) : (
+				socket && <Home socket={socket} />
+			)}
+		</div>
+	);
 };
 
 export default App;

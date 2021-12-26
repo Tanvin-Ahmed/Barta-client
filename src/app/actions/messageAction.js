@@ -44,9 +44,11 @@ export const sendMessageInDatabase = chat => {
 
 		let URL;
 		if (JSON.parse(sessionStorage.getItem("barta/groupId"))?.groupId) {
-			URL = "http://localhost:5000/groupChat/messages/post";
+			URL =
+				"https://git.heroku.com/barta-the-real-time-chat-app.git/groupChat/messages/post";
 		} else {
-			URL = "http://localhost:5000/chatMessage/postOneOneChat";
+			URL =
+				"https://git.heroku.com/barta-the-real-time-chat-app.git/chatMessage/postOneOneChat";
 		}
 
 		axios
@@ -108,7 +110,11 @@ export const uploadFiles = chosenFiles => {
 		}
 
 		axios
-			.post(`http://localhost:5000/${destination}/upload`, chosenFiles, options)
+			.post(
+				`https://git.heroku.com/barta-the-real-time-chat-app.git/${destination}/upload`,
+				chosenFiles,
+				options
+			)
 			.then(() => {
 				dispatch({
 					type: CHAT_UPLOAD_PERCENTAGE,
@@ -166,9 +172,9 @@ export const getMessagesFromDatabase = (data, oldMessage = false) => {
 
 		let URL;
 		if (JSON.parse(sessionStorage.getItem("barta/groupId"))?.groupId) {
-			URL = `http://localhost:5000/groupChat/messages/${data?.roomId}`;
+			URL = `https://git.heroku.com/barta-the-real-time-chat-app.git/groupChat/messages/${data?.roomId}`;
 		} else {
-			URL = `http://localhost:5000/chatMessage/getOneOneChat/${data?.roomId}`;
+			URL = `https://git.heroku.com/barta-the-real-time-chat-app.git/chatMessage/getOneOneChat/${data?.roomId}`;
 		}
 
 		axios
@@ -258,7 +264,7 @@ export const download = filename => {
 	}
 	axios({
 		method: "GET",
-		url: `http://localhost:5000/${destination}/file/${filename}`,
+		url: `https://git.heroku.com/barta-the-real-time-chat-app.git/${destination}/file/${filename}`,
 		responseType: "blob",
 	})
 		.then(({ data }) => {
@@ -279,12 +285,16 @@ export const updateChatMessage = react => {
 		destination = "chatMessage";
 	}
 	axios
-		.put(`http://localhost:5000/${destination}/updateChatMessage`, react, {
-			headers: {
-				Authorization:
-					"Bearer " + JSON.parse(localStorage.getItem("accessToken")),
-			},
-		})
+		.put(
+			`https://git.heroku.com/barta-the-real-time-chat-app.git/${destination}/updateChatMessage`,
+			react,
+			{
+				headers: {
+					Authorization:
+						"Bearer " + JSON.parse(localStorage.getItem("accessToken")),
+				},
+			}
+		)
 		.then(() => console.log("update message successfully"))
 		.catch(() => alert("react not set, please try again"));
 };
@@ -297,12 +307,16 @@ export const updatePreReact = react => {
 		destination = "chatMessage";
 	}
 	axios
-		.put(`http://localhost:5000/${destination}/updateOnlyReact`, react, {
-			headers: {
-				Authorization:
-					"Bearer " + JSON.parse(localStorage.getItem("accessToken")),
-			},
-		})
+		.put(
+			`https://git.heroku.com/barta-the-real-time-chat-app.git/${destination}/updateOnlyReact`,
+			react,
+			{
+				headers: {
+					Authorization:
+						"Bearer " + JSON.parse(localStorage.getItem("accessToken")),
+				},
+			}
+		)
 		.then(() => console.log("update message successfully"))
 		.catch(() => alert("react not set, please try again"));
 };
@@ -315,12 +329,16 @@ export const deleteReact = react => {
 		destination = "chatMessage";
 	}
 	axios
-		.put(`http://localhost:5000/${destination}/removeReact`, react, {
-			headers: {
-				Authorization:
-					"Bearer " + JSON.parse(localStorage.getItem("accessToken")),
-			},
-		})
+		.put(
+			`https://git.heroku.com/barta-the-real-time-chat-app.git/${destination}/removeReact`,
+			react,
+			{
+				headers: {
+					Authorization:
+						"Bearer " + JSON.parse(localStorage.getItem("accessToken")),
+				},
+			}
+		)
 		.then(() => console.log("update message successfully"))
 		.catch(() => alert("react not remove, please try again"));
 };
@@ -333,12 +351,15 @@ const deleteChatMessage = id => {
 		destination = "chatMessage";
 	}
 	axios
-		.delete(`http://localhost:5000/${destination}/deleteChatMessage/${id}`, {
-			headers: {
-				Authorization:
-					"Bearer " + JSON.parse(localStorage.getItem("accessToken")),
-			},
-		})
+		.delete(
+			`https://git.heroku.com/barta-the-real-time-chat-app.git/${destination}/deleteChatMessage/${id}`,
+			{
+				headers: {
+					Authorization:
+						"Bearer " + JSON.parse(localStorage.getItem("accessToken")),
+				},
+			}
+		)
 		.then(() => console.log("deleted successfully"))
 		.catch(() => alert("failed to delete, please try again"));
 };
@@ -354,12 +375,15 @@ export const deleteChat = message => {
 		for (let i = 0; i < message?.files.length; i++) {
 			const id = message?.files[i].fileId;
 			axios
-				.delete(`http://localhost:5000/${destination}/file/delete/${id}`, {
-					headers: {
-						Authorization:
-							"Bearer " + JSON.parse(localStorage.getItem("accessToken")),
-					},
-				})
+				.delete(
+					`https://git.heroku.com/barta-the-real-time-chat-app.git/${destination}/file/delete/${id}`,
+					{
+						headers: {
+							Authorization:
+								"Bearer " + JSON.parse(localStorage.getItem("accessToken")),
+						},
+					}
+				)
 				.then(() => {
 					console.log("delete file successfully");
 					if (i === message?.files?.length - 1) {
@@ -475,13 +499,17 @@ export const updateMessageStatus = ids => {
 		destination = "chatMessage";
 	}
 	axios
-		.post(`http://localhost:5000/${destination}/unseen-message-to-seen`, ids, {
-			headers: {
-				Authorization: `Bearer ${JSON.parse(
-					localStorage.getItem("accessToken")
-				)}`,
-			},
-		})
+		.post(
+			`https://git.heroku.com/barta-the-real-time-chat-app.git/${destination}/unseen-message-to-seen`,
+			ids,
+			{
+				headers: {
+					Authorization: `Bearer ${JSON.parse(
+						localStorage.getItem("accessToken")
+					)}`,
+				},
+			}
+		)
 		.catch(err => console.log(err.response));
 };
 
@@ -560,7 +588,7 @@ export const deleteMessageFromChatBar = (id, chatList, groups) => {
 		groups.forEach(group => {
 			if (group?.lastMessage?._id === id) {
 				axios(
-					`http://localhost:5000/groupChat/get-lastMessage-for-chatBar/${group?._id}`,
+					`https://git.heroku.com/barta-the-real-time-chat-app.git/groupChat/get-lastMessage-for-chatBar/${group?._id}`,
 					{
 						headers: {
 							Authorization:
@@ -581,7 +609,7 @@ export const deleteMessageFromChatBar = (id, chatList, groups) => {
 		chatList.forEach(friend => {
 			if (friend.lastMessage?._id === id) {
 				axios(
-					`http://localhost:5000/chatMessage/get-lastMessage-for-chatBar/${friend?.lastMessage?.id}`,
+					`https://git.heroku.com/barta-the-real-time-chat-app.git/chatMessage/get-lastMessage-for-chatBar/${friend?.lastMessage?.id}`,
 					{
 						headers: {
 							Authorization:
@@ -612,7 +640,7 @@ export const deleteConversation = (roomId, setLoading, setMessage) => {
 	}
 	axios
 		.delete(
-			`http://localhost:5000/${destination}/delete-conversation/${roomId}`,
+			`https://git.heroku.com/barta-the-real-time-chat-app.git/${destination}/delete-conversation/${roomId}`,
 			{
 				headers: {
 					Authorization:

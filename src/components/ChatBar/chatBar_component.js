@@ -60,7 +60,7 @@ export const ChatBarHeader = ({ userPhotoURL, photoId, name }) => {
 							src={
 								userPhotoURL
 									? userPhotoURL
-									: `http://localhost:5000/user/account/get-profile-img/${photoId}`
+									: `https://git.heroku.com/barta-the-real-time-chat-app.git/user/account/get-profile-img/${photoId}`
 							}
 						/>
 						<div className="onLine" />
@@ -141,7 +141,7 @@ export const ChatList = ({
 											src={
 												friend?.photoURL
 													? friend?.photoURL
-													: `http://localhost:5000/user/account/get-profile-img/${friend?.photoId}`
+													: `https://git.heroku.com/barta-the-real-time-chat-app.git/user/account/get-profile-img/${friend?.photoId}`
 											}
 										/>
 										<div
@@ -392,7 +392,7 @@ export const GroupList = ({
 								>
 									<div style={{ position: "relative" }} className="mr-3">
 										<Avatar
-											src={`http://localhost:5000/groupAccount/get-profile-img/${group?.photoId}`}
+											src={`https://git.heroku.com/barta-the-real-time-chat-app.git/groupAccount/get-profile-img/${group?.photoId}`}
 										/>
 										<div
 											className={
@@ -661,7 +661,7 @@ export const SearchFriend = ({
 									size="small"
 								/>
 								<Avatar
-									src={`http://localhost:5000/user/account/get-profile-img/${selectedId?.photoId}`}
+									src={`https://git.heroku.com/barta-the-real-time-chat-app.git/user/account/get-profile-img/${selectedId?.photoId}`}
 								/>
 							</div>
 						))}
@@ -714,7 +714,7 @@ export const SearchFriend = ({
 								>
 									<div className="mr-3">
 										<Avatar
-											src={`http://localhost:5000/user/account/get-profile-img/${otherUser?.photoId}`}
+											src={`https://git.heroku.com/barta-the-real-time-chat-app.git/user/account/get-profile-img/${otherUser?.photoId}`}
 										/>
 									</div>
 									<h6 className="m-4">{otherUser?.displayName}</h6>
@@ -762,7 +762,7 @@ export const FinalProcessToCreateGroup = ({
 								size="small"
 							/>
 							<Avatar
-								src={`http://localhost:5000/user/account/get-profile-img/${selectedId?.photoId}`}
+								src={`https://git.heroku.com/barta-the-real-time-chat-app.git/user/account/get-profile-img/${selectedId?.photoId}`}
 							/>
 						</div>
 					))}
