@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import "./Chat.css";
 import { useDispatch, useSelector } from "react-redux";
-import { useParams, useLocation, Switch, Route } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useHistory } from "react-router";
 import Peer from "simple-peer";
 import {
@@ -11,6 +11,7 @@ import {
 	handleSendMessage,
 } from "./one_one_chat_logic";
 import {
+	AudioRecorder,
 	ChatBody,
 	ChatFooter,
 	ChatHeader,
@@ -94,6 +95,7 @@ const Chat = ({
 		myName,
 		receivingCall,
 		timer,
+		interVal,
 		videoChat,
 		userStatusToReceiveOtherCall,
 		showCallButtons,
@@ -122,6 +124,7 @@ const Chat = ({
 		myName: state.privateCall.myName,
 		receivingCall: state.privateCall.receivingCall,
 		timer: state.privateCall.timer,
+		interVal: state.privateCall.interVal,
 		videoChat: state.privateCall.videoChat,
 		userStatusToReceiveOtherCall:
 			state.privateCall.userStatusToReceiveOtherCall,
@@ -129,6 +132,7 @@ const Chat = ({
 		// group call
 		showCallButtons: state.groupCallReducer.showCallButtons,
 	}));
+	const [openAudioRecorder, setOpenAudioRecorder] = useState(false);
 	const [inputText, setInputText] = useState("");
 	const text = useRef(null);
 	const [cursorPosition, setCursorPosition] = useState(null);
@@ -375,9 +379,9 @@ const Chat = ({
 						openEmoji={openEmoji}
 					/>
 
-					{uploadPercentage > 0 && (
+					{uploadPercentage > 0 ? (
 						<UploadProgressBar uploadPercentage={uploadPercentage} />
-					)}
+					) : null}
 					<ChatBody
 						chatMessage={chatMessage}
 						senderInfo={senderInfo}
@@ -413,7 +417,18 @@ const Chat = ({
 						id={id}
 						openEmoji={openEmoji}
 						setOpenEmoji={setOpenEmoji}
+						setOpenAudioRecorder={setOpenAudioRecorder}
 					/>
+					{openAudioRecorder ? (
+						<AudioRecorder
+							timer={timer}
+							dispatch={dispatch}
+							interval={interVal}
+							setOpenAudioRecorder={setOpenAudioRecorder}
+							roomId={roomId}
+							sender={senderInfo?.email}
+						/>
+					) : null}
 				</>
 			)}
 		</section>

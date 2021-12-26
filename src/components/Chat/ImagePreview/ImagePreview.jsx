@@ -36,9 +36,9 @@ const ImagePreview = () => {
 			});
 
 		const message = {
-			url: image,
-			contentType: "image/jpeg",
-			name: `${Date.now()}.jpeg`,
+			files: [
+				{ url: image, contentType: "image/jpeg", name: `${Date.now()}.jpeg` },
+			],
 			sender: userInfo?.email,
 		};
 

@@ -14,6 +14,8 @@ import Picker from "emoji-picker-react";
 import CheckIcon from "@mui/icons-material/Check";
 import DoneAllIcon from "@mui/icons-material/DoneAll";
 import CameraAltIcon from "@mui/icons-material/CameraAlt";
+import KeyboardVoiceIcon from "@mui/icons-material/KeyboardVoice";
+import SettingsVoiceIcon from "@mui/icons-material/SettingsVoice";
 import {
 	deleteChosenFiles,
 	fileUpload,
@@ -25,7 +27,12 @@ import {
 import AddCircleIcon from "@material-ui/icons/AddCircle";
 import InsertPhotoIcon from "@material-ui/icons/InsertPhoto";
 import VideoLibraryIcon from "@material-ui/icons/VideoLibrary";
-import { deleteChat, download } from "../../../app/actions/messageAction";
+import {
+	deleteChat,
+	download,
+	uploadFiles,
+	setMessage,
+} from "../../../app/actions/messageAction";
 import HighlightOffIcon from "@material-ui/icons/HighlightOff";
 import DeleteIcon from "@material-ui/icons/Delete";
 import AddReactionIcon from "@material-ui/icons/AddReaction";
@@ -41,6 +48,11 @@ import path from "path";
 import { useState, useEffect } from "react";
 import { Menu, MenuItem } from "@mui/material";
 import { useHistory } from "react-router";
+import { start, end } from "../PrivateCallSystem/timer";
+import ClearIcon from "@mui/icons-material/Clear";
+import PauseCircleIcon from "@mui/icons-material/PauseCircle";
+import StopIcon from "@mui/icons-material/Stop";
+import { setCallTimer } from "../../../app/actions/privateCallAction";
 
 const CallButtons = ({ callUser }) => {
 	return (
@@ -479,8 +491,11 @@ export const ChatBody = ({
 										<div className="d-flex justify-content-center align-items-center flex-wrap">
 											{message?.files?.length > 0 ? (
 												<SRLWrapper options={option}>
-													{message.files?.map((file, index) => {
-														if (file.contentType.split("/")[0] === "image") {
+													{message?.files?.map((file, index) => {
+														if (
+															file?.contentType?.split("/")[0] === "image" ||
+															file?.type?.split("/")[0] === "image"
+														) {
 															return (
 																<a
 																	key={index}
@@ -505,7 +520,8 @@ export const ChatBody = ({
 																</a>
 															);
 														} else if (
-															file.contentType.split("/")[0] === "video"
+															file?.contentType?.split("/")[0] === "video" ||
+															file?.type?.split("/")[0] === "video"
 														) {
 															return (
 																<div
@@ -534,7 +550,9 @@ export const ChatBody = ({
 																</div>
 															);
 														} else if (
-															file.contentType.split("/")[0] === "application"
+															file?.contentType?.split("/")[0] ===
+																"application" ||
+															file?.type?.split("/")[0] === "application"
 														) {
 															return (
 																<div
@@ -559,6 +577,35 @@ export const ChatBody = ({
 																			?.split("◉_◉")[0] +
 																			path.extname(file.filename)}
 																	</div>
+																</div>
+															);
+														} else if (
+															file?.contentType?.split("/")[0] === "audio" ||
+															file?.type?.split("/")[0] === "audio"
+														) {
+															return (
+																<div
+																	key={index}
+																	className="d-flex justify-content-center align-items-center"
+																>
+																	<IconButton
+																		variant="contained"
+																		size="small"
+																		onClick={() => download(file.filename)}
+																		className="icon download__icon text-light"
+																	>
+																		<ArrowDownwardIcon />
+																	</IconButton>
+																	<audio
+																		key={file.fileId || index}
+																		className="d-flex justify-content-center align-items-center p-1 my-2 audio_player"
+																		src={
+																			file.fileId
+																				? `http://localhost:5000/${destination}/file/${file?.filename}`
+																				: file?.url
+																		}
+																		controls
+																	></audio>
 																</div>
 															);
 														}
@@ -715,13 +762,20 @@ const TextInput = ({
 	setOpenEmoji,
 	chosenFiles,
 	handleOnEnter,
+	setOpenAudioRecorder,
 }) => {
 	return (
 		<div
 			className="d-flex justify-content-between align-items-center"
 			style={{ flex: 1 }}
 		>
-			{!inputText.trim() && <FilePicker dispatch={dispatch} id={id} />}
+			{!inputText.trim() && (
+				<FilePicker
+					dispatch={dispatch}
+					id={id}
+					setOpenAudioRecorder={setOpenAudioRecorder}
+				/>
+			)}
 			<textarea
 				cols="30"
 				rows="2"
@@ -777,6 +831,7 @@ export const ChatFooter = ({
 	id,
 	openEmoji,
 	setOpenEmoji,
+	setOpenAudioRecorder,
 }) => {
 	const [message, setMessage] = useState("");
 	const [cursorPosition, setCursorPosition] = useState(null);
@@ -822,6 +877,7 @@ export const ChatFooter = ({
 						setOpenEmoji={setOpenEmoji}
 						chosenFiles={chosenFiles}
 						handleOnEnter={handleOnEnter}
+						setOpenAudioRecorder={setOpenAudioRecorder}
 					/>
 				) : (
 					<TextInput
@@ -838,6 +894,7 @@ export const ChatFooter = ({
 						setOpenEmoji={setOpenEmoji}
 						chosenFiles={chosenFiles}
 						handleOnEnter={handleOnEnter}
+						setOpenAudioRecorder={setOpenAudioRecorder}
 					/>
 				)}
 			</div>
@@ -854,7 +911,7 @@ export const ChatFooter = ({
 	);
 };
 
-const FilePicker = ({ dispatch, id }) => {
+const FilePicker = ({ dispatch, id, setOpenAudioRecorder }) => {
 	const history = useHistory();
 	const [anchorEl, setAnchorEl] = useState(null);
 	const open = Boolean(anchorEl);
@@ -867,6 +924,11 @@ const FilePicker = ({ dispatch, id }) => {
 
 	const handleWebcam = () => {
 		history.push(`/chat/${id}/webcam`);
+		handleClose();
+	};
+
+	const handleVoice = () => {
+		setOpenAudioRecorder(true);
 		handleClose();
 	};
 
@@ -894,6 +956,13 @@ const FilePicker = ({ dispatch, id }) => {
 				<MenuItem style={{ backgroundColor: "black" }} onClick={handleWebcam}>
 					<span style={{ color: "rgb(144, 89, 233)" }}>Take </span>
 					<CameraAltIcon style={{ color: "rgb(144, 89, 233)" }} size="small" />
+				</MenuItem>
+				<MenuItem style={{ backgroundColor: "black" }} onClick={handleVoice}>
+					<span style={{ color: "rgb(144, 89, 233)" }}>Voice </span>
+					<KeyboardVoiceIcon
+						style={{ color: "rgb(144, 89, 233)" }}
+						size="small"
+					/>
 				</MenuItem>
 				<MenuItem
 					style={{ backgroundColor: "black" }}
@@ -941,6 +1010,149 @@ const FilePicker = ({ dispatch, id }) => {
 					</label>
 				</MenuItem>
 			</Menu>
+		</div>
+	);
+};
+
+export const AudioRecorder = ({
+	timer,
+	dispatch,
+	interval,
+	setOpenAudioRecorder,
+	roomId,
+	sender,
+}) => {
+	const [data, setData] = useState(null);
+	const [status, setStatus] = useState("pause");
+	const [stream, setStream] = useState(null);
+
+	const handleRecord = () => {
+		setStatus("play");
+		navigator.mediaDevices
+			.getUserMedia({ audio: true })
+			.then(stream => {
+				setStream(stream);
+				start(timer, dispatch);
+				const items = [];
+				const recorder = new MediaRecorder(stream);
+				recorder.ondataavailable = e => {
+					items.push(e.data);
+					if (recorder.state === "inactive") {
+						const blob = new Blob(items, { type: "audio/webm" });
+						setData(blob);
+					}
+				};
+				recorder.start();
+			})
+			.catch(err => {
+				alert(err.message);
+			});
+	};
+
+	const handleStop = stream => {
+		stream?.getTracks()?.forEach(track => {
+			if (track.readyState === "live") {
+				track.stop();
+			}
+		});
+	};
+
+	const handleClose = () => {
+		setOpenAudioRecorder(false);
+		setData(null);
+		setStream(null);
+		handleStop(stream);
+		dispatch(setCallTimer({ s: 0, m: 0, h: 0 }));
+	};
+
+	const handleSend = (data, stream) => {
+		const audio = new FormData();
+		audio.append("file", data);
+		audio.append("id", roomId);
+		audio.append("status", "unseen");
+		audio.append("sender", sender);
+		audio.append("timeStamp", new Date().toUTCString());
+
+		const message = {
+			files: [
+				{
+					url: URL.createObjectURL(data),
+					contentType: "audio/webm",
+					name: `${Date.now()}.jpeg`,
+				},
+			],
+			sender,
+			status: "unseen",
+		};
+
+		dispatch(setMessage(message));
+		dispatch(uploadFiles(audio));
+
+		setOpenAudioRecorder(false);
+		setData(null);
+		setStream(null);
+		handleStop(stream);
+		dispatch(setCallTimer({ s: 0, m: 0, h: 0 }));
+	};
+
+	const handlePause = stream => {
+		setStatus("pause");
+		handleStop(stream);
+		end(interval);
+	};
+
+	return (
+		<div className="audio_recorder">
+			<div onClick={handleClose} className="back__drop"></div>
+			<div className="recorder_container">
+				<div className="d-flex justify-content-center align-items-center">
+					<SettingsVoiceIcon
+						style={{ color: "#fff", fontSize: "3em" }}
+						fontSize="large"
+					/>
+					<Timer timer={timer} />
+				</div>
+				{data ? (
+					<div className="text-center my-3">
+						<audio
+							style={{ width: "90%" }}
+							src={URL.createObjectURL(data)}
+							controls
+						/>
+					</div>
+				) : null}
+				<div className="d-flex justify-content-around align-items-center">
+					<IconButton
+						onClick={handleClose}
+						style={{ background: "rgb(255, 73, 73)", color: "#fff" }}
+					>
+						<ClearIcon fontSize="small" />
+					</IconButton>
+					{status === "pause" ? (
+						<IconButton
+							title="start"
+							onClick={handleRecord}
+							style={{ background: "rgb(255, 9, 193)", color: "#fff" }}
+						>
+							<StopIcon fontSize="small" />
+						</IconButton>
+					) : (
+						<IconButton
+							title="stop"
+							onClick={() => handlePause(stream)}
+							style={{ background: "rgb(255, 9, 193)", color: "#fff" }}
+						>
+							<PauseCircleIcon fontSize="small" />
+						</IconButton>
+					)}
+					<IconButton
+						onClick={() => handleSend(data)}
+						style={{ background: "dodgerblue", color: "#fff" }}
+					>
+						<SendIcon fontSize="small" />
+					</IconButton>
+				</div>
+			</div>
 		</div>
 	);
 };
