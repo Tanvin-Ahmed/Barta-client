@@ -1,0 +1,27 @@
+.videoPreview {
+	height: 95vh;
+	width: 100%;
+	position: relative;
+}
+
+.videoPreview .view_video {
+	object-fit: cover !important;
+	height: 95vh !important;
+	width: 100%;
+}
+
+.videoPreview .close_btn {
+	position: absolute;
+	left: 5%;
+	bottom: 12%;
+	transform: translate(-50%, 0);
+	z-index: 500;
+}
+
+.videoPreview .send_btn {
+	position: absolute;
+	right: 0;
+	bottom: 12%;
+	transform: translate(-50%, 0);
+	z-index: 500;
+}

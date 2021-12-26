@@ -132,6 +132,7 @@ const Chat = ({
 	const [inputText, setInputText] = useState("");
 	const text = useRef(null);
 	const [cursorPosition, setCursorPosition] = useState(null);
+	const [openEmoji, setOpenEmoji] = useState(false);
 
 	const onEmojiClick = (event, { emoji }) => {
 		const ref = text.current;
@@ -371,6 +372,7 @@ const Chat = ({
 						acceptCall={acceptCall}
 						// settings
 						history={history}
+						openEmoji={openEmoji}
 					/>
 
 					{uploadPercentage > 0 && (
@@ -387,6 +389,7 @@ const Chat = ({
 						getMessageSpinner={getMessageSpinner}
 						getOldMessage={getOldMessage}
 						reFetchMessage={reFetchMessage}
+						openEmoji={openEmoji}
 					/>
 
 					{chosenFiles[0] && (
@@ -408,6 +411,8 @@ const Chat = ({
 						chosenFiles={chosenFiles[0]}
 						dispatch={dispatch}
 						id={id}
+						openEmoji={openEmoji}
+						setOpenEmoji={setOpenEmoji}
 					/>
 				</>
 			)}

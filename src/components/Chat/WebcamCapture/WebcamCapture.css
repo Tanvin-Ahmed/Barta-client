@@ -2,6 +2,15 @@
 	position: relative;
 }
 
+.optionShowLayer {
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 13%;
+	z-index: 200;
+}
+
 .webCamCapture video {
 	object-fit: cover !important;
 	height: 95vh !important;
@@ -11,16 +20,64 @@
 	position: absolute;
 	bottom: 2%;
 	left: 0;
+	z-index: 500;
 }
 
 .webCamCapture .capture__image {
 	position: absolute;
 	bottom: 2%;
-	left: 45%;
+	left: 50%;
+	transform: translate(-50%, 0);
+	z-index: 500;
 }
 
 .webCamCapture .switch__camera {
 	position: absolute;
 	bottom: 2%;
 	right: 0;
+	z-index: 500;
+}
+
+.webCamCapture .webcamSwitchBtnGroup {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	position: absolute;
+	bottom: 15%;
+	left: 50%;
+	transform: translate(-50%, 0);
+	z-index: 500;
+}
+
+.webCamCapture .webcamSwitchBtnGroup .imageBtn,
+.webCamCapture .webcamSwitchBtnGroup .videoBtn {
+	border: 0;
+	border-radius: 5px;
+	color: white;
+	padding: 0 0.5rem;
+	font-size: 13px;
+	letter-spacing: 1px;
+	font-weight: 600;
+}
+
+.webCamCapture .webcamSwitchBtnGroup .imageBtn {
+	background-color: dodgerblue;
+}
+
+.webCamCapture .webcamSwitchBtnGroup .videoBtn {
+	background-color: rgb(255, 17, 0);
+}
+
+.webCamCapture .stop_icon {
+	position: absolute;
+	bottom: 2%;
+	left: 70%;
+	z-index: 500;
+}
+
+.webCamCapture .timer {
+	position: absolute;
+	top: 80%;
+	left: 50%;
+	z-index: 500;
 }

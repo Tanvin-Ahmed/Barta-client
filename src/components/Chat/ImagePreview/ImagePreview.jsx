@@ -6,28 +6,17 @@ import { uploadFiles, setMessage } from "../../../app/actions/messageAction";
 import { useDispatch, useSelector } from "react-redux";
 import { IconButton } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import { useHistory, useParams } from "react-router";
+import { useHistory } from "react-router";
 
 const ImagePreview = () => {
 	const history = useHistory();
 	const dispatch = useDispatch();
-	const { id } = useParams();
 
 	const { image, roomId, userInfo } = useSelector(state => ({
 		image: state.webcamReducer.image,
 		roomId: state.messageReducer.roomId,
 		userInfo: state.userReducer.userInfo,
 	}));
-
-	const _base64ToArrayBuffer = base64 => {
-		var binary_string = window.atob(base64);
-		var len = binary_string.length;
-		var bytes = new Uint8Array(len);
-		for (var i = 0; i < len; i++) {
-			bytes[i] = binary_string.charCodeAt(i);
-		}
-		return bytes.buffer;
-	};
 
 	const handleSendImage = () => {
 		fetch(image)
@@ -54,7 +43,7 @@ const ImagePreview = () => {
 		};
 
 		dispatch(setMessage(message));
-		history.push(`/chat/${id}`);
+		history.push(`/chat/${roomId}`);
 	};
 	return (
 		<section className="ImagePreview">

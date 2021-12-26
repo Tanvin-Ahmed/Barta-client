@@ -42,6 +42,12 @@ export const DELETE_UNSENT_MESSAGE = "delete_unsent_message";
 export const SET_CAPTURED_IMAGE = "set_captured_image";
 export const SET_IMAGE_VIEW = "set_image_view";
 export const TOGGLE_CAMERA = "toggle_camera";
+export const SET_WEBCAM_MOOD = "set_webcam_mood";
+export const OPEN_CAMERA_MOOD_CHANGE_OPTION = "open_camera_mood_change_option";
+export const CAPTURING_VIDEO = "capturing_video";
+export const SET_RECORDED_CHUNKS = "set_recorded_chunks";
+export const SET_VIDEO_BLOB = "set_video_blob";
+export const SET_VIDEO_URL = "set_video_url";
 
 // file upload
 export const SELECTED_FILES = "selected_files";
