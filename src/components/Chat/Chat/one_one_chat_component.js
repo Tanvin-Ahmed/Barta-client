@@ -892,7 +892,7 @@ const FilePicker = ({ dispatch, id }) => {
 				}}
 			>
 				<MenuItem style={{ backgroundColor: "black" }} onClick={handleWebcam}>
-					<span style={{ color: "rgb(144, 89, 233)" }}>Take photo</span>
+					<span style={{ color: "rgb(144, 89, 233)" }}>Take </span>
 					<CameraAltIcon style={{ color: "rgb(144, 89, 233)" }} size="small" />
 				</MenuItem>
 				<MenuItem
