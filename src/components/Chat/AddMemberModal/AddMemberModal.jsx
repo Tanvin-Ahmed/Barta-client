@@ -113,7 +113,7 @@ const AddMemberModal = ({ setIsOpen, groupMembers }) => {
 											src={
 												member?.photoURL
 													? member.photoURL
-													: `https://git.heroku.com/barta-the-real-time-chat-app.git/user/account/get-profile-img/${member?.photoId}`
+													: `https://barta-the-real-time-chat-app.herokuapp.com/user/account/get-profile-img/${member?.photoId}`
 											}
 										/>
 									</Badge>
@@ -173,7 +173,7 @@ const AddMemberModal = ({ setIsOpen, groupMembers }) => {
 												src={
 													user?.PhotoURL
 														? user.PhotoURL
-														: `https://git.heroku.com/barta-the-real-time-chat-app.git/user/account/get-profile-img/${user?.photoId}`
+														: `https://barta-the-real-time-chat-app.herokuapp.com/user/account/get-profile-img/${user?.photoId}`
 												}
 											/>
 											<p className="ml-2">{user?.displayName}</p>

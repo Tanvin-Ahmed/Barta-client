@@ -50,7 +50,7 @@ const App = () => {
 
 	// socket
 	useEffect(() => {
-		const s = io("https://git.heroku.com/barta-the-real-time-chat-app.git/");
+		const s = io("https://barta-the-real-time-chat-app.herokuapp.com/");
 		setSocket(s);
 
 		return () => s.close();

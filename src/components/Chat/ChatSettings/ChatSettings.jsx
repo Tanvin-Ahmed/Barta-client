@@ -58,8 +58,8 @@ const ChatSettings = () => {
 						information?.photoURL
 							? information.photoURL
 							: JSON.parse(sessionStorage.getItem("barta/groupId"))?.groupId
-							? `https://git.heroku.com/barta-the-real-time-chat-app.git/groupAccount/get-profile-img/${information?.photoId}`
-							: `https://git.heroku.com/barta-the-real-time-chat-app.git/user/account/get-profile-img/${information?.photoId}`
+							? `https://barta-the-real-time-chat-app.herokuapp.com/groupAccount/get-profile-img/${information?.photoId}`
+							: `https://barta-the-real-time-chat-app.herokuapp.com/user/account/get-profile-img/${information?.photoId}`
 					}
 					style={{ height: "10rem", width: "10rem" }}
 				/>

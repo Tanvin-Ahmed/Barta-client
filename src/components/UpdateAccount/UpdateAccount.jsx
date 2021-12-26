@@ -40,9 +40,9 @@ const UpdateAccount = () => {
 	useEffect(() => {
 		let url;
 		if (JSON.parse(sessionStorage.getItem("barta/groupId"))?.groupId) {
-			url = `https://git.heroku.com/barta-the-real-time-chat-app.git/groupAccount/get-profile-img/${groupInfo?.photoId}`;
+			url = `https://barta-the-real-time-chat-app.herokuapp.com/groupAccount/get-profile-img/${groupInfo?.photoId}`;
 		} else {
-			url = `https://git.heroku.com/barta-the-real-time-chat-app.git/user/account/get-profile-img/${userInfo?.photoId}`;
+			url = `https://barta-the-real-time-chat-app.herokuapp.com/user/account/get-profile-img/${userInfo?.photoId}`;
 		}
 		setPhotoIdURL(url);
 	}, [groupInfo, userInfo]);

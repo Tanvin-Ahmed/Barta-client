@@ -60,7 +60,7 @@ export const ChatBarHeader = ({ userPhotoURL, photoId, name }) => {
 							src={
 								userPhotoURL
 									? userPhotoURL
-									: `https://git.heroku.com/barta-the-real-time-chat-app.git/user/account/get-profile-img/${photoId}`
+									: `https://barta-the-real-time-chat-app.herokuapp.com/user/account/get-profile-img/${photoId}`
 							}
 						/>
 						<div className="onLine" />
@@ -141,7 +141,7 @@ export const ChatList = ({
 											src={
 												friend?.photoURL
 													? friend?.photoURL
-													: `https://git.heroku.com/barta-the-real-time-chat-app.git/user/account/get-profile-img/${friend?.photoId}`
+													: `https://barta-the-real-time-chat-app.herokuapp.com/user/account/get-profile-img/${friend?.photoId}`
 											}
 										/>
 										<div
@@ -392,7 +392,7 @@ export const GroupList = ({
 								>
 									<div style={{ position: "relative" }} className="mr-3">
 										<Avatar
-											src={`https://git.heroku.com/barta-the-real-time-chat-app.git/groupAccount/get-profile-img/${group?.photoId}`}
+											src={`https://barta-the-real-time-chat-app.herokuapp.com/groupAccount/get-profile-img/${group?.photoId}`}
 										/>
 										<div
 											className={
@@ -661,7 +661,7 @@ export const SearchFriend = ({
 									size="small"
 								/>
 								<Avatar
-									src={`https://git.heroku.com/barta-the-real-time-chat-app.git/user/account/get-profile-img/${selectedId?.photoId}`}
+									src={`https://barta-the-real-time-chat-app.herokuapp.com/user/account/get-profile-img/${selectedId?.photoId}`}
 								/>
 							</div>
 						))}
@@ -714,7 +714,7 @@ export const SearchFriend = ({
 								>
 									<div className="mr-3">
 										<Avatar
-											src={`https://git.heroku.com/barta-the-real-time-chat-app.git/user/account/get-profile-img/${otherUser?.photoId}`}
+											src={`https://barta-the-real-time-chat-app.herokuapp.com/user/account/get-profile-img/${otherUser?.photoId}`}
 										/>
 									</div>
 									<h6 className="m-4">{otherUser?.displayName}</h6>
@@ -762,7 +762,7 @@ export const FinalProcessToCreateGroup = ({
 								size="small"
 							/>
 							<Avatar
-								src={`https://git.heroku.com/barta-the-real-time-chat-app.git/user/account/get-profile-img/${selectedId?.photoId}`}
+								src={`https://barta-the-real-time-chat-app.herokuapp.com/user/account/get-profile-img/${selectedId?.photoId}`}
 							/>
 						</div>
 					))}

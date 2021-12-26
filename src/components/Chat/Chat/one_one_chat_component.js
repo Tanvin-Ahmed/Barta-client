@@ -97,9 +97,9 @@ export const ChatHeader = ({
 				<Avatar
 					src={
 						receiverInfo?.photoId
-							? `https://git.heroku.com/barta-the-real-time-chat-app.git/user/account/get-profile-img/${receiverInfo?.photoId}`
+							? `https://barta-the-real-time-chat-app.herokuapp.com/user/account/get-profile-img/${receiverInfo?.photoId}`
 							: groupInfo?.photoId &&
-							  `https://git.heroku.com/barta-the-real-time-chat-app.git/groupAccount/get-profile-img/${groupInfo?.photoId}`
+							  `https://barta-the-real-time-chat-app.herokuapp.com/groupAccount/get-profile-img/${groupInfo?.photoId}`
 					}
 				/>
 
@@ -501,7 +501,7 @@ export const ChatBody = ({
 																	key={index}
 																	href={
 																		file?.fileId
-																			? `https://git.heroku.com/barta-the-real-time-chat-app.git/${destination}/file/${file?.filename}`
+																			? `https://barta-the-real-time-chat-app.herokuapp.com/${destination}/file/${file?.filename}`
 																			: file?.base64Img
 																			? file?.base64Img
 																			: file?.url
@@ -512,7 +512,7 @@ export const ChatBody = ({
 																		className="chat__img"
 																		src={
 																			file.fileId
-																				? `https://git.heroku.com/barta-the-real-time-chat-app.git/${destination}/file/${file?.filename}`
+																				? `https://barta-the-real-time-chat-app.herokuapp.com/${destination}/file/${file?.filename}`
 																				: file?.url
 																		}
 																		alt={`${index + 1}`}
@@ -541,7 +541,7 @@ export const ChatBody = ({
 																		className="chat__img"
 																		src={
 																			file.fileId
-																				? `https://git.heroku.com/barta-the-real-time-chat-app.git/${destination}/file/${file?.filename}`
+																				? `https://barta-the-real-time-chat-app.herokuapp.com/${destination}/file/${file?.filename}`
 																				: file?.url
 																		}
 																		controls
@@ -601,7 +601,7 @@ export const ChatBody = ({
 																		className="d-flex justify-content-center align-items-center p-1 my-2 audio_player"
 																		src={
 																			file.fileId
-																				? `https://git.heroku.com/barta-the-real-time-chat-app.git/${destination}/file/${file?.filename}`
+																				? `https://barta-the-real-time-chat-app.herokuapp.com/${destination}/file/${file?.filename}`
 																				: file?.url
 																		}
 																		controls

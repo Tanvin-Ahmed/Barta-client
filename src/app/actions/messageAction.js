@@ -45,10 +45,10 @@ export const sendMessageInDatabase = chat => {
 		let URL;
 		if (JSON.parse(sessionStorage.getItem("barta/groupId"))?.groupId) {
 			URL =
-				"https://git.heroku.com/barta-the-real-time-chat-app.git/groupChat/messages/post";
+				"https://barta-the-real-time-chat-app.herokuapp.com/groupChat/messages/post";
 		} else {
 			URL =
-				"https://git.heroku.com/barta-the-real-time-chat-app.git/chatMessage/postOneOneChat";
+				"https://barta-the-real-time-chat-app.herokuapp.com/chatMessage/postOneOneChat";
 		}
 
 		axios
@@ -111,7 +111,7 @@ export const uploadFiles = chosenFiles => {
 
 		axios
 			.post(
-				`https://git.heroku.com/barta-the-real-time-chat-app.git/${destination}/upload`,
+				`https://barta-the-real-time-chat-app.herokuapp.com/${destination}/upload`,
 				chosenFiles,
 				options
 			)
@@ -172,9 +172,9 @@ export const getMessagesFromDatabase = (data, oldMessage = false) => {
 
 		let URL;
 		if (JSON.parse(sessionStorage.getItem("barta/groupId"))?.groupId) {
-			URL = `https://git.heroku.com/barta-the-real-time-chat-app.git/groupChat/messages/${data?.roomId}`;
+			URL = `https://barta-the-real-time-chat-app.herokuapp.com/groupChat/messages/${data?.roomId}`;
 		} else {
-			URL = `https://git.heroku.com/barta-the-real-time-chat-app.git/chatMessage/getOneOneChat/${data?.roomId}`;
+			URL = `https://barta-the-real-time-chat-app.herokuapp.com/chatMessage/getOneOneChat/${data?.roomId}`;
 		}
 
 		axios
@@ -264,7 +264,7 @@ export const download = filename => {
 	}
 	axios({
 		method: "GET",
-		url: `https://git.heroku.com/barta-the-real-time-chat-app.git/${destination}/file/${filename}`,
+		url: `https://barta-the-real-time-chat-app.herokuapp.com/${destination}/file/${filename}`,
 		responseType: "blob",
 	})
 		.then(({ data }) => {
@@ -286,7 +286,7 @@ export const updateChatMessage = react => {
 	}
 	axios
 		.put(
-			`https://git.heroku.com/barta-the-real-time-chat-app.git/${destination}/updateChatMessage`,
+			`https://barta-the-real-time-chat-app.herokuapp.com/${destination}/updateChatMessage`,
 			react,
 			{
 				headers: {
@@ -308,7 +308,7 @@ export const updatePreReact = react => {
 	}
 	axios
 		.put(
-			`https://git.heroku.com/barta-the-real-time-chat-app.git/${destination}/updateOnlyReact`,
+			`https://barta-the-real-time-chat-app.herokuapp.com/${destination}/updateOnlyReact`,
 			react,
 			{
 				headers: {
@@ -330,7 +330,7 @@ export const deleteReact = react => {
 	}
 	axios
 		.put(
-			`https://git.heroku.com/barta-the-real-time-chat-app.git/${destination}/removeReact`,
+			`https://barta-the-real-time-chat-app.herokuapp.com/${destination}/removeReact`,
 			react,
 			{
 				headers: {
@@ -352,7 +352,7 @@ const deleteChatMessage = id => {
 	}
 	axios
 		.delete(
-			`https://git.heroku.com/barta-the-real-time-chat-app.git/${destination}/deleteChatMessage/${id}`,
+			`https://barta-the-real-time-chat-app.herokuapp.com/${destination}/deleteChatMessage/${id}`,
 			{
 				headers: {
 					Authorization:
@@ -376,7 +376,7 @@ export const deleteChat = message => {
 			const id = message?.files[i].fileId;
 			axios
 				.delete(
-					`https://git.heroku.com/barta-the-real-time-chat-app.git/${destination}/file/delete/${id}`,
+					`https://barta-the-real-time-chat-app.herokuapp.com/${destination}/file/delete/${id}`,
 					{
 						headers: {
 							Authorization:
@@ -500,7 +500,7 @@ export const updateMessageStatus = ids => {
 	}
 	axios
 		.post(
-			`https://git.heroku.com/barta-the-real-time-chat-app.git/${destination}/unseen-message-to-seen`,
+			`https://barta-the-real-time-chat-app.herokuapp.com/${destination}/unseen-message-to-seen`,
 			ids,
 			{
 				headers: {
@@ -588,7 +588,7 @@ export const deleteMessageFromChatBar = (id, chatList, groups) => {
 		groups.forEach(group => {
 			if (group?.lastMessage?._id === id) {
 				axios(
-					`https://git.heroku.com/barta-the-real-time-chat-app.git/groupChat/get-lastMessage-for-chatBar/${group?._id}`,
+					`https://barta-the-real-time-chat-app.herokuapp.com/groupChat/get-lastMessage-for-chatBar/${group?._id}`,
 					{
 						headers: {
 							Authorization:
@@ -609,7 +609,7 @@ export const deleteMessageFromChatBar = (id, chatList, groups) => {
 		chatList.forEach(friend => {
 			if (friend.lastMessage?._id === id) {
 				axios(
-					`https://git.heroku.com/barta-the-real-time-chat-app.git/chatMessage/get-lastMessage-for-chatBar/${friend?.lastMessage?.id}`,
+					`https://barta-the-real-time-chat-app.herokuapp.com/chatMessage/get-lastMessage-for-chatBar/${friend?.lastMessage?.id}`,
 					{
 						headers: {
 							Authorization:
@@ -640,7 +640,7 @@ export const deleteConversation = (roomId, setLoading, setMessage) => {
 	}
 	axios
 		.delete(
-			`https://git.heroku.com/barta-the-real-time-chat-app.git/${destination}/delete-conversation/${roomId}`,
+			`https://barta-the-real-time-chat-app.herokuapp.com/${destination}/delete-conversation/${roomId}`,
 			{
 				headers: {
 					Authorization:
